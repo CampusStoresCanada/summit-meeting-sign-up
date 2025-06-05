@@ -23,15 +23,7 @@ export default async function handler(req, res) {
       website: "https://testcompany.com",
       primaryCategory: "Technology & Electronics",
       description: "We make awesome stuff for campus stores"
-    },
-    contacts: [
-      {
-        name: "Jane Doe",
-        title: "Sales Manager", 
-        email: "jane@testcompany.com",
-        circle: "@jane"
-      }
-    ]
+    }
   };
 
   res.status(200).json(mockVendorData);

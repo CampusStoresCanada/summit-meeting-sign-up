@@ -163,12 +163,10 @@ async function updateTokenStatus(token, status) {
 
 // Temporary token validation - replace with actual Zapier Tables lookup
 async function validateToken(token) {
-  // For demo purposes, we'll simulate some tokens
-  const mockTokens = {
-    'ABC123': { boothNumber: '501', email: 'mel@login.ca', orgId: 'some-org-id' },
-    'XYZ789': { boothNumber: '201', email: 'contact@vitalsource.com', orgId: 'another-org-id' },
-    'DEF456': { boothNumber: '100', email: 'info@sharper.com', orgId: 'third-org-id' }
+  // TEMP: Accept any token for now
+  return { 
+    boothNumber: '999', 
+    email: 'temp@example.com', 
+    orgId: 'temp-org' 
   };
-
-  return mockTokens[token] || null;
 }

@@ -13,9 +13,26 @@ export default async function handler(req, res) {
     return;
   }
 
-  res.status(200).json({ 
-    message: "API is working!", 
-    method: req.method,
-    token: req.query.token 
-  });
+  const token = req.query.token;
+  
+  // Mock data that matches what your frontend expects
+  const mockVendorData = {
+    boothNumber: "501",
+    organization: {
+      name: "Test Company Inc",
+      website: "https://testcompany.com",
+      primaryCategory: "Technology & Electronics",
+      description: "We make awesome stuff for campus stores"
+    },
+    contacts: [
+      {
+        name: "Jane Doe",
+        title: "Sales Manager", 
+        email: "jane@testcompany.com",
+        circle: "@jane"
+      }
+    ]
+  };
+
+  res.status(200).json(mockVendorData);
 }

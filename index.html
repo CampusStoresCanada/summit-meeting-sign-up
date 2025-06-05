@@ -485,15 +485,6 @@
                 document.getElementById('highlightProductName').value = data.organization.highlightProduct.name || '';
                 document.getElementById('highlightProductDescription').value = data.organization.highlightProduct.description || '';
             }
-            
-            // Populate contacts
-            if (data.contacts && data.contacts.length > 0) {
-                data.contacts.forEach(contact => {
-                    addContactRow(contact);
-                });
-            } else {
-                addContactRow(); // Add one empty row
-            }
         }
 
         function addContactRow(contactData = {}) {

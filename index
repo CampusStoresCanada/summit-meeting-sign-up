@@ -379,18 +379,6 @@
                     </div>
                 </div>
 
-                <!-- Contact Information Section -->
-                <div class="section">
-                    <h3>👥 Booth Representatives</h3>
-                    <div class="help-text">Add the people who will be working your booth at the conference</div>
-                    
-                    <div id="contactsContainer">
-                        <!-- Contacts will be populated here -->
-                    </div>
-                    
-                    <button type="button" class="add-contact-btn" onclick="addContactRow()">+ Add Another Contact</button>
-                </div>
-
                 <!-- Resources Section -->
                 <div class="section">
                     <h3>📁 Marketing Materials</h3>

@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/update-vendor-profile.js": {
+      "maxDuration": 30
+    },
+    "api/google-callback.js": {
+      "maxDuration": 30
+    }
+  }
+}

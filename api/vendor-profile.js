@@ -58,13 +58,17 @@ export default async function handler(req, res) {
     
     // Transform Notion data to what your frontend expects
     const vendorData = {
-      boothNumber: "501", // You'll need to add booth assignment logic
+      boothNumber: "501", 
       organization: {
         name: org.properties.Organization?.title?.[0]?.text?.content || '',
         website: org.properties.Website?.url || '',
         primaryCategory: org.properties['Primary Category']?.select?.name || '',
-        description: '' // Add if you have this field
-      }
+        description: ''
+      },
+      // Add the current values for form pre-population:
+      currentCompanyName: org.properties.Organization?.title?.[0]?.text?.content || '',
+      currentWebsite: org.properties.Website?.url || '',
+      currentPrimaryCategory: org.properties['Primary Category']?.select?.name || ''
     };
 
     res.status(200).json(vendorData);

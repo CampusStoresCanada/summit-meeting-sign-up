@@ -21,9 +21,21 @@ export default async function handler(req, res) {
     return;
   }
   
+  // Temporary debugging - let's see what we actually have
+  console.log('🔍 Environment check:');
+  console.log('- NOTION_TOKEN exists:', !!process.env.NOTION_TOKEN);
+  console.log('- NOTION_ORGANIZATIONS_DB_ID exists:', !!process.env.NOTION_ORGANIZATIONS_DB_ID);
+  console.log('- NOTION_CONTACTS_DB_ID exists:', !!process.env.NOTION_CONTACTS_DB_ID);
+  
   const notionToken = process.env.NOTION_TOKEN;
   const organizationsDbId = process.env.NOTION_ORGANIZATIONS_DB_ID;
   const contactsDbId = process.env.NOTION_CONTACTS_DB_ID;
+  
+  if (!notionToken || !organizationsDbId || !contactsDbId) {
+    console.error('❌ Missing environment variables!');
+    res.status(500).json({ error: 'Missing configuration' });
+    return;
+  }
   
   try {
     console.log('🔍 Looking up organization for token:', token);

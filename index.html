@@ -278,6 +278,76 @@
                 margin: 10px;
             }
         }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.2s;
+        }
+        
+        .contact-item:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+        
+        .contact-checkbox {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+        
+        .contact-info {
+            flex-grow: 1;
+        }
+        
+        .contact-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .contact-details {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .primary-contact-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .primary-contact-radio {
+            margin-left: 15px;
+        }
+        
+        .contact-actions {
+            margin-left: 15px;
+        }
+        
+        .edit-contact-btn {
+            background: #ffc107;
+            color: #333;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        .no-contacts-message {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -375,6 +445,60 @@
                             <label for="highlightProductDescription">Description</label>
                             <div class="help-text">Brief description of your highlight</div>
                             <textarea id="highlightProductDescription" name="highlightProductDescription" placeholder="Now tell our members something about it that will make them want to come to your booth. If you don't know for now, leave it blank. We'll be checking in on this one closer to the conference."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <!-- Conference Team Section -->
+                <div class="section">
+                    <h3>👥 Conference Team</h3>
+                    
+                    <div class="help-text" style="margin-bottom: 20px;">
+                        Select who from your team will be attending the conference. Choose ONE person as your primary contact - they'll receive all conference communications and coordinate with their booth team.
+                    </div>
+                    
+                    <div id="contactsLoading" style="display: none; text-align: center; padding: 20px;">
+                        <div style="font-size: 1.2rem;">Loading your team members...</div>
+                    </div>
+                    
+                    <div id="contactsError" style="display: none;" class="error">
+                        <strong>Unable to load team members.</strong> <span id="contactsErrorMessage"></span>
+                    </div>
+                    
+                    <div id="contactsList" style="display: none;">
+                        <!-- Contacts will be populated here by JavaScript -->
+                    </div>
+                    
+                    <div id="addNewContact" style="margin-top: 20px;">
+                        <button type="button" id="addContactBtn" class="add-contact-btn" onclick="showAddContactForm()">
+                            ➕ Add New Team Member
+                        </button>
+                        
+                        <div id="newContactForm" style="display: none; margin-top: 15px; padding: 20px; border: 2px dashed #667eea; border-radius: 8px; background: #f0f4ff;">
+                            <h4>Add New Team Member</h4>
+                            <div class="two-column">
+                                <div class="form-group">
+                                    <label>Full Name *</label>
+                                    <input type="text" id="newContactName" placeholder="Sarah Johnson" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Job Title</label>
+                                    <input type="text" id="newContactTitle" placeholder="Sales Director">
+                                </div>
+                            </div>
+                            <div class="two-column">
+                                <div class="form-group">
+                                    <label>Work Email *</label>
+                                    <input type="email" id="newContactEmail" placeholder="sarah@company.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Work Phone</label>
+                                    <input type="tel" id="newContactPhone" placeholder="+1 (555) 123-4567">
+                                </div>
+                            </div>
+                            <div style="margin-top: 15px;">
+                                <button type="button" onclick="addNewContact()" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-right: 10px;">Add Person</button>
+                                <button type="button" onclick="hideAddContactForm()" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px;">Cancel</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -579,7 +703,233 @@
                 displayElement.innerHTML = '';
             }
         }
-    
+        let organizationContacts = [];
+        let conferenceTeam = []; // People attending the conference
+        
+        // Load organization contacts after vendor data is loaded
+        async function loadOrganizationContacts(token) {
+            console.log('👥 Loading organization contacts...');
+            
+            const contactsLoading = document.getElementById('contactsLoading');
+            const contactsError = document.getElementById('contactsError');
+            const contactsList = document.getElementById('contactsList');
+            
+            contactsLoading.style.display = 'block';
+            contactsError.style.display = 'none';
+            contactsList.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE}/get-organization-contacts?token=${token}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                organizationContacts = data.contacts;
+                
+                console.log(`✅ Loaded ${organizationContacts.length} contacts for ${data.organizationName}`);
+                
+                displayContacts();
+                
+            } catch (error) {
+                console.error('💥 Error loading contacts:', error);
+                contactsLoading.style.display = 'none';
+                contactsError.style.display = 'block';
+                document.getElementById('contactsErrorMessage').textContent = error.message;
+            }
+        }
+        
+        // Display contacts in the UI
+        function displayContacts() {
+            const contactsLoading = document.getElementById('contactsLoading');
+            const contactsList = document.getElementById('contactsList');
+            
+            contactsLoading.style.display = 'none';
+            contactsList.style.display = 'block';
+            
+            if (organizationContacts.length === 0) {
+                contactsList.innerHTML = `
+                    <div class="no-contacts-message">
+                        <p>No team members found in our database.</p>
+                        <p>Use the "Add New Team Member" button below to add your conference team.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let contactsHTML = '<div style="margin-bottom: 15px;"><strong>Select team members attending the conference:</strong></div>';
+            
+            organizationContacts.forEach((contact, index) => {
+                const isAttending = conferenceTeam.some(c => c.id === contact.id);
+                const isPrimary = conferenceTeam.find(c => c.id === contact.id && c.isPrimaryContact);
+                
+                contactsHTML += `
+                    <div class="contact-item">
+                        <input type="checkbox" 
+                               class="contact-checkbox" 
+                               id="contact_${contact.id}" 
+                               ${isAttending ? 'checked' : ''}
+                               onchange="toggleContactAttendance('${contact.id}')">
+                        
+                        <div class="contact-info">
+                            <div class="contact-name">
+                                ${contact.name}
+                                ${isPrimary ? '<span class="primary-contact-badge">Primary Contact</span>' : ''}
+                            </div>
+                            <div class="contact-details">
+                                ${contact.roleTitle} • ${contact.workEmail} ${contact.workPhone ? '• ' + contact.workPhone : ''}
+                            </div>
+                        </div>
+                        
+                        ${isAttending ? `
+                            <div class="primary-contact-radio">
+                                <label style="font-size: 0.9rem; color: #6c757d;">
+                                    <input type="radio" 
+                                           name="primaryContact" 
+                                           value="${contact.id}"
+                                           ${isPrimary ? 'checked' : ''}
+                                           onchange="setPrimaryContact('${contact.id}')">
+                                    Primary
+                                </label>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="contact-actions">
+                            <button type="button" class="edit-contact-btn" onclick="editContact('${contact.id}')">
+                                Edit
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            contactsList.innerHTML = contactsHTML;
+        }
+        
+        // Toggle whether a contact is attending the conference
+        function toggleContactAttendance(contactId) {
+            const contact = organizationContacts.find(c => c.id === contactId);
+            if (!contact) return;
+            
+            const existingIndex = conferenceTeam.findIndex(c => c.id === contactId);
+            
+            if (existingIndex >= 0) {
+                // Remove from conference team
+                conferenceTeam.splice(existingIndex, 1);
+                console.log(`❌ Removed ${contact.name} from conference team`);
+            } else {
+                // Add to conference team
+                conferenceTeam.push({
+                    id: contact.id,
+                    name: contact.name,
+                    workEmail: contact.workEmail,
+                    roleTitle: contact.roleTitle,
+                    isPrimaryContact: false
+                });
+                console.log(`✅ Added ${contact.name} to conference team`);
+            }
+            
+            // If this was the primary contact and they're removed, clear primary status
+            if (existingIndex >= 0 && conferenceTeam.length > 0) {
+                const hadPrimary = conferenceTeam.some(c => c.isPrimaryContact);
+                if (!hadPrimary && conferenceTeam.length > 0) {
+                    // Auto-assign first person as primary if no one else is
+                    conferenceTeam[0].isPrimaryContact = true;
+                }
+            }
+            
+            // If this is the first person added, make them primary
+            if (conferenceTeam.length === 1) {
+                conferenceTeam[0].isPrimaryContact = true;
+            }
+            
+            displayContacts();
+        }
+        
+        // Set primary contact
+        function setPrimaryContact(contactId) {
+            // Clear all primary statuses
+            conferenceTeam.forEach(c => c.isPrimaryContact = false);
+            
+            // Set new primary
+            const contact = conferenceTeam.find(c => c.id === contactId);
+            if (contact) {
+                contact.isPrimaryContact = true;
+                console.log(`👑 Set ${contact.name} as primary contact`);
+            }
+            
+            displayContacts();
+        }
+        
+        // Show add contact form
+        function showAddContactForm() {
+            document.getElementById('newContactForm').style.display = 'block';
+            document.getElementById('addContactBtn').style.display = 'none';
+        }
+        
+        // Hide add contact form
+        function hideAddContactForm() {
+            document.getElementById('newContactForm').style.display = 'none';
+            document.getElementById('addContactBtn').style.display = 'block';
+            
+            // Clear form
+            document.getElementById('newContactName').value = '';
+            document.getElementById('newContactTitle').value = '';
+            document.getElementById('newContactEmail').value = '';
+            document.getElementById('newContactPhone').value = '';
+        }
+        
+        // Add new contact (temporarily, we'll save to Notion later)
+        function addNewContact() {
+            const name = document.getElementById('newContactName').value.trim();
+            const title = document.getElementById('newContactTitle').value.trim();
+            const email = document.getElementById('newContactEmail').value.trim();
+            const phone = document.getElementById('newContactPhone').value.trim();
+            
+            if (!name || !email) {
+                alert('Name and email are required!');
+                return;
+            }
+            
+            // Create temporary contact
+            const newContact = {
+                id: 'temp_' + Date.now(),
+                name: name,
+                firstName: name.split(' ')[0],
+                workEmail: email,
+                workPhone: phone,
+                roleTitle: title,
+                contactType: 'Conference Attendee',
+                tags: [],
+                notes: 'Added during conference registration',
+                isAttending: true,
+                isPrimaryContact: conferenceTeam.length === 0 // First person is primary
+            };
+            
+            // Add to both lists
+            organizationContacts.push(newContact);
+            conferenceTeam.push({
+                id: newContact.id,
+                name: newContact.name,
+                workEmail: newContact.workEmail,
+                roleTitle: newContact.roleTitle,
+                isPrimaryContact: newContact.isPrimaryContact
+            });
+            
+            console.log(`➕ Added new contact: ${name}`);
+            
+            hideAddContactForm();
+            displayContacts();
+        }
+        
+        // Edit contact (placeholder for now)
+        function editContact(contactId) {
+            const contact = organizationContacts.find(c => c.id === contactId);
+            if (contact) {
+                alert(`Edit contact functionality coming soon!\n\nContact: ${contact.name}\nEmail: ${contact.workEmail}`);
+            }
+        }
         // Form submission with S3 upload
         document.getElementById('vendorForm').addEventListener('submit', async (e) => {
             e.preventDefault();

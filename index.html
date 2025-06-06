@@ -602,6 +602,10 @@
                 console.log('✅ Vendor data loaded:', vendorData);
                 
                 populateForm(vendorData);
+                
+                // 👥 NEW: Load organization contacts
+                await loadOrganizationContacts(token);
+                
                 showLoading(false);
                 document.getElementById('profileForm').style.display = 'block';
                 

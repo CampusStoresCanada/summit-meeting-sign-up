@@ -55,14 +55,12 @@ module.exports = async function handler(req, res) {
     
     const org = data.results[0];
     
-    // Get the booth relation and fetch actual booth number
+    // Get the booth number from the relation display text
     const boothRelation = org.properties['26 Booth Number']?.relation?.[0];
     let boothNumber = 'TBD';
     
     if (boothRelation) {
-      console.log('Fetching booth data for ID:', boothRelation.id);
-      
-      // Query the Conference Booth Sales record to get the booth number (title)
+      // The relation might have a title or we need to fetch it to get the display text
       const boothResponse = await fetch(`https://api.notion.com/v1/pages/${boothRelation.id}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -70,33 +68,27 @@ module.exports = async function handler(req, res) {
         }
       });
       
-      console.log('Booth response status:', boothResponse.status);
-      
       if (boothResponse.ok) {
         const boothData = await boothResponse.json();
-        console.log('Booth data properties:', Object.keys(boothData.properties));
-        console.log('Full booth data:', JSON.stringify(boothData.properties, null, 2));
+        console.log('Booth data:', boothData);
         
-        // Try different possible property names for the title
-        boothNumber = boothData.properties.title?.title?.[0]?.text?.content || 
-                      boothData.properties.Name?.title?.[0]?.text?.content || 
-                      boothData.properties.Title?.title?.[0]?.text?.content ||
-                      'TBD';
+        // The booth number should be in the title - extract first 3 digits
+        const titleText = boothData.properties.title?.title?.[0]?.text?.content || '';
+        const boothMatch = titleText.match(/^(\d{1,3})/); // Extract first 1-3 digits at start
+        boothNumber = boothMatch ? boothMatch[1] : 'TBD';
         
         console.log('Extracted booth number:', boothNumber);
       }
-    } else {
-      console.log('No booth relation found for this organization');
     }
-    
-    // Transform Notion data to what your frontend expects
-    const vendorData = {
-      boothNumber: boothNumber,
-      organization: {
-        name: org.properties.Organization?.title?.[0]?.text?.content || '',
-        website: org.properties.Website?.url || '',
-        primaryCategory: org.properties['Primary Category']?.select?.name || '',
-        description: ''
+        
+        // Transform Notion data to what your frontend expects
+        const vendorData = {
+          boothNumber: boothNumber,
+          organization: {
+            name: org.properties.Organization?.title?.[0]?.text?.content || '',
+            website: org.properties.Website?.url || '',
+            primaryCategory: org.properties['Primary Category']?.select?.name || '',
+            description: ''
       }
     };
     

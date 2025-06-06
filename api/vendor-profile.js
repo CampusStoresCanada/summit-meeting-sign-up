@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -101,39 +101,4 @@ const vendorData = {
     console.error('Error fetching vendor data:', error);
     res.status(500).json({ error: 'Failed to load vendor data' });
   }
-}
-const org = data.results[0];
-
-// Get the booth relation and fetch actual booth number
-console.log('Org properties:', org.properties);
-const boothRelation = org.properties['Conference Booth Sales']?.relation?.[0];
-console.log('Booth relation:', boothRelation);
-
-let boothNumber = 'TBD';
-
-if (boothRelation) {
-  console.log('Fetching booth data for ID:', boothRelation.id);
-  
-  // Query the Conference Booth Sales record to get the booth number (title)
-  const boothResponse = await fetch(`https://api.notion.com/v1/pages/${boothRelation.id}`, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Notion-Version': '2022-06-28'
-    }
-  });
-  
-  console.log('Booth response status:', boothResponse.status);
-  
-  if (boothResponse.ok) {
-    const boothData = await boothResponse.json();
-    console.log('Booth data:', boothData);
-    
-    // The booth number is the title of the Conference Booth Sales record
-    boothNumber = boothData.properties['Conference Booth Sales']?.title?.[0]?.text?.content || 'TBD';
-    console.log('Extracted booth number:', boothNumber);
-  } else {
-    console.log('Booth response failed');
-  }
-} else {
-  console.log('No booth relation found');
 }

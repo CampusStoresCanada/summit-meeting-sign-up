@@ -1,4 +1,4 @@
-// api/update-vendor-profile.js - NOW IMPROVED WITH THE FLAVOUR OF URLs.
+// api/update-vendor-profile.js - Now MUCH simpler since files are handled directly!
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -137,23 +137,12 @@ export default async function handler(req, res) {
       };
     }
 
-    // 🎯 Add file URLs from S3 upload results!
-    if (uploadResults) {
-      if (uploadResults.catalogueUrl) {
-        submissionData.properties["Catalogue"] = {
-          url: uploadResults.catalogueUrl
-        };
-        console.log('📄 Added catalogue URL:', uploadResults.catalogueUrl);
-      }
-
-      if (uploadResults.otherFiles && uploadResults.otherFiles.length > 0) {
-        // Create clean S3 folder URL
-        const folderUrl = `https://s3.console.aws.amazon.com/s3/buckets/${process.env.AWS_S3_BUCKET}?prefix=vendors/${org.properties.Organization?.title?.[0]?.text?.content.replace(/[^a-zA-Z0-9 ]/g, '-').replace(/\s+/g, '-')}/docs/`;
-        submissionData.properties["Other Docs"] = {
-          url: folderUrl
-        };
-        console.log('📁 Added docs folder URL:', folderUrl);
-      }
+    // 🎯 Add catalogue URL from S3 upload results!
+    if (uploadResults && uploadResults.catalogueUrl) {
+      submissionData.properties["Catalogue"] = {
+        url: uploadResults.catalogueUrl
+      };
+      console.log('📄 Added catalogue URL:', uploadResults.catalogueUrl);
     }
 
     console.log('💾 Creating Notion submission...');

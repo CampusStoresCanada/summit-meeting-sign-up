@@ -558,6 +558,7 @@
         document.getElementById('vendorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            console.log('🪄 Starting magical form submission...');
             showLoading(true);
             
             try {
@@ -571,40 +572,133 @@
                 
                 // Add all form fields to the object
                 for (let [key, value] of formData.entries()) {
-                    jsonData[key] = value;
+                    if (key.includes('File') && value instanceof File && value.size > 0) {
+                        // Handle file conversion to base64 for JSON transport
+                        jsonData.files = jsonData.files || [];
+                        
+                        const fileContent = await fileToBase64(value);
+                        jsonData.files.push({
+                            name: value.name,
+                            type: value.type,
+                            size: value.size,
+                            content: fileContent
+                        });
+                        
+                        console.log(`📎 Added file: ${value.name} (${(value.size / 1024 / 1024).toFixed(2)} MB)`);
+                    } else if (value) {
+                        jsonData[key] = value;
+                    }
                 }
+                
+                console.log('📤 Sending form data...', Object.keys(jsonData));
                 
                 const response = await fetch(`${API_BASE}/update-vendor-profile`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(jsonData)  // This sends JSON
+                    body: JSON.stringify(jsonData)
                 });
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                showLoading(false);
-                document.getElementById('profileForm').style.display = 'none';
-                document.getElementById('successState').style.display = 'block';
+                const result = await response.json();
+                console.log('✨ Got response:', result);
+                
+                if (result.requiresAuth && result.authUrl) {
+                    console.log('🔐 OAuth required, redirecting to Google...');
+                    showLoading(false);
+                    
+                    // Show user what's happening
+                    const message = document.createElement('div');
+                    message.className = 'current-data';
+                    message.innerHTML = `
+                        <strong>🔐 Authorization Required</strong><br>
+                        We need permission to upload your files to Google Drive. 
+                        You'll be redirected to Google to authorize access.
+                    `;
+                    document.querySelector('.form-container').prepend(message);
+                    
+                    // Small delay so user can read the message
+                    setTimeout(() => {
+                        window.location.href = result.authUrl;
+                    }, 2000);
+                    
+                } else {
+                    // No files, direct success
+                    showLoading(false);
+                    document.getElementById('profileForm').style.display = 'none';
+                    document.getElementById('successState').style.display = 'block';
+                }
                 
             } catch (error) {
+                console.error('💥 Form submission failed:', error);
                 showLoading(false);
                 showError('Failed to update profile. Please try again.');
-                console.error('Submission error:', error);
             }
         });
-
-        function showLoading(show) {
-            document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+        
+        // Helper function to convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    // Remove the data:mime/type;base64, prefix
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = error => reject(error);
+            });
         }
-
-        function showError(message) {
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorState').style.display = 'block';
-        }
+        
+        // Also add this to handle OAuth callback success/error states
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Check for OAuth callback success/error
+            if (urlParams.get('success') === 'true') {
+                console.log('🎉 OAuth callback success!');
+                document.getElementById('profileForm').style.display = 'none';
+                document.getElementById('successState').style.display = 'block';
+                return;
+            }
+            
+            if (urlParams.get('error')) {
+                const error = urlParams.get('error');
+                console.error('❌ OAuth callback error:', error);
+                
+                let errorMessage = 'An error occurred during authorization.';
+                switch (error) {
+                    case 'oauth_denied':
+                        errorMessage = 'Google Drive authorization was denied. Your profile was saved without files.';
+                        break;
+                    case 'oauth_invalid':
+                        errorMessage = 'Invalid authorization response. Please try again.';
+                        break;
+                    case 'token_failed':
+                        errorMessage = 'Failed to get authorization token. Please try again.';
+                        break;
+                    case 'callback_failed':
+                        errorMessage = 'Authorization callback failed. Please try again.';
+                        break;
+                }
+                
+                showError(errorMessage);
+                return;
+            }
+            
+            // Normal page load - continue with existing logic
+            const token = urlParams.get('token');
+            if (!token) {
+                showError('Invalid access link. Please check your email for the correct URL.');
+                return;
+            }
+        
+            loadVendorData(token);
+        });
     </script>
 </body>
 </html>

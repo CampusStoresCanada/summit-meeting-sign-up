@@ -52,7 +52,10 @@ module.exports = async function handler(req, res) {
       res.status(404).json({ error: 'Invalid token' });
       return;
     }
-    
+    console.log('🧪 ENV TEST - NOTION_TOKEN exists:', !!process.env.NOTION_TOKEN);
+    console.log('🧪 ENV TEST - NOTION_ORGANIZATIONS_DB_ID exists:', !!process.env.NOTION_ORGANIZATIONS_DB_ID);
+    console.log('🧪 ENV TEST - First 10 chars of hardcoded token:', accessToken.slice(0, 10));
+
     const org = data.results[0];
     
     // SINGLE SOURCE OF TRUTH: Get booth number from Organization database only
@@ -104,6 +107,3 @@ module.exports = async function handler(req, res) {
     res.status(500).json({ error: 'Failed to load vendor data', details: error.message });
   }
 }
-  console.log('🧪 ENV TEST - NOTION_TOKEN exists:', !!process.env.NOTION_TOKEN);
-  console.log('🧪 ENV TEST - NOTION_ORGANIZATIONS_DB_ID exists:', !!process.env.NOTION_ORGANIZATIONS_DB_ID);
-  console.log('🧪 ENV TEST - First 10 chars of hardcoded token:', accessToken.slice(0, 10));

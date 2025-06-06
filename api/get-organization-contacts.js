@@ -21,21 +21,10 @@ export default async function handler(req, res) {
     return;
   }
   
-  // Temporary debugging - let's see what we actually have
-  console.log('🔍 Environment check:');
-  console.log('- NOTION_TOKEN exists:', !!process.env.NOTION_TOKEN);
-  console.log('- NOTION_ORGANIZATIONS_DB_ID exists:', !!process.env.NOTION_ORGANIZATIONS_DB_ID);
-  console.log('- NOTION_CONTACTS_DB_ID exists:', !!process.env.NOTION_CONTACTS_DB_ID);
-  
-  const notionToken = process.env.NOTION_TOKEN;
-  const organizationsDbId = process.env.NOTION_ORGANIZATIONS_DB_ID;
-  const contactsDbId = process.env.NOTION_CONTACTS_DB_ID;
-  
-  if (!notionToken || !organizationsDbId || !contactsDbId) {
-    console.error('❌ Missing environment variables!');
-    res.status(500).json({ error: 'Missing configuration' });
-    return;
-  }
+  // Hardcode like vendor-profile.js (we'll fix env vars later)
+  const notionToken = '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';
+  const organizationsDbId = '1f9a69bf0cfd80158cb6f021d5c616cd';
+  const contactsDbId = '1f9a69bf0cfd802f9aedd32a6ceff02f';
   
   try {
     console.log('🔍 Looking up organization for token:', token);

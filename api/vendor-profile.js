@@ -56,7 +56,7 @@ module.exports = async function handler(req, res) {
     const org = data.results[0];
     
     // Get the booth relation and fetch actual booth number
-    const boothRelation = org.properties['Conference Booth Sales']?.relation?.[0];
+    const boothRelation = org.properties['26 Booth Number']?.relation?.[0];
     let boothNumber = 'TBD';
     
     if (boothRelation) {

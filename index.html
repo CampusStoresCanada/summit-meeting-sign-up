@@ -595,7 +595,7 @@
         document.getElementById('vendorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            console.log('🚀 Starting S3 form submission...');
+            console.log('🚀 Starting DIRECT S3 form submission...');
             showLoading(true);
             
             try {
@@ -603,16 +603,20 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const token = urlParams.get('token');
                 
-                // Collect all files first
-                const files = [];
+                // Collect file info (NO file content yet!)
+                const fileList = [];
+                const actualFiles = [];
+                
                 for (let [key, value] of formData.entries()) {
                     if (key.includes('File') && value instanceof File && value.size > 0) {
-                        const fileContent = await fileToBase64(value);
-                        files.push({
+                        fileList.push({
                             name: value.name,
                             type: value.type,
                             size: value.size,
-                            content: fileContent,
+                            fieldName: key
+                        });
+                        actualFiles.push({
+                            file: value,
                             fieldName: key
                         });
                         console.log(`📎 Found file: ${value.name} (${(value.size / 1024 / 1024).toFixed(2)} MB) from ${key}`);
@@ -624,32 +628,76 @@
                     otherFiles: []
                 };
         
-                // If we have files, upload them to S3 first
-                if (files.length > 0) {
-                    console.log(`📁 Uploading ${files.length} files to S3...`);
+                // If we have files, upload them DIRECTLY to S3
+                if (fileList.length > 0) {
+                    console.log(`📁 Getting presigned URLs for ${fileList.length} files...`);
                     
-                    const uploadResponse = await fetch(`${API_BASE}/upload-to-s3`, {
+                    // Step 1: Get presigned URLs from our backend (NO FILE DATA!)
+                    const urlResponse = await fetch(`${API_BASE}/get-presigned-urls`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            files: files,
+                            fileList: fileList,
                             organizationName: vendorData.organization?.name || 'Unknown Organization',
                             token: token
                         })
                     });
         
-                    if (!uploadResponse.ok) {
-                        const errorData = await uploadResponse.json();
-                        throw new Error(`Upload failed: ${errorData.error}`);
+                    if (!urlResponse.ok) {
+                        const errorData = await urlResponse.json();
+                        throw new Error(`Failed to get upload URLs: ${errorData.error}`);
                     }
         
-                    const uploadData = await uploadResponse.json();
-                    uploadResults = uploadData.uploadResults;
+                    const urlData = await urlResponse.json();
+                    console.log('🎫 Got presigned URLs!', urlData.uploadUrls.length);
                     
-                    console.log('🎉 S3 upload complete!', uploadResults);
+                    // Step 2: Upload each file DIRECTLY to S3 (bypass Vercel!)
+                    for (let i = 0; i < urlData.uploadUrls.length; i++) {
+                        const urlInfo = urlData.uploadUrls[i];
+                        const fileInfo = actualFiles.find(f => f.fieldName === urlInfo.fieldName);
+                        
+                        if (!fileInfo) {
+                            console.error(`❌ No file found for ${urlInfo.fileName}`);
+                            continue;
+                        }
+                        
+                        try {
+                            console.log(`⬆️ Uploading ${urlInfo.fileName} directly to S3...`);
+                            
+                            const uploadResponse = await fetch(urlInfo.presignedUrl, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': fileInfo.file.type
+                                },
+                                body: fileInfo.file // Raw file, not base64!
+                            });
+                            
+                            if (uploadResponse.ok) {
+                                if (urlInfo.isCatalogue) {
+                                    uploadResults.catalogueUrl = urlInfo.publicUrl;
+                                    console.log(`📄 Catalogue uploaded: ${urlInfo.publicUrl}`);
+                                } else {
+                                    uploadResults.otherFiles.push({
+                                        name: urlInfo.fileName,
+                                        url: urlInfo.publicUrl,
+                                        key: urlInfo.s3Key
+                                    });
+                                    console.log(`📎 Document uploaded: ${urlInfo.fileName}`);
+                                }
+                            } else {
+                                const errorText = await uploadResponse.text();
+                                console.error(`❌ Upload failed for ${urlInfo.fileName}:`, errorText);
+                            }
+                            
+                        } catch (uploadError) {
+                            console.error(`💥 Error uploading ${urlInfo.fileName}:`, uploadError);
+                        }
+                    }
+                    
+                    console.log('🎉 All S3 uploads complete!', uploadResults);
                 }
         
-                // Now submit the form data (with file URLs) to our backend
+                // Step 3: Submit form data (with file URLs) to our backend
                 const jsonData = {
                     token: token,
                     uploadResults: uploadResults
@@ -688,48 +736,7 @@
                 showError('Failed to update profile. Please try again.');
             }
         });
-        
-        // Helper function to convert file to base64 (keep this the same)
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                    // Remove the data:mime/type;base64, prefix
-                    const base64 = reader.result.split(',')[1];
-                    resolve(base64);
-                };
-                reader.onerror = error => reject(error);
-            });
-        }
-        
-        // Also update your DOMContentLoaded handler to be simpler:
-        document.addEventListener('DOMContentLoaded', async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            // Check for success state (no more OAuth callbacks!)
-            if (urlParams.get('success') === 'true') {
-                console.log('🎉 Success!');
-                document.getElementById('profileForm').style.display = 'none';
-                document.getElementById('successState').style.display = 'block';
-                return;
-            }
-            
-            // Normal page load - get token and load vendor data
-            const token = urlParams.get('token');
-            if (!token) {
-                showError('Invalid access link. Please check your email for the correct URL.');
-                return;
-            }
-        
-            try {
-                console.log('🪄 Loading vendor data for token:', token);
-                await loadVendorData(token);
-            } catch (error) {
-                console.error('Error loading vendor data:', error);
-                showError('Unable to load your profile information. Please try again later.');
-            }
-        });
+    
           function showLoading(show) {
             document.getElementById('loadingState').style.display = show ? 'block' : 'none';
         }

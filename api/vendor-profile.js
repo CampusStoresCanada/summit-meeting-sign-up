@@ -89,7 +89,19 @@ module.exports = async function handler(req, res) {
       currentWebsite: org.properties.Website?.url || '',
       currentPrimaryCategory: org.properties['Primary Category']?.select?.name || ''
     };
-    
+   if (boothResponse.ok) {
+  const boothData = await boothResponse.json();
+  console.log('Booth data properties:', Object.keys(boothData.properties));
+  console.log('Full booth data:', JSON.stringify(boothData.properties, null, 2));
+  
+  // Try different possible property names for the title
+  boothNumber = boothData.properties.Name?.title?.[0]?.text?.content || 
+                boothData.properties.Title?.title?.[0]?.text?.content ||
+                boothData.properties['Conference Booth Sales']?.title?.[0]?.text?.content || 
+                'TBD';
+  
+  console.log('Extracted booth number:', boothNumber);
+} 
     res.status(200).json(vendorData);
     
   } catch (error) {

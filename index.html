@@ -618,16 +618,20 @@
                             name: value.name,
                             type: value.type,
                             size: value.size,
-                            content: fileContent
+                            content: fileContent,
+                            fieldName: key  // 🎯 ADD THIS! Tells us which field this file came from
                         });
                         
-                        console.log(`📎 Added file: ${value.name} (${(value.size / 1024 / 1024).toFixed(2)} MB)`);
-                    } else if (value) {
+                        console.log(`📎 Added file: ${value.name} from field: ${key} (${(value.size / 1024 / 1024).toFixed(2)} MB)`);
+                    } else if (value && typeof value === 'string') {
                         jsonData[key] = value;
                     }
                 }
                 
-                console.log('📤 Sending form data...', Object.keys(jsonData));
+                console.log('📤 Sending form data...', {
+                    fields: Object.keys(jsonData).filter(k => k !== 'files'),
+                    fileCount: (jsonData.files || []).length
+                });
                 
                 const response = await fetch(`${API_BASE}/update-vendor-profile`, {
                     method: 'POST',

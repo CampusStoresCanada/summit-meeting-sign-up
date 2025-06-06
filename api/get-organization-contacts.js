@@ -59,15 +59,14 @@ export default async function handler(req, res) {
     
     const org = orgData.results[0];
     const organizationName = org.properties.Organization?.title?.[0]?.text?.content || '';
+    const organizationId = org.id; // This is the key! Use the relation ID
     
     console.log('🏢 Found organization:', organizationName);
-    console.log('🔍 Organization ID:', org.id);
-    console.log('📋 Organization properties:', Object.keys(org.properties));
+    console.log('🔍 Organization ID for relation:', organizationId);
     
-    // Step 2: Get all contacts for this organization
+    // Step 2: Get contacts where Organization relation = this org ID
     console.log('👥 Fetching contacts for organization...');
     
-    // Let's try a simpler query first to test the database access
     const contactsResponse = await fetch(`https://api.notion.com/v1/databases/${contactsDbId}/query`, {
       method: 'POST',
       headers: {
@@ -76,8 +75,12 @@ export default async function handler(req, res) {
         'Notion-Version': '2022-06-28'
       },
       body: JSON.stringify({
-        // Start with NO filter to test basic access
-        page_size: 5
+        filter: {
+          property: 'Organization',
+          relation: {
+            contains: organizationId
+          }
+        }
       })
     });
     

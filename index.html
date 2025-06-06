@@ -559,11 +559,23 @@
             try {
                 const formData = new FormData(e.target);
                 const urlParams = new URLSearchParams(window.location.search);
-                formData.append('token', urlParams.get('token'));
+                
+                // Convert FormData to a regular object
+                const jsonData = {
+                    token: urlParams.get('token')
+                };
+                
+                // Add all form fields to the object
+                for (let [key, value] of formData.entries()) {
+                    jsonData[key] = value;
+                }
                 
                 const response = await fetch(`${API_BASE}/update-vendor-profile`, {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)  // This sends JSON
                 });
                 
                 if (!response.ok) {

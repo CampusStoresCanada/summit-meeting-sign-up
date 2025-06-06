@@ -827,6 +827,14 @@
             
             return multipartBytes;
         }
+          function showLoading(show) {
+            document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorState').style.display = 'block';
+        }
     </script>
 </body>
 </html>

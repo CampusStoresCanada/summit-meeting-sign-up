@@ -464,47 +464,16 @@
 
         function populateForm(data) {
             // Update booth info
-            document.getElementById('boothNumber').textContent = `Booth ${data.boothNumber}`;
-            console.log('Full org properties:', JSON.stringify(org.properties, null, 2));
-
-            const boothRelation = org.properties['Conference Booth Sales']?.relation?.[0];
-            console.log('Booth relation found:', boothRelation);
+            function populateForm(data) {
+                // Update booth info
+                document.getElementById('boothNumber').textContent = `Booth ${data.boothNumber}`;
             
-            let boothNumber = 'TBD';
-            
-            if (boothRelation) {
-              console.log('Fetching booth data for ID:', boothRelation.id);
-              
-              // Query the Conference Booth Sales record to get the booth number (title)
-              const boothResponse = await fetch(`https://api.notion.com/v1/pages/${boothRelation.id}`, {
-                headers: {
-                  'Authorization': `Bearer ${accessToken}`,
-                  'Notion-Version': '2022-06-28'
-                }
-              });
-              
-              console.log('Booth response status:', boothResponse.status);
-              
-              if (boothResponse.ok) {
-                const boothData = await boothResponse.json();
-                console.log('Booth data properties:', JSON.stringify(boothData.properties, null, 2));
-                
-                // The booth number is the title of the Conference Booth Sales record
-                boothNumber = boothData.properties['Conference Booth Sales']?.title?.[0]?.text?.content || 'TBD';
-                console.log('Extracted booth number:', boothNumber);
-              } else {
-                console.log('Booth response failed with status:', boothResponse.status);
-              }
-            } else {
-              console.log('No booth relation found for this organization');
+                // Populate current company data
+                document.getElementById('companyNameValue').textContent = data.organization?.name || 'No company name on file';
+                document.getElementById('companyName').value = data.organization?.name || '';
+                document.getElementById('websiteValue').textContent = data.organization?.website || 'No website on file';
+                document.getElementById('websiteUrl').value = data.organization?.website || '';
             }
-            
-            // Populate current company data
-            document.getElementById('companyNameValue').textContent = data.organization?.name || 'No company name on file';
-            document.getElementById('companyName').value = data.organization?.name || '';
-            document.getElementById('websiteValue').textContent = data.organization?.website || 'No website on file';
-            document.getElementById('websiteUrl').value = data.organization?.website || '';
-            
             // Pre-select category if exists
             if (data.organization?.primaryCategory) {
                 document.getElementById('primaryCategory').value = data.organization.primaryCategory;

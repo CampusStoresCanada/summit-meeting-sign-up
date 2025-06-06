@@ -591,11 +591,11 @@
             }
         }
     
-        // Form submission with OAuth magic
+        // Form submission with S3 upload
         document.getElementById('vendorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            console.log('🚀 Starting DIRECT UPLOAD form submission...');
+            console.log('🚀 Starting S3 form submission...');
             showLoading(true);
             
             try {
@@ -607,10 +607,13 @@
                 const files = [];
                 for (let [key, value] of formData.entries()) {
                     if (key.includes('File') && value instanceof File && value.size > 0) {
+                        const fileContent = await fileToBase64(value);
                         files.push({
-                            file: value,
-                            fieldName: key,
-                            isCatalogue: key === 'catalogFile'
+                            name: value.name,
+                            type: value.type,
+                            size: value.size,
+                            content: fileContent,
+                            fieldName: key
                         });
                         console.log(`📎 Found file: ${value.name} (${(value.size / 1024 / 1024).toFixed(2)} MB) from ${key}`);
                     }
@@ -618,121 +621,35 @@
         
                 let uploadResults = {
                     catalogueUrl: null,
-                    folderUrl: null,
-                    uploadedFiles: []
+                    otherFiles: []
                 };
         
-                // If we have files, upload them directly to Google Drive
+                // If we have files, upload them to S3 first
                 if (files.length > 0) {
-                    console.log(`📁 Need to upload ${files.length} files...`);
+                    console.log(`📁 Uploading ${files.length} files to S3...`);
                     
-                    // Get upload token and folder
-                    const tokenResponse = await fetch(`${API_BASE}/get-upload-token`, {
+                    const uploadResponse = await fetch(`${API_BASE}/upload-to-s3`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            token: token,
-                            organizationName: vendorData.organization?.name || 'Unknown Organization'
+                            files: files,
+                            organizationName: vendorData.organization?.name || 'Unknown Organization',
+                            token: token
                         })
                     });
         
-                    if (!tokenResponse.ok) {
-                        throw new Error('Failed to get upload token');
+                    if (!uploadResponse.ok) {
+                        const errorData = await uploadResponse.json();
+                        throw new Error(`Upload failed: ${errorData.error}`);
                     }
         
-                    const tokenData = await tokenResponse.json();
+                    const uploadData = await uploadResponse.json();
+                    uploadResults = uploadData.uploadResults;
                     
-                    if (tokenData.requiresAuth) {
-                        console.log('🔐 OAuth required, redirecting...');
-                        showLoading(false);
-                        
-                        const message = document.createElement('div');
-                        message.className = 'current-data';
-                        message.innerHTML = `
-                            <strong>🔐 Authorization Required</strong><br>
-                            We need permission to upload your files to Google Drive. 
-                            You'll be redirected to Google to authorize access.
-                        `;
-                        document.querySelector('.form-container').prepend(message);
-                        
-                        setTimeout(() => {
-                            window.location.href = tokenData.authUrl;
-                        }, 2000);
-                        return;
-                    }
-        
-                    console.log('🎫 Got upload token! Uploading files directly...');
-                    
-                    // Upload each file directly to Google Drive
-                    for (const fileInfo of files) {
-                        try {
-                            console.log(`⬆️ Uploading ${fileInfo.file.name} directly to Drive...`);
-                            
-                            const fileMetadata = {
-                                name: fileInfo.file.name,
-                                parents: [tokenData.folderId]
-                            };
-        
-                            // Create multipart upload
-                            const boundary = 'boundary_' + Math.random().toString(36).substr(2, 9);
-                            const multipartBody = await createMultipartUpload(fileMetadata, fileInfo.file, boundary);
-        
-                            const uploadResponse = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                                method: 'POST',
-                                headers: {
-                                    'Authorization': `Bearer ${tokenData.uploadToken}`,
-                                    'Content-Type': `multipart/related; boundary="${boundary}"`
-                                },
-                                body: multipartBody
-                            });
-        
-                            if (uploadResponse.ok) {
-                                const fileResult = await uploadResponse.json();
-                                
-                                // Make file shareable
-                                await fetch(`https://www.googleapis.com/drive/v3/files/${fileResult.id}/permissions`, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Authorization': `Bearer ${tokenData.uploadToken}`,
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        role: 'reader',
-                                        type: 'anyone'
-                                    })
-                                });
-                                
-                                const fileUrl = `https://drive.google.com/file/d/${fileResult.id}/view`;
-                                
-                                if (fileInfo.isCatalogue) {
-                                    uploadResults.catalogueUrl = fileUrl;
-                                    console.log(`📄 Catalogue uploaded: ${fileUrl}`);
-                                }
-                                
-                                uploadResults.uploadedFiles.push({
-                                    name: fileInfo.file.name,
-                                    url: fileUrl,
-                                    id: fileResult.id,
-                                    fieldName: fileInfo.fieldName
-                                });
-                                
-                                console.log(`✅ Successfully uploaded: ${fileInfo.file.name}`);
-                                
-                            } else {
-                                const errorText = await uploadResponse.text();
-                                console.error(`❌ Upload failed for ${fileInfo.file.name}:`, errorText);
-                            }
-                            
-                        } catch (uploadError) {
-                            console.error(`💥 Error uploading ${fileInfo.file.name}:`, uploadError);
-                        }
-                    }
-        
-                    uploadResults.folderUrl = tokenData.folderUrl;
-                    console.log('🎉 All uploads complete!', uploadResults);
+                    console.log('🎉 S3 upload complete!', uploadResults);
                 }
         
-                // Now submit the form data (without files) to our backend
+                // Now submit the form data (with file URLs) to our backend
                 const jsonData = {
                     token: token,
                     uploadResults: uploadResults
@@ -754,7 +671,8 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    const errorData = await response.json();
+                    throw new Error(`Backend error: ${errorData.error}`);
                 }
                 
                 const result = await response.json();
@@ -771,62 +689,47 @@
             }
         });
         
-        // Helper function to create multipart upload body
-        async function createMultipartUpload(metadata, file, boundary) {
-            const delimiter = `--${boundary}`;
-            const closeDelimiter = `--${boundary}--`;
-            
-            // Convert file to array buffer
-            const fileArrayBuffer = await file.arrayBuffer();
-            const fileBytes = new Uint8Array(fileArrayBuffer);
-            
-            // Create multipart body as Uint8Array
-            const textEncoder = new TextEncoder();
-            
-            // Metadata part
-            const metadataPart = [
-                delimiter,
-                'Content-Type: application/json',
-                '',
-                JSON.stringify(metadata),
-                ''
-            ].join('\r\n');
-            
-            // File part header
-            const filePartHeader = [
-                delimiter,
-                `Content-Type: ${file.type}`,
-                '',
-                ''
-            ].join('\r\n');
-            
-            const closeDelimiterPart = '\r\n' + closeDelimiter;
-            
-            // Combine all parts
-            const metadataBytes = textEncoder.encode(metadataPart);
-            const fileHeaderBytes = textEncoder.encode(filePartHeader);
-            const closeBytes = textEncoder.encode(closeDelimiterPart);
-            
-            // Calculate total length
-            const totalLength = metadataBytes.length + fileHeaderBytes.length + fileBytes.length + closeBytes.length;
-            
-            // Create final array
-            const multipartBytes = new Uint8Array(totalLength);
-            let offset = 0;
-            
-            multipartBytes.set(metadataBytes, offset);
-            offset += metadataBytes.length;
-            
-            multipartBytes.set(fileHeaderBytes, offset);
-            offset += fileHeaderBytes.length;
-            
-            multipartBytes.set(fileBytes, offset);
-            offset += fileBytes.length;
-            
-            multipartBytes.set(closeBytes, offset);
-            
-            return multipartBytes;
+        // Helper function to convert file to base64 (keep this the same)
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    // Remove the data:mime/type;base64, prefix
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = error => reject(error);
+            });
         }
+        
+        // Also update your DOMContentLoaded handler to be simpler:
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Check for success state (no more OAuth callbacks!)
+            if (urlParams.get('success') === 'true') {
+                console.log('🎉 Success!');
+                document.getElementById('profileForm').style.display = 'none';
+                document.getElementById('successState').style.display = 'block';
+                return;
+            }
+            
+            // Normal page load - get token and load vendor data
+            const token = urlParams.get('token');
+            if (!token) {
+                showError('Invalid access link. Please check your email for the correct URL.');
+                return;
+            }
+        
+            try {
+                console.log('🪄 Loading vendor data for token:', token);
+                await loadVendorData(token);
+            } catch (error) {
+                console.error('Error loading vendor data:', error);
+                showError('Unable to load your profile information. Please try again later.');
+            }
+        });
           function showLoading(show) {
             document.getElementById('loadingState').style.display = show ? 'block' : 'none';
         }

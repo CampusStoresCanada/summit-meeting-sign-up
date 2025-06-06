@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
   if (req.method !== 'GET') {
     res.status(405).json({ error: `Method ${req.method} not allowed, expected GET` });
-    return;
+    return;åç
   }
 
   const token = req.query.token;
@@ -58,7 +58,31 @@ export default async function handler(req, res) {
     
     // Transform Notion data to what your frontend expects
     const vendorData = {
-      boothNumber: "501", 
+      const org = data.results[0];
+
+      // Get the booth relation and fetch actual booth number
+      const boothRelation = org.properties['Conference Booth Sales']?.relation?.[0];
+      let boothNumber = 'TBD';
+      
+      if (boothRelation) {
+        // Query the Conference Booth Sales record to get the booth number (title)
+        const boothResponse = await fetch(`https://api.notion.com/v1/pages/${boothRelation.id}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Notion-Version': '2022-06-28'
+          }
+        });
+        
+        if (boothResponse.ok) {
+          const boothData = await boothResponse.json();
+          // The booth number is the title of the Conference Booth Sales record
+          boothNumber = boothData.properties['Conference Booth Sales']?.title?.[0]?.text?.content || 'TBD';
+        }
+      }
+
+// Transform Notion data to what your frontend expects
+const vendorData = {
+  boothNumber: boothNumber, // <-- Now uses real booth number!
       organization: {
         name: org.properties.Organization?.title?.[0]?.text?.content || '',
         website: org.properties.Website?.url || '',

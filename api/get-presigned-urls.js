@@ -46,12 +46,12 @@ export default async function handler(req, res) {
         const fileName = fileInfo.name.replace(/[^a-zA-Z0-9.-]/g, '_');
         const s3Key = `${folderPath}${isCatalogueFile ? 'catalogue/' : 'docs/'}${fileName}`;
         
-        // Create presigned URL for upload
+        // Create presigned URL for upload (no ACL needed!)
         const command = new PutObjectCommand({
           Bucket: process.env.AWS_S3_BUCKET,
           Key: s3Key,
-          ContentType: fileInfo.type,
-          ACL: 'public-read'
+          ContentType: fileInfo.type
+          // Removed ACL - bucket policy will handle public access
         });
         
         const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // 1 hour

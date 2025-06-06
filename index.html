@@ -463,17 +463,17 @@
         }
 
         function populateForm(data) {
-            // Update booth info
-            function populateForm(data) {
-                // Update booth info
-                document.getElementById('boothNumber').textContent = `Booth ${data.boothNumber}`;
+            console.log('populateForm called with:', data);
             
-                // Populate current company data
-                document.getElementById('companyNameValue').textContent = data.organization?.name || 'No company name on file';
-                document.getElementById('companyName').value = data.organization?.name || '';
-                document.getElementById('websiteValue').textContent = data.organization?.website || 'No website on file';
-                document.getElementById('websiteUrl').value = data.organization?.website || '';
-            }
+            // Update booth info
+            document.getElementById('boothNumber').textContent = `Booth ${data.boothNumber}`;
+        
+            // Populate current company data
+            document.getElementById('companyNameValue').textContent = data.organization?.name || 'No company name on file';
+            document.getElementById('companyName').value = data.organization?.name || '';
+            document.getElementById('websiteValue').textContent = data.organization?.website || 'No website on file';
+            document.getElementById('websiteUrl').value = data.organization?.website || '';
+            
             // Pre-select category if exists
             if (data.organization?.primaryCategory) {
                 document.getElementById('primaryCategory').value = data.organization.primaryCategory;

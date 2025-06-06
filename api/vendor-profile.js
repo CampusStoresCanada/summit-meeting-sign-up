@@ -7,19 +7,18 @@ module.exports = async function handler(req, res) {
     res.status(200).end();
     return;
   }
-
   if (req.method !== 'GET') {
     res.status(405).json({ error: `Method ${req.method} not allowed, expected GET` });
-    return;åç
+    return; // <-- Fixed: removed åç
   }
-
+  
   const token = req.query.token;
   
   if (!token) {
     res.status(400).json({ error: 'Token is required' });
     return;
   }
-
+  
   // Notion API setup
   const accessToken = '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';
   const databaseId = '1f9a69bf0cfd80158cb6f021d5c616cd';
@@ -42,47 +41,43 @@ module.exports = async function handler(req, res) {
         }
       })
     });
-
+    
     if (!response.ok) {
       throw new Error(`Notion API error: ${response.status}`);
     }
-
+    
     const data = await response.json();
     
     if (data.results.length === 0) {
       res.status(404).json({ error: 'Invalid token' });
       return;
     }
-
+    
     const org = data.results[0];
+    
+    // Get the booth relation and fetch actual booth number
+    const boothRelation = org.properties['Conference Booth Sales']?.relation?.[0];
+    let boothNumber = 'TBD';
+    
+    if (boothRelation) {
+      // Query the Conference Booth Sales record to get the booth number (title)
+      const boothResponse = await fetch(`https://api.notion.com/v1/pages/${boothRelation.id}`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Notion-Version': '2022-06-28'
+        }
+      });
+      
+      if (boothResponse.ok) {
+        const boothData = await boothResponse.json();
+        // The booth number is the title of the Conference Booth Sales record
+        boothNumber = boothData.properties['Conference Booth Sales']?.title?.[0]?.text?.content || 'TBD';
+      }
+    }
     
     // Transform Notion data to what your frontend expects
     const vendorData = {
-      const org = data.results[0];
-
-      // Get the booth relation and fetch actual booth number
-      const boothRelation = org.properties['Conference Booth Sales']?.relation?.[0];
-      let boothNumber = 'TBD';
-      
-      if (boothRelation) {
-        // Query the Conference Booth Sales record to get the booth number (title)
-        const boothResponse = await fetch(`https://api.notion.com/v1/pages/${boothRelation.id}`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Notion-Version': '2022-06-28'
-          }
-        });
-        
-        if (boothResponse.ok) {
-          const boothData = await boothResponse.json();
-          // The booth number is the title of the Conference Booth Sales record
-          boothNumber = boothData.properties['Conference Booth Sales']?.title?.[0]?.text?.content || 'TBD';
-        }
-      }
-
-// Transform Notion data to what your frontend expects
-const vendorData = {
-  boothNumber: boothNumber, // <-- Now uses real booth number!
+      boothNumber: boothNumber,
       organization: {
         name: org.properties.Organization?.title?.[0]?.text?.content || '',
         website: org.properties.Website?.url || '',
@@ -94,7 +89,7 @@ const vendorData = {
       currentWebsite: org.properties.Website?.url || '',
       currentPrimaryCategory: org.properties['Primary Category']?.select?.name || ''
     };
-
+    
     res.status(200).json(vendorData);
     
   } catch (error) {

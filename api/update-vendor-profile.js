@@ -1,4 +1,3 @@
-// api/update-vendor-profile.js
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -14,24 +13,11 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Use the new vendor portal OAuth token
-  const accessToken = process.env.NOTION_VENDOR_TOKEN;
-  const headers = {
-    'Authorization': `Bearer ${accessToken}`,
-    'Content-Type': 'application/json',
-    'Notion-Version': '2022-06-28'
-  };
-
+  const accessToken = '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';
+  const submissionsDbId = '209a69bf0cfd80afa65dcf0575c9224f';
+  
   try {
-    // Parse form data (handles both JSON and FormData)
-    let formData;
-    if (req.headers['content-type']?.includes('application/json')) {
-      formData = req.body;
-    } else {
-      // Handle FormData from file uploads
-      formData = req.body;
-    }
-
+    const formData = req.body;
     const { token } = formData;
     
     if (!token) {
@@ -39,45 +25,65 @@ export default async function handler(req, res) {
       return;
     }
 
-    console.log(`Updating vendor profile for token: ${token}`);
+    console.log(`Creating submission for token: ${token}`);
 
-    // Step 1: Validate token
-    const tokenData = await validateToken(token);
-    if (!tokenData) {
-      res.status(404).json({ error: 'Invalid or expired token' });
+    // First, get the booth number from the original organization
+    const orgResponse = await fetch(`https://api.notion.com/v1/databases/1f9a69bf0cfd80158cb6f021d5c616cd/query`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({
+        filter: {
+          property: 'Token',
+          rich_text: {
+            equals: token
+          }
+        }
+      })
+    });
+
+    if (!orgResponse.ok) {
+      throw new Error(`Failed to lookup organization: ${orgResponse.status}`);
+    }
+
+    const orgData = await orgResponse.json();
+    if (orgData.results.length === 0) {
+      res.status(404).json({ error: 'Invalid token' });
       return;
     }
 
-    // Step 2: Create submission record in "Vendor Profile Submissions" database
-    // You'll need to create this database first with the appropriate fields
+    // Create submission record
     const submissionData = {
       parent: { 
-        database_id: "VENDOR_SUBMISSIONS_DATABASE_ID" // Replace with actual database ID
+        database_id: submissionsDbId
       },
       properties: {
         "Token": {
-          rich_text: [{ text: { content: token } }]
+          title: [{ text: { content: token } }]
         },
         "Booth Number": {
-          rich_text: [{ text: { content: tokenData.boothNumber } }]
+          rich_text: [{ text: { content: "501" } }] // TODO: Get real booth number
         },
         "Submission Date": {
-          date: { start: new Date().toISOString() }
+          date: { start: new Date().toISOString().split('T')[0] } // Today's date
         },
         "Status": {
-          select: { name: "Pending Review" }
+          status: { name: "Pending Review" }
         },
         "Company Name": {
           rich_text: [{ text: { content: formData.companyName || '' } }]
         },
+        "Company Description": {
+          rich_text: [{ text: { content: formData.companyDescription || '' } }]
+        },
         "Primary Category": {
-          select: { name: formData.primaryCategory || '' }
+          select: formData.primaryCategory ? { name: formData.primaryCategory } : null
         },
         "Website URL": {
           url: formData.websiteUrl || null
-        },
-        "Company Description": {
-          rich_text: [{ text: { content: formData.companyDescription || '' } }]
         },
         "Highlight Product Name": {
           rich_text: [{ text: { content: formData.highlightProductName || '' } }]
@@ -88,38 +94,14 @@ export default async function handler(req, res) {
       }
     };
 
-    // Step 3: Process contacts data
-    const contacts = [];
-    Object.keys(formData).forEach(key => {
-      if (key.startsWith('contacts[')) {
-        const match = key.match(/contacts\[([^\]]+)\]\[([^\]]+)\]/);
-        if (match) {
-          const [, contactId, field] = match;
-          if (!contacts[contactId]) contacts[contactId] = {};
-          contacts[contactId][field] = formData[key];
-        }
-      }
-    });
-
-    // Add contacts to submission
-    if (Object.keys(contacts).length > 0) {
-      const contactsText = Object.values(contacts)
-        .filter(contact => contact.name) // Only include contacts with names
-        .map(contact => 
-          `${contact.name} (${contact.title || 'No title'}) - ${contact.email || 'No email'} - Circle: ${contact.circle || 'None'}`
-        )
-        .join('\n');
-      
-      submissionData.properties["Contacts"] = {
-        rich_text: [{ text: { content: contactsText } }]
-      };
-    }
-
-    // Step 4: Submit to Notion
     console.log('Creating submission record...');
     const submissionResponse = await fetch('https://api.notion.com/v1/pages', {
       method: 'POST',
-      headers,
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
       body: JSON.stringify(submissionData)
     });
 
@@ -132,17 +114,10 @@ export default async function handler(req, res) {
     const submission = await submissionResponse.json();
     console.log(`Created submission record: ${submission.id}`);
 
-    // Step 5: Update token status to "completed"
-    await updateTokenStatus(token, 'completed');
-
-    // Step 6: TODO - Handle file uploads to Notion
-    // Files would need to be processed and attached to the submission record
-    // This requires additional handling for multipart/form-data
-
     res.status(200).json({
       success: true,
       submissionId: submission.id,
-      message: 'Profile updated successfully and is now under review'
+      message: 'Company profile updated successfully! We\'ll send you a separate link to register your booth staff in a couple weeks.'
     });
     
   } catch (error) {
@@ -152,21 +127,4 @@ export default async function handler(req, res) {
       details: error.message 
     });
   }
-}
-
-// Update token status in Zapier Tables
-async function updateTokenStatus(token, status) {
-  // This would update the status in Zapier Tables
-  // For now, just log it
-  console.log(`Token ${token} status updated to: ${status}`);
-}
-
-// Temporary token validation - replace with actual Zapier Tables lookup
-async function validateToken(token) {
-  // TEMP: Accept any token for now
-  return { 
-    boothNumber: '999', 
-    email: 'temp@example.com', 
-    orgId: 'temp-org' 
-  };
 }

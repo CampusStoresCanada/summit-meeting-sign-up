@@ -9,7 +9,7 @@ module.exports = async function handler(req, res) {
   }
   if (req.method !== 'GET') {
     res.status(405).json({ error: `Method ${req.method} not allowed, expected GET` });
-    return; // <-- Fixed: removed åç
+    return; //
   }
   
   const token = req.query.token;

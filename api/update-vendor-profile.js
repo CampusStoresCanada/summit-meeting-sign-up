@@ -17,45 +17,20 @@ export default async function handler(req, res) {
   const submissionsDbId = '209a69bf0cfd80afa65dcf0575c9224f';
   
   try {
+    console.log('Request body:', req.body);
+    
     const formData = req.body;
     const { token } = formData;
     
     if (!token) {
+      console.log('No token provided');
       res.status(400).json({ error: 'Token is required' });
       return;
     }
 
-    console.log(`Creating submission for token: ${token}`);
+    console.log(`Processing submission for token: ${token}`);
 
-    // First, get the booth number from the original organization
-    const orgResponse = await fetch(`https://api.notion.com/v1/databases/1f9a69bf0cfd80158cb6f021d5c616cd/query`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28'
-      },
-      body: JSON.stringify({
-        filter: {
-          property: 'Token',
-          rich_text: {
-            equals: token
-          }
-        }
-      })
-    });
-
-    if (!orgResponse.ok) {
-      throw new Error(`Failed to lookup organization: ${orgResponse.status}`);
-    }
-
-    const orgData = await orgResponse.json();
-    if (orgData.results.length === 0) {
-      res.status(404).json({ error: 'Invalid token' });
-      return;
-    }
-
-    // Create submission record
+    // Skip the organization lookup for now - just create the submission
     const submissionData = {
       parent: { 
         database_id: submissionsDbId
@@ -65,36 +40,32 @@ export default async function handler(req, res) {
           title: [{ text: { content: token } }]
         },
         "Booth Number": {
-          rich_text: [{ text: { content: "501" } }] // TODO: Get real booth number
+          rich_text: [{ text: { content: "501" } }]
         },
         "Submission Date": {
-          date: { start: new Date().toISOString().split('T')[0] } // Today's date
+          date: { start: new Date().toISOString().split('T')[0] }
         },
         "Status": {
           status: { name: "Pending Review" }
-        },
-        "Company Name": {
-          rich_text: [{ text: { content: formData.companyName || '' } }]
-        },
-        "Company Description": {
-          rich_text: [{ text: { content: formData.companyDescription || '' } }]
-        },
-        "Primary Category": {
-          select: formData.primaryCategory ? { name: formData.primaryCategory } : null
-        },
-        "Website URL": {
-          url: formData.websiteUrl || null
-        },
-        "Highlight Product Name": {
-          rich_text: [{ text: { content: formData.highlightProductName || '' } }]
-        },
-        "Highlight Product Description": {
-          rich_text: [{ text: { content: formData.highlightProductDescription || '' } }]
         }
       }
     };
 
-    console.log('Creating submission record...');
+    // Add form fields if they exist
+    if (formData.companyName) {
+      submissionData.properties["Company Name"] = {
+        rich_text: [{ text: { content: formData.companyName } }]
+      };
+    }
+
+    if (formData.primaryCategory) {
+      submissionData.properties["Primary Category"] = {
+        select: { name: formData.primaryCategory }
+      };
+    }
+
+    console.log('Submission data:', JSON.stringify(submissionData, null, 2));
+
     const submissionResponse = await fetch('https://api.notion.com/v1/pages', {
       method: 'POST',
       headers: {
@@ -105,26 +76,30 @@ export default async function handler(req, res) {
       body: JSON.stringify(submissionData)
     });
 
+    console.log('Notion response status:', submissionResponse.status);
+
     if (!submissionResponse.ok) {
       const errorData = await submissionResponse.json();
-      console.error('Submission failed:', errorData);
-      throw new Error(`Submission failed: ${submissionResponse.status}`);
+      console.error('Notion error:', errorData);
+      res.status(500).json({ error: 'Notion API error', details: errorData });
+      return;
     }
 
     const submission = await submissionResponse.json();
-    console.log(`Created submission record: ${submission.id}`);
+    console.log(`Success! Created submission: ${submission.id}`);
 
     res.status(200).json({
       success: true,
       submissionId: submission.id,
-      message: 'Company profile updated successfully! We\'ll send you a separate link to register your booth staff in a couple weeks.'
+      message: 'Profile updated successfully!'
     });
     
   } catch (error) {
-    console.error('Error updating vendor profile:', error);
+    console.error('Caught error:', error);
     res.status(500).json({ 
-      error: 'Failed to update vendor profile', 
-      details: error.message 
+      error: 'Server error', 
+      details: error.message,
+      stack: error.stack
     });
   }
 }

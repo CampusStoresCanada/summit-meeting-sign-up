@@ -421,30 +421,64 @@
         const API_BASE = '/api'; // Will point to your Vercel functions
         let vendorData = {};
         let contactCounter = 0;
-
-        // Initialize the portal
+    
+        // SINGLE DOMContentLoaded handler that does everything in the right order
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token');
             
+            // FIRST: Check for OAuth callback success/error
+            if (urlParams.get('success') === 'true') {
+                console.log('🎉 OAuth callback success!');
+                document.getElementById('profileForm').style.display = 'none';
+                document.getElementById('successState').style.display = 'block';
+                return; // Stop here, don't load form
+            }
+            
+            if (urlParams.get('error')) {
+                const error = urlParams.get('error');
+                console.error('❌ OAuth callback error:', error);
+                
+                let errorMessage = 'An error occurred during authorization.';
+                switch (error) {
+                    case 'oauth_denied':
+                        errorMessage = 'Google Drive authorization was denied. Your profile was saved without files.';
+                        break;
+                    case 'oauth_invalid':
+                        errorMessage = 'Invalid authorization response. Please try again.';
+                        break;
+                    case 'token_failed':
+                        errorMessage = 'Failed to get authorization token. Please try again.';
+                        break;
+                    case 'callback_failed':
+                        errorMessage = 'Authorization callback failed. Please try again.';
+                        break;
+                }
+                
+                showError(errorMessage);
+                return; // Stop here, don't load form
+            }
+            
+            // SECOND: Normal page load - get token and load vendor data
+            const token = urlParams.get('token');
             if (!token) {
                 showError('Invalid access link. Please check your email for the correct URL.');
                 return;
             }
-
+    
             try {
+                console.log('🪄 Loading vendor data for token:', token);
                 await loadVendorData(token);
             } catch (error) {
                 console.error('Error loading vendor data:', error);
                 showError('Unable to load your profile information. Please try again later.');
             }
         });
-
+    
         async function loadVendorData(token) {
             showLoading(true);
             
             try {
-                // This would call your Vercel function to get vendor data
+                console.log('📡 Fetching vendor profile...');
                 const response = await fetch(`${API_BASE}/vendor-profile?token=${token}`);
                 
                 if (!response.ok) {
@@ -452,18 +486,21 @@
                 }
                 
                 vendorData = await response.json();
+                console.log('✅ Vendor data loaded:', vendorData);
+                
                 populateForm(vendorData);
                 showLoading(false);
                 document.getElementById('profileForm').style.display = 'block';
                 
             } catch (error) {
                 showLoading(false);
+                console.error('💥 Failed to load vendor data:', error);
                 throw error;
             }
         }
-
+    
         function populateForm(data) {
-            console.log('populateForm called with:', data);
+            console.log('📝 Populating form with:', data);
             
             // Update booth info
             document.getElementById('boothNumber').textContent = `Booth ${data.boothNumber}`;
@@ -490,7 +527,7 @@
                 document.getElementById('highlightProductDescription').value = data.organization.highlightProduct.description || '';
             }
         }
-
+    
         function addContactRow(contactData = {}) {
             const container = document.getElementById('contactsContainer');
             const contactId = `contact_${contactCounter++}`;
@@ -521,12 +558,12 @@
             
             container.appendChild(contactRow);
         }
-
+    
         function removeContactRow(button) {
             const row = button.closest('.contact-row');
             row.remove();
         }
-
+    
         function handleFileSelect(input, displayElementId) {
             const file = input.files[0];
             const displayElement = document.getElementById(displayElementId);
@@ -538,7 +575,7 @@
                 displayElement.textContent = '';
             }
         }
-
+    
         function handleMultipleFiles(input, displayElementId) {
             const files = Array.from(input.files);
             const displayElement = document.getElementById(displayElementId);
@@ -553,8 +590,8 @@
                 displayElement.innerHTML = '';
             }
         }
-
-        // Form submission
+    
+        // Form submission with OAuth magic
         document.getElementById('vendorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -653,52 +690,15 @@
                 reader.onerror = error => reject(error);
             });
         }
-        
-        // Also add this to handle OAuth callback success/error states
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            // Check for OAuth callback success/error
-            if (urlParams.get('success') === 'true') {
-                console.log('🎉 OAuth callback success!');
-                document.getElementById('profileForm').style.display = 'none';
-                document.getElementById('successState').style.display = 'block';
-                return;
-            }
-            
-            if (urlParams.get('error')) {
-                const error = urlParams.get('error');
-                console.error('❌ OAuth callback error:', error);
-                
-                let errorMessage = 'An error occurred during authorization.';
-                switch (error) {
-                    case 'oauth_denied':
-                        errorMessage = 'Google Drive authorization was denied. Your profile was saved without files.';
-                        break;
-                    case 'oauth_invalid':
-                        errorMessage = 'Invalid authorization response. Please try again.';
-                        break;
-                    case 'token_failed':
-                        errorMessage = 'Failed to get authorization token. Please try again.';
-                        break;
-                    case 'callback_failed':
-                        errorMessage = 'Authorization callback failed. Please try again.';
-                        break;
-                }
-                
-                showError(errorMessage);
-                return;
-            }
-            
-            // Normal page load - continue with existing logic
-            const token = urlParams.get('token');
-            if (!token) {
-                showError('Invalid access link. Please check your email for the correct URL.');
-                return;
-            }
-        
-            loadVendorData(token);
-        });
+    
+        function showLoading(show) {
+            document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+        }
+    
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorState').style.display = 'block';
+        }
     </script>
 </body>
 </html>

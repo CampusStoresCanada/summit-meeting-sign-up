@@ -55,12 +55,16 @@ module.exports = async function handler(req, res) {
     
     const org = data.results[0];
     
-    // Get the booth number from the relation display text
-    const boothRelation = org.properties['26 Booth Number']?.relation?.[0];
+    // SINGLE SOURCE OF TRUTH: Get booth number from Organization database only
     let boothNumber = 'TBD';
     
-    if (boothRelation) {
-      // The relation might have a title or we need to fetch it to get the display text
+    // Check the '26 Booth Number' relation property
+    const boothRelationArray = org.properties['26 Booth Number']?.relation;
+    
+    if (boothRelationArray && boothRelationArray.length > 0) {
+      // Follow the relation to get the booth record (ONE API call only)
+      const boothRelation = boothRelationArray[0];
+      
       const boothResponse = await fetch(`https://api.notion.com/v1/pages/${boothRelation.id}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -70,25 +74,26 @@ module.exports = async function handler(req, res) {
       
       if (boothResponse.ok) {
         const boothData = await boothResponse.json();
-        console.log('Booth data:', boothData);
         
-        // The booth number should be in the title - extract first 3 digits
-        const titleText = boothData.properties.title?.title?.[0]?.text?.content || '';
-        const boothMatch = titleText.match(/^(\d{1,3})/); // Extract first 1-3 digits at start
+        // Extract booth number from the title (first 3 characters only)
+        const titleText = boothData.properties['Booth Number']?.title?.[0]?.text?.content || '';
+        const boothMatch = titleText.match(/^(\d{1,3})/);
         boothNumber = boothMatch ? boothMatch[1] : 'TBD';
         
-        console.log('Extracted booth number:', boothNumber);
+        console.log(`Found booth number: ${boothNumber} from title: ${titleText}`);
       }
+    } else {
+      console.log(`No booth relation found for token: ${token}`);
     }
-        
-        // Transform Notion data to what your frontend expects
-        const vendorData = {
-          boothNumber: boothNumber,
-          organization: {
-            name: org.properties.Organization?.title?.[0]?.text?.content || '',
-            website: org.properties.Website?.url || '',
-            primaryCategory: org.properties['Primary Category']?.select?.name || '',
-            description: ''
+    
+    // Return the data
+    const vendorData = {
+      boothNumber: boothNumber,
+      organization: {
+        name: org.properties.Organization?.title?.[0]?.text?.content || '',
+        website: org.properties.Website?.url || '',
+        primaryCategory: org.properties['Primary Category']?.select?.name || '',
+        description: ''
       }
     };
     

@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     console.log(`✨ Processing submission for token: ${token}`);
 
     // Check if we have files to upload
-    const hasFiles = formData.catalogFile || formData.additionalFiles;
+    const hasFiles = formData.files && formData.files.length > 0;
     
     if (hasFiles) {
       console.log('📁 Files detected! Redirecting to Google OAuth...');

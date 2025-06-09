@@ -1254,15 +1254,21 @@
                     const nonAttendingContacts = organizationContacts
                         .filter(contact => !conferenceTeam.some(member => member.id === contact.id))
                         .filter(contact => !contact.id.startsWith('temp_'))
+                        .filter(contact => !contact.id.startsWith('edited_')) // Don't double-process edited contacts
                         .map(contact => ({
-                            id: contact.id,
+                            id: contact.originalId || contact.id, // Use originalId for edited contacts
                             attending: false,
                             isPrimary: false
                         }));
                     
                     contactOperations.conferenceTeam.push(...nonAttendingContacts);
                     
-                    console.log('📋 Contact operations:', contactOperations);
+                    console.log('📋 Contact operations to send:', JSON.stringify(contactOperations, null, 2));
+                    console.log('📊 Summary:');
+                    console.log(`  - New contacts: ${contactOperations.create.length}`);
+                    console.log(`  - Updated contacts: ${contactOperations.update.length}`);
+                    console.log(`  - Conference team: ${contactOperations.conferenceTeam.length}`);
+                    console.log(`  - Delete operations: ${contactOperations.delete.length}`);
                     
                     const contactResponse = await fetch(`${API_BASE}/save-conference-team`, {
                         method: 'POST',
@@ -1273,8 +1279,24 @@
                         })
                     });
                     
+                    console.log('🔍 Backend response status:', contactResponse.status);
+                    console.log('🔍 Backend response headers:', contactResponse.headers);
+                    
                     if (!contactResponse.ok) {
-                        const errorData = await contactResponse.json();
+                        // Try to get the error as text first to see what's actually returned
+                        const errorText = await contactResponse.text();
+                        console.error('❌ Raw backend response:', errorText);
+                        
+                        // Try to parse as JSON if possible
+                        let errorData;
+                        try {
+                            errorData = JSON.parse(errorText);
+                        } catch (e) {
+                            console.error('❌ Response is not JSON, showing raw text');
+                            showError(`Backend error (${contactResponse.status}): ${errorText.substring(0, 200)}...`);
+                            return;
+                        }
+                        
                         console.error('❌ Contact save failed:', errorData);
                         showError('Company profile saved, but there was an issue saving contact information.');
                         return;

@@ -145,17 +145,14 @@ export default async function handler(req, res) {
           const updateData = {
             properties: {}
           };
-
+    
           // Only include fields that are being updated
           if (updateContact.name) {
             updateData.properties["Name"] = {
               title: [{ text: { content: updateContact.name } }]
             };
-            updateData.properties["First Name"] = {
-              rich_text: [{ text: { content: updateContact.name.split(' ')[0] } }]
-            };
           }
-          
+              
           if (updateContact.workEmail) {
             updateData.properties["Work Email"] = {
               email: updateContact.workEmail
@@ -174,7 +171,7 @@ export default async function handler(req, res) {
             };
           }
 
-          const updateResponse = await fetch(`https://api.notion.com/v1/pages/${updateContact.id}`, {
+          const updateResponse = await fetch(`https://api.notion.com/v1/pages/${updateContact.originalId}`, {
             method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${notionToken}`,
@@ -195,8 +192,7 @@ export default async function handler(req, res) {
             results.errors.push(`Failed to update contact: ${errorData.message}`);
             console.error(`❌ Failed to update contact:`, errorData);
           }
-        } catch (error) {
-          results.errors.push(`Error updating contact: ${error.message}`);
+              } catch (error) {
           console.error(`💥 Error updating contact:`, error);
         }
       }
@@ -288,6 +284,12 @@ export default async function handler(req, res) {
       
       // Now process each team member
       for (const teamMember of contactOperations.conferenceTeam) {
+        if (!teamMember.id || teamMember.id === 'undefined') {
+          console.error(`❌ Invalid team member ID: ${teamMember.id}`);
+          results.errors.push(`Invalid team member ID: ${teamMember.id}`);
+          continue;
+        }
+        
         try {
           // Get the contact's current tags
           const contactResponse = await fetch(`https://api.notion.com/v1/pages/${teamMember.id}`, {

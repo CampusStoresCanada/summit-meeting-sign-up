@@ -139,8 +139,12 @@ export default async function handler(req, res) {
     // Step 3: Handle UPDATE operations
     if (contactOperations.update && contactOperations.update.length > 0) {
       console.log(`✏️ Updating ${contactOperations.update.length} contacts...`);
+      console.log(`📝 Update data received:`, JSON.stringify(contactOperations.update, null, 2));
       
       for (const updateContact of contactOperations.update) {
+        console.log(`🔄 Processing update for originalId: ${updateContact.originalId}`);
+        console.log(`📝 New name will be: "${updateContact.name}"`);
+        
         try {
           const updateData = {
             properties: {}
@@ -148,6 +152,7 @@ export default async function handler(req, res) {
     
           // Only include fields that are being updated
           if (updateContact.name) {
+            console.log(`📝 Setting Name property to: "${updateContact.name}"`);
             updateData.properties["Name"] = {
               title: [{ text: { content: updateContact.name } }]
             };
@@ -170,8 +175,10 @@ export default async function handler(req, res) {
               rich_text: [{ text: { content: updateContact.roleTitle } }]
             };
           }
-
-          const updateResponse = await fetch(`https://api.notion.com/v1/pages/${teamMember.id}`, {
+    
+          console.log(`📤 Sending to Notion:`, JSON.stringify(updateData, null, 2));
+    
+          const updateResponse = await fetch(`https://api.notion.com/v1/pages/${updateContact.originalId}`, {
             method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${notionToken}`,
@@ -180,24 +187,29 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify(updateData)
           });
-
+    
+          console.log(`📡 Notion response status: ${updateResponse.status}`);
+    
           if (updateResponse.ok) {
+            const responseData = await updateResponse.json();
+            console.log(`✅ Successfully updated contact: ${updateContact.name}`);
             results.updated.push({
-              id: updateContact.id,
+              id: updateContact.originalId,
               name: updateContact.name || 'Contact'
             });
-            console.log(`✅ Updated contact: ${updateContact.name || updateContact.id}`);
           } else {
             const errorData = await updateResponse.json();
+            console.error(`❌ Notion update failed:`, errorData);
             results.errors.push(`Failed to update contact: ${errorData.message}`);
-            console.error(`❌ Failed to update contact:`, errorData);
           }
-              } catch (error) {
+        } catch (error) {
           console.error(`💥 Error updating contact:`, error);
+          results.errors.push(`Error updating contact: ${error.message}`);
         }
       }
+    } else {
+      console.log(`⚠️ No updates to process. contactOperations.update length:`, contactOperations.update?.length || 0);
     }
-
     // Step 4: Handle DELETE operations (we'll mark as inactive rather than delete)
     if (contactOperations.delete && contactOperations.delete.length > 0) {
       console.log(`🗑️ Marking ${contactOperations.delete.length} contacts as inactive...`);

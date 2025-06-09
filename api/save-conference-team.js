@@ -1,380 +1,1230 @@
-// api/save-conference-team.js - Handle all contact operations
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
-
-  const notionToken = process.env.NOTION_TOKEN;
-  const organizationsDbId = process.env.NOTION_ORGANIZATIONS_DB_ID;
-  const contactsDbId = process.env.NOTION_CONTACTS_DB_ID;
-  const tagSystemDbId = process.env.NOTION_TAG_SYSTEM_DB_ID;
-  
-  // Safety check
-  if (!notionToken || !organizationsDbId || !contactsDbId) {
-    console.error('❌ Missing environment variables!');
-    res.status(500).json({ error: 'Missing configuration' });
-    return;
-  }
-
-  try {
-    const { token, contactOperations } = req.body;
-    
-    if (!token) {
-      res.status(400).json({ error: 'Token is required' });
-      return;
-    }
-
-    console.log('👥 Processing conference team operations for token:', token);
-
-    // Step 1: Get organization info (we need the org ID for relations)
-    const orgResponse = await fetch(`https://api.notion.com/v1/databases/${organizationsDbId}/query`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${notionToken}`,
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28'
-      },
-      body: JSON.stringify({
-        filter: {
-          property: 'Token',
-          rich_text: { equals: token }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Booth Profile - CSC Conference</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-      })
-    });
 
-    const orgData = await orgResponse.json();
-    if (orgData.results.length === 0) {
-      res.status(404).json({ error: 'Organization not found' });
-      return;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    const org = orgData.results[0];
-    const organizationId = org.id;
-    const organizationName = org.properties.Organization?.title?.[0]?.text?.content || '';
-    
-    console.log(`🏢 Found organization: ${organizationName} (${organizationId})`);
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
 
-    const results = {
-      created: [],
-      updated: [],
-      deleted: [],
-      errors: []
-    };
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
 
-    // Step 2: Handle CREATE operations
-    if (contactOperations.create && contactOperations.create.length > 0) {
-      console.log(`➕ Creating ${contactOperations.create.length} new contacts...`);
-      
-      for (const newContact of contactOperations.create) {
-        try {
-          const contactData = {
-            parent: { database_id: contactsDbId },
-            properties: {
-              "Name": {
-                title: [{ text: { content: newContact.name || 'Unknown Name' } }]
-              },
-              "First Name": {
-                rich_text: [{ text: { content: newContact.firstName || newContact.name?.split(' ')[0] || '' } }]
-              },
-              "Work Email": {
-                email: newContact.workEmail || null
-              },
-              "Work Phone Number": {
-                phone_number: newContact.workPhone || null
-              },
-              "Role/Title": {
-                rich_text: [{ text: { content: newContact.roleTitle || '' } }]
-              },
-              "Contact Type": {
-                select: { name: "Conference Attendee" }
-              },
-              "Organization": {
-                relation: [{ id: organizationId }]
-              },
-              "Notes": {
-                rich_text: [{ text: { content: "Added during conference registration" } }]
-              }
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .booth-info {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .booth-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            background: #fafbfc;
+        }
+
+        .section h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .help-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"], 
+        input[type="url"], 
+        input[type="email"],
+        input[type="tel"],
+        select, 
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .file-upload {
+            border: 2px dashed #c3cfe2;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background: #fafbfc;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload-text {
+            color: #6c757d;
+            margin-top: 10px;
+        }
+
+        .current-data {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .current-data strong {
+            color: #1976d2;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.2s;
+        }
+        
+        .contact-item:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+        
+        .contact-checkbox {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+        
+        .contact-info {
+            flex-grow: 1;
+        }
+        
+        .contact-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .contact-details {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .primary-contact-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .primary-contact-radio {
+            margin-left: 15px;
+        }
+        
+        .contact-actions {
+            margin-left: 15px;
+        }
+        
+        .edit-contact-btn {
+            background: #ffc107;
+            color: #333;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        .no-contacts-message {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .add-contact-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .submit-section {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
             }
-          };
+            
+            .container {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Complete Your Booth Profile</h1>
+            <p>Campus Stores Canada Conference 2026</p>
+        </div>
 
-          const createResponse = await fetch('https://api.notion.com/v1/pages', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${notionToken}`,
-              'Content-Type': 'application/json',
-              'Notion-Version': '2022-06-28'
-            },
-            body: JSON.stringify(contactData)
-          });
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <p>Loading your profile information...</p>
+        </div>
 
-          if (createResponse.ok) {
-            const createdContact = await createResponse.json();
-            results.created.push({
-              id: createdContact.id,
-              name: newContact.name
+        <div id="errorState" class="error" style="display: none;">
+            <strong>Oops!</strong> <span id="errorMessage"></span>
+        </div>
+
+        <div id="successState" class="success" style="display: none;">
+            <h3>✅ Profile Updated Successfully!</h3>
+            <p>Thank you for completing your booth profile. Your information is now under review and will appear on the conference map once approved.</p>
+        </div>
+
+        <div id="profileForm" style="display: block;">
+            <div class="booth-info">
+                <span class="booth-badge" id="boothNumber">Booth 501</span>
+                <span class="status-badge">Profile Incomplete</span>
+                <p style="margin-top: 10px; color: #6c757d;">
+                    Complete your profile to help conference attendees learn about your company and products.
+                </p>
+            </div>
+
+            <form id="vendorForm" class="form-container">
+                <!-- Company Information Section -->
+                <div class="section">
+                    <h3>📋 Company Information</h3>
+                    
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <div class="current-data" id="currentCompanyName">
+                            <strong>Current:</strong> <span id="companyNameValue">Loading...</span>
+                        </div>
+                        <div class="help-text">This will be displayed on the booth map. Leave blank to keep current name.</div>
+                        <input type="text" id="companyName" name="companyName" value="" placeholder="Update company name (optional)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="primaryCategory">Primary Product Category *</label>
+                        <div class="help-text">Select the category that best describes your main products/services</div>
+                        <select id="primaryCategory" name="primaryCategory" required>
+                            <option value="">Select a category...</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Apparel">Apparel</option>
+                            <option value="Books">Books</option>
+                            <option value="Campus Living">Campus Living</option>
+                            <option value="Food & Beverages">Food & Beverages</option>
+                            <option value="Gifts & Promotional Products">Gifts & Promotional Products</option>
+                            <option value="Graduation & Regalia">Graduation & Regalia</option>
+                            <option value="Health & Beauty">Health & Beauty</option>
+                            <option value="School, Office & Lab Supplies">School, Office & Lab Supplies</option>
+                            <option value="Store Operations">Store Operations</option>
+                            <option value="Technology & Electronics">Technology & Electronics</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="websiteUrl">Website URL</label>
+                        <div class="current-data" id="currentWebsite">
+                            <strong>Current:</strong> <span id="websiteValue">No website on file</span>
+                        </div>
+                        <div class="help-text">This link will be displayed on your booth profile</div>
+                        <input type="url" id="websiteUrl" name="websiteUrl" placeholder="https://yourcompany.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="companyDescription">Company Description</label>
+                        <div class="help-text">Brief description of your company (2-3 sentences, 200 characters max)</div>
+                        <textarea id="companyDescription" name="companyDescription" maxlength="200" placeholder="What does your company do? What makes you unique?"></textarea>
+                    </div>
+                </div>
+
+                <!-- Conference Special Section -->
+                <div class="section">
+                    <h3>🌟 Conference Highlight</h3>
+                    
+                    <div class="two-column">
+                        <div class="form-group">
+                            <label for="highlightProductName">Featured Product/Service Name</label>
+                            <div class="help-text">What's your "must-see" item for this conference?</div>
+                            <input type="text" id="highlightProductName" name="highlightProductName" placeholder="What's hot? What's New? give it a title!">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="highlightProductDescription">Description</label>
+                            <div class="help-text">Brief description of your highlight</div>
+                            <textarea id="highlightProductDescription" name="highlightProductDescription" placeholder="Now tell our members something about it that will make them want to come to your booth. If you don't know for now, leave it blank. We'll be checking in on this one closer to the conference."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conference Team Section -->
+                <div class="section">
+                    <h3>👥 Conference Team</h3>
+                    
+                    <div class="help-text" style="margin-bottom: 20px;">
+                        Select who from your team will be attending the conference. Choose ONE person as your primary contact - they'll receive all conference communications and coordinate with their booth team.
+                    </div>
+                    
+                    <div id="contactsLoading" style="display: none; text-align: center; padding: 20px;">
+                        <div style="font-size: 1.2rem;">Loading your team members...</div>
+                    </div>
+                    
+                    <div id="contactsError" style="display: none;" class="error">
+                        <strong>Unable to load team members.</strong> <span id="contactsErrorMessage"></span>
+                    </div>
+                    
+                    <div id="contactsList" style="display: none;">
+                        <!-- Contacts will be populated here by JavaScript -->
+                    </div>
+                    
+                    <div id="addNewContact" style="margin-top: 20px;">
+                        <button type="button" id="addContactBtn" class="add-contact-btn" onclick="showAddContactForm()">
+                            ➕ Add New Team Member
+                        </button>
+                        
+                        <div id="newContactForm" style="display: none; margin-top: 15px; padding: 20px; border: 2px dashed #667eea; border-radius: 8px; background: #f0f4ff;">
+                            <h4>Add New Team Member</h4>
+                            <div class="two-column">
+                                <div class="form-group">
+                                    <label>Full Name *</label>
+                                    <input type="text" id="newContactName" placeholder="Sarah Johnson">
+                                </div>
+                                <div class="form-group">
+                                    <label>Job Title</label>
+                                    <input type="text" id="newContactTitle" placeholder="Sales Director">
+                                </div>
+                            </div>
+                            <div class="two-column">
+                                <div class="form-group">
+                                    <label>Work Email *</label>
+                                    <input type="email" id="newContactEmail" placeholder="sarah@company.com">
+                                </div>
+                                <div class="form-group">
+                                    <label>Work Phone</label>
+                                    <input type="tel" id="newContactPhone" placeholder="+1 (555) 123-4567">
+                                </div>
+                            </div>
+                            <div style="margin-top: 15px;">
+                                <button type="button" onclick="addNewContact()" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-right: 10px;">Add Person</button>
+                                <button type="button" onclick="hideAddContactForm()" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px;">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resources Section -->
+                <div class="section">
+                    <h3>📄 Product Catalogue</h3>
+                    
+                    <div class="form-group">
+                        <label>Product Catalog</label>
+                        <div class="help-text">Upload your main product catalog (PDF preferred, max 10MB)</div>
+                        <div class="file-upload" onclick="document.getElementById('catalogFile').click()">
+                            <div style="font-size: 2rem;">📄</div>
+                            <div class="file-upload-text">Click to upload product catalog</div>
+                            <input type="file" id="catalogFile" name="catalogFile" accept=".pdf,.doc,.docx" onchange="handleFileSelect(this, 'catalogFileName')">
+                        </div>
+                        <div id="catalogFileName" style="margin-top: 10px; color: #28a745;"></div>
+                    </div>
+                </div>
+
+                <div class="submit-section">
+                    <button type="submit" class="submit-btn">Update Booth Profile</button>
+                    <p style="margin-top: 15px; color: #6c757d;">
+                        Your submission will be reviewed and approved before appearing on the conference map.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ===========================================
+        // CONFIGURATION & GLOBAL VARIABLES
+        // ===========================================
+        const API_BASE = '/api';
+        let vendorData = {};
+        let organizationContacts = [];
+        let conferenceTeam = [];
+
+        // ===========================================
+        // UTILITY FUNCTIONS
+        // ===========================================
+        function showLoading(show) {
+            document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorState').style.display = 'block';
+        }
+
+        function handleFileSelect(input, displayElementId) {
+            const file = input.files[0];
+            const displayElement = document.getElementById(displayElementId);
+            
+            if (file) {
+                displayElement.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                displayElement.style.color = '#28a745';
+            } else {
+                displayElement.textContent = '';
+            }
+        }
+
+        // ===========================================
+        // MAIN INITIALIZATION
+        // ===========================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Check for OAuth callback success/error
+            if (urlParams.get('success') === 'true') {
+                console.log('🎉 OAuth callback success!');
+                document.getElementById('profileForm').style.display = 'none';
+                document.getElementById('successState').style.display = 'block';
+                return;
+            }
+            
+            if (urlParams.get('error')) {
+                const error = urlParams.get('error');
+                console.error('❌ OAuth callback error:', error);
+                
+                let errorMessage = 'An error occurred during authorization.';
+                switch (error) {
+                    case 'oauth_denied':
+                        errorMessage = 'Google Drive authorization was denied. Your profile was saved without files.';
+                        break;
+                    case 'oauth_invalid':
+                        errorMessage = 'Invalid authorization response. Please try again.';
+                        break;
+                    case 'token_failed':
+                        errorMessage = 'Failed to get authorization token. Please try again.';
+                        break;
+                    case 'callback_failed':
+                        errorMessage = 'Authorization callback failed. Please try again.';
+                        break;
+                }
+                
+                showError(errorMessage);
+                return;
+            }
+            
+            // Normal page load - get token and load vendor data
+            const token = urlParams.get('token');
+            if (!token) {
+                showError('Invalid access link. Please check your email for the correct URL.');
+                return;
+            }
+
+            try {
+                console.log('🪄 Loading vendor data for token:', token);
+                await loadVendorData(token);
+            } catch (error) {
+                console.error('Error loading vendor data:', error);
+                showError('Unable to load your profile information. Please try again later.');
+            }
+        });
+
+        // ===========================================
+        // DATA LOADING FUNCTIONS
+        // ===========================================
+        async function loadVendorData(token) {
+            showLoading(true);
+            
+            try {
+                console.log('📡 Fetching vendor profile...');
+                const response = await fetch(`${API_BASE}/vendor-profile?token=${token}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                vendorData = await response.json();
+                console.log('✅ Vendor data loaded:', vendorData);
+                
+                populateForm(vendorData);
+                await loadOrganizationContacts(token);
+                
+                showLoading(false);
+                document.getElementById('profileForm').style.display = 'block';
+                
+            } catch (error) {
+                showLoading(false);
+                console.error('💥 Failed to load vendor data:', error);
+                throw error;
+            }
+        }
+
+        async function loadOrganizationContacts(token) {
+            console.log('👥 Loading organization contacts...');
+            
+            const contactsLoading = document.getElementById('contactsLoading');
+            const contactsError = document.getElementById('contactsError');
+            const contactsList = document.getElementById('contactsList');
+            
+            contactsLoading.style.display = 'block';
+            contactsError.style.display = 'none';
+            contactsList.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE}/get-organization-contacts?token=${token}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                organizationContacts = data.contacts;
+                
+                console.log(`✅ Loaded ${organizationContacts.length} contacts for ${data.organizationName}`);
+                
+                displayContacts();
+                
+            } catch (error) {
+                console.error('💥 Error loading contacts:', error);
+                contactsLoading.style.display = 'none';
+                contactsError.style.display = 'block';
+                document.getElementById('contactsErrorMessage').textContent = error.message;
+            }
+        }
+
+        function populateForm(data) {
+            console.log('📝 Populating form with:', data);
+            
+            // Update booth info
+            document.getElementById('boothNumber').textContent = `Booth ${data.boothNumber}`;
+        
+            // Populate current company data
+            document.getElementById('companyNameValue').textContent = data.organization?.name || 'No company name on file';
+            document.getElementById('companyName').value = data.organization?.name || '';
+            document.getElementById('websiteValue').textContent = data.organization?.website || 'No website on file';
+            document.getElementById('websiteUrl').value = data.organization?.website || '';
+            
+            // Pre-select category if exists
+            if (data.organization?.primaryCategory) {
+                document.getElementById('primaryCategory').value = data.organization.primaryCategory;
+            }
+            
+            // Populate description if exists
+            if (data.organization?.description) {
+                document.getElementById('companyDescription').value = data.organization.description;
+            }
+            
+            // Populate highlight product if exists
+            if (data.organization?.highlightProduct) {
+                document.getElementById('highlightProductName').value = data.organization.highlightProduct.name || '';
+                document.getElementById('highlightProductDescription').value = data.organization.highlightProduct.description || '';
+            }
+        }
+
+        // ===========================================
+        // CONTACT MANAGEMENT FUNCTIONS
+        // ===========================================
+        function displayContacts() {
+            const contactsLoading = document.getElementById('contactsLoading');
+            const contactsList = document.getElementById('contactsList');
+            
+            contactsLoading.style.display = 'none';
+            contactsList.style.display = 'block';
+            
+            if (organizationContacts.length === 0) {
+                contactsList.innerHTML = `
+                    <div class="no-contacts-message">
+                        <p>No team members found in our database.</p>
+                        <p>Use the "Add New Team Member" button below to add your conference team.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let contactsHTML = '<div style="margin-bottom: 15px;"><strong>Select team members attending the conference:</strong></div>';
+            
+            organizationContacts.forEach((contact, index) => {
+                const isAttending = conferenceTeam.some(c => c.id === contact.id);
+                const isPrimary = conferenceTeam.find(c => c.id === contact.id && c.isPrimaryContact);
+                
+                contactsHTML += `
+                    <div class="contact-item">
+                        <input type="checkbox" 
+                               class="contact-checkbox" 
+                               id="contact_${contact.id}" 
+                               ${isAttending ? 'checked' : ''}
+                               onchange="toggleContactAttendance('${contact.id}')">
+                        
+                        <div class="contact-info">
+                            <div class="contact-name">
+                                ${contact.name}
+                                ${isPrimary ? '<span class="primary-contact-badge">Primary Contact</span>' : ''}
+                            </div>
+                            <div class="contact-details">
+                                ${contact.roleTitle} • ${contact.workEmail} ${contact.workPhone ? '• ' + contact.workPhone : ''}
+                            </div>
+                        </div>
+                        
+                        ${isAttending ? `
+                            <div class="primary-contact-radio">
+                                <label style="font-size: 0.9rem; color: #6c757d;">
+                                    <input type="radio" 
+                                           name="primaryContact" 
+                                           value="${contact.id}"
+                                           ${isPrimary ? 'checked' : ''}
+                                           onchange="setPrimaryContact('${contact.id}')">
+                                    Primary
+                                </label>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="contact-actions">
+                            <button type="button" class="edit-contact-btn" onclick="editContact('${contact.id}')">
+                                Edit
+                            </button>
+                        </div>
+                    </div>
+                `;
             });
-            console.log(`✅ Created contact: ${newContact.name}`);
-          } else {
-            const errorData = await createResponse.json();
-            results.errors.push(`Failed to create ${newContact.name}: ${errorData.message}`);
-            console.error(`❌ Failed to create ${newContact.name}:`, errorData);
-          }
-        } catch (error) {
-          results.errors.push(`Error creating ${newContact.name}: ${error.message}`);
-          console.error(`💥 Error creating ${newContact.name}:`, error);
+            
+            contactsList.innerHTML = contactsHTML;
         }
-      }
-    }
-
-    // Step 3: Handle UPDATE operations
-    if (contactOperations.update && contactOperations.update.length > 0) {
-      console.log(`✏️ Updating ${contactOperations.update.length} contacts...`);
-      
-      for (const updateContact of contactOperations.update) {
-        try {
-          const updateData = {
-            properties: {}
-          };
-
-          // Only include fields that are being updated
-          if (updateContact.name) {
-            updateData.properties["Name"] = {
-              title: [{ text: { content: updateContact.name } }]
+        
+        function toggleContactAttendance(contactId) {
+            const contact = organizationContacts.find(c => c.id === contactId);
+            if (!contact) return;
+            
+            const existingIndex = conferenceTeam.findIndex(c => c.id === contactId);
+            
+            if (existingIndex >= 0) {
+                // Remove from conference team
+                conferenceTeam.splice(existingIndex, 1);
+                console.log(`❌ Removed ${contact.name} from conference team`);
+            } else {
+                // Add to conference team
+                conferenceTeam.push({
+                    id: contact.id,
+                    name: contact.name,
+                    workEmail: contact.workEmail,
+                    roleTitle: contact.roleTitle,
+                    isPrimaryContact: false
+                });
+                console.log(`✅ Added ${contact.name} to conference team`);
+            }
+            
+            // Auto-assign primary contact logic
+            if (existingIndex >= 0 && conferenceTeam.length > 0) {
+                const hadPrimary = conferenceTeam.some(c => c.isPrimaryContact);
+                if (!hadPrimary && conferenceTeam.length > 0) {
+                    conferenceTeam[0].isPrimaryContact = true;
+                }
+            }
+            
+            if (conferenceTeam.length === 1) {
+                conferenceTeam[0].isPrimaryContact = true;
+            }
+            
+            displayContacts();
+        }
+        
+        function setPrimaryContact(contactId) {
+            // Clear all primary statuses
+            conferenceTeam.forEach(c => c.isPrimaryContact = false);
+            
+            // Set new primary
+            const contact = conferenceTeam.find(c => c.id === contactId);
+            if (contact) {
+                contact.isPrimaryContact = true;
+                console.log(`👑 Set ${contact.name} as primary contact`);
+            }
+            
+            displayContacts();
+        }
+        
+        function showAddContactForm() {
+            document.getElementById('newContactForm').style.display = 'block';
+            document.getElementById('addContactBtn').style.display = 'none';
+            
+            // Enable validation for add form
+            document.getElementById('newContactName').required = true;
+            document.getElementById('newContactEmail').required = true;
+        }
+        
+        function hideAddContactForm() {
+            document.getElementById('newContactForm').style.display = 'none';
+            document.getElementById('addContactBtn').style.display = 'block';
+            
+            // Disable validation when form is hidden
+            document.getElementById('newContactName').required = false;
+            document.getElementById('newContactEmail').required = false;
+            
+            // Clear form
+            document.getElementById('newContactName').value = '';
+            document.getElementById('newContactTitle').value = '';
+            document.getElementById('newContactEmail').value = '';
+            document.getElementById('newContactPhone').value = '';
+        }
+        
+        function addNewContact() {
+            const name = document.getElementById('newContactName').value.trim();
+            const title = document.getElementById('newContactTitle').value.trim();
+            const email = document.getElementById('newContactEmail').value.trim();
+            const phone = document.getElementById('newContactPhone').value.trim();
+            
+            if (!name || !email) {
+                alert('Name and email are required!');
+                return;
+            }
+            
+            // Create temporary contact
+            const newContact = {
+                id: 'temp_' + Date.now(),
+                name: name,
+                firstName: name.split(' ')[0],
+                workEmail: email,
+                workPhone: phone,
+                roleTitle: title,
+                contactType: 'Conference Attendee',
+                tags: [],
+                notes: 'Added during conference registration',
+                isAttending: true,
+                isPrimaryContact: conferenceTeam.length === 0 // First person is primary
             };
-            updateData.properties["First Name"] = {
-              rich_text: [{ text: { content: updateContact.name.split(' ')[0] } }]
-            };
-          }
-          
-          if (updateContact.workEmail) {
-            updateData.properties["Work Email"] = {
-              email: updateContact.workEmail
-            };
-          }
-          
-          if (updateContact.workPhone) {
-            updateData.properties["Work Phone Number"] = {
-              phone_number: updateContact.workPhone
-            };
-          }
-          
-          if (updateContact.roleTitle) {
-            updateData.properties["Role/Title"] = {
-              rich_text: [{ text: { content: updateContact.roleTitle } }]
-            };
-          }
-
-          const updateResponse = await fetch(`https://api.notion.com/v1/pages/${updateContact.originalId}`, {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${notionToken}`,
-              'Content-Type': 'application/json',
-              'Notion-Version': '2022-06-28'
-            },
-            body: JSON.stringify(updateData)
-          });
-
-          if (updateResponse.ok) {
-            results.updated.push({
-              id: updateContact.id,
-              name: updateContact.name || 'Contact'
+            
+            // Add to both lists
+            organizationContacts.push(newContact);
+            conferenceTeam.push({
+                id: newContact.id,
+                name: newContact.name,
+                workEmail: newContact.workEmail,
+                roleTitle: newContact.roleTitle,
+                isPrimaryContact: newContact.isPrimaryContact
             });
-            console.log(`✅ Updated contact: ${updateContact.name || updateContact.id}`);
-          } else {
-            const errorData = await updateResponse.json();
-            results.errors.push(`Failed to update contact: ${errorData.message}`);
-            console.error(`❌ Failed to update contact:`, errorData);
-          }
-        } catch (error) {
-          results.errors.push(`Error updating contact: ${error.message}`);
-          console.error(`💥 Error updating contact:`, error);
+            
+            console.log(`➕ Added new contact: ${name}`);
+            
+            hideAddContactForm();
+            displayContacts();
         }
-      }
-    }
-
-    // Step 4: Handle DELETE operations (we'll mark as inactive rather than delete)
-    if (contactOperations.delete && contactOperations.delete.length > 0) {
-      console.log(`🗑️ Marking ${contactOperations.delete.length} contacts as inactive...`);
-      
-      for (const contactId of contactOperations.delete) {
-        try {
-          const deleteData = {
-            properties: {
-              "Contact Type": {
-                select: { name: "Inactive" }
-              },
-              "Notes": {
-                rich_text: [{ 
-                  text: { 
-                    content: `Marked inactive during conference registration on ${new Date().toISOString().split('T')[0]}` 
-                  } 
-                }]
-              }
+        
+        function editContact(contactId) {
+            const contact = organizationContacts.find(c => c.id === contactId);
+            if (!contact) return;
+            
+            console.log(`✏️ Editing contact: ${contact.name}`);
+            
+            // Hide the add new contact button and form
+            document.getElementById('addContactBtn').style.display = 'none';
+            document.getElementById('newContactForm').style.display = 'none';
+            
+            // Show edit form with pre-populated data
+            showEditContactForm(contact);
+        }
+        
+        function showEditContactForm(contact) {
+            // Create edit form HTML
+            const editFormHTML = `
+                <div id="editContactForm" style="margin-top: 15px; padding: 20px; border: 2px solid #ffc107; border-radius: 8px; background: #fff8e1;">
+                    <h4>Edit Team Member: ${contact.name}</h4>
+                    <div class="two-column">
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" id="editContactName" value="${contact.name}">
+                        </div>
+                        <div class="form-group">
+                            <label>Job Title</label>
+                            <input type="text" id="editContactTitle" value="${contact.roleTitle || ''}" placeholder="Sales Director">
+                        </div>
+                    </div>
+                    <div class="two-column">
+                        <div class="form-group">
+                            <label>Work Email *</label>
+                            <input type="email" id="editContactEmail" value="${contact.workEmail}">
+                        </div>
+                        <div class="form-group">
+                            <label>Work Phone</label>
+                            <input type="tel" id="editContactPhone" value="${contact.workPhone || ''}" placeholder="+1 (555) 123-4567">
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <button type="button" onclick="saveEditedContact('${contact.id}')" style="background: #ffc107; color: #333; border: none; padding: 8px 16px; border-radius: 4px; margin-right: 10px;">Save Changes</button>
+                        <button type="button" onclick="cancelEditContact()" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px;">Cancel</button>
+                    </div>
+                </div>
+            `;
+            
+            // Insert the edit form after the contacts list
+            const addNewContactDiv = document.getElementById('addNewContact');
+            addNewContactDiv.insertAdjacentHTML('beforebegin', editFormHTML);
+        }
+        
+        function saveEditedContact(originalContactId) {
+            const name = document.getElementById('editContactName').value.trim();
+            const title = document.getElementById('editContactTitle').value.trim();
+            const email = document.getElementById('editContactEmail').value.trim();
+            const phone = document.getElementById('editContactPhone').value.trim();
+            
+            if (!name || !email) {
+                alert('Name and email are required!');
+                return;
             }
-          };
-
-          const deleteResponse = await fetch(`https://api.notion.com/v1/pages/${contactId}`, {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${notionToken}`,
-              'Content-Type': 'application/json',
-              'Notion-Version': '2022-06-28'
-            },
-            body: JSON.stringify(deleteData)
-          });
-
-          if (deleteResponse.ok) {
-            results.deleted.push(contactId);
-            console.log(`✅ Marked contact as inactive: ${contactId}`);
-          } else {
-            const errorData = await deleteResponse.json();
-            results.errors.push(`Failed to delete contact: ${errorData.message}`);
-          }
-        } catch (error) {
-          results.errors.push(`Error deleting contact: ${error.message}`);
-        }
-      }
-    }
-
-    // Step 5: Handle conference team tagging
-    if (contactOperations.conferenceTeam) {
-      console.log(`🏷️ Processing conference team tagging...`);
-      
-      // First, we need to get the tag IDs from the Tag System database
-      const tagSystemDbId = process.env.NOTION_TAG_SYSTEM_DB_ID
-      
-      // Get the tags we need
-      const tagsToFind = ['26 Conference Exhibitor', 'Primary Contact', 'Secondary Contact'];
-      const tagIds = {};
-      
-      for (const tagName of tagsToFind) {
-        try {
-          const tagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${notionToken}`,
-              'Content-Type': 'application/json',
-              'Notion-Version': '2022-06-28'
-            },
-            body: JSON.stringify({
-              filter: {
-                property: 'Name', // Assuming the tag name property is called 'Name'
-                title: { equals: tagName }
-              }
-            })
-          });
-          
-          const tagData = await tagResponse.json();
-          if (tagData.results.length > 0) {
-            tagIds[tagName] = tagData.results[0].id;
-            console.log(`🏷️ Found tag "${tagName}": ${tagIds[tagName]}`);
-          } else {
-            console.error(`❌ Tag "${tagName}" not found in Tag System database`);
-          }
-        } catch (error) {
-          console.error(`💥 Error finding tag "${tagName}":`, error);
-        }
-      }
-      
-      // Now process each team member
-      for (const teamMember of contactOperations.conferenceTeam) {
-        try {
-          // Get the contact's current tags
-          const contactResponse = await fetch(`https://api.notion.com/v1/pages/${teamMember.id}`, {
-            headers: {
-              'Authorization': `Bearer ${notionToken}`,
-              'Notion-Version': '2022-06-28'
+            
+            // Find the original contact
+            const originalContact = organizationContacts.find(c => c.id === originalContactId);
+            if (!originalContact) return;
+            
+            // Check if anything actually changed
+            const hasChanges = (
+                name !== originalContact.name ||
+                title !== (originalContact.roleTitle || '') ||
+                email !== originalContact.workEmail ||
+                phone !== (originalContact.workPhone || '')
+            );
+            
+            if (!hasChanges) {
+                console.log('👍 No changes detected, canceling edit');
+                cancelEditContact();
+                return;
             }
-          });
-          
-          if (!contactResponse.ok) {
-            console.error(`❌ Failed to get contact ${teamMember.id}`);
-            continue;
-          }
-          
-          const contact = await contactResponse.json();
-          const currentTags = contact.properties['Personal Tag']?.relation || [];
-          
-          // Start with existing tags (minus the ones we're managing)
-          const managedTagIds = Object.values(tagIds);
-          const keepTags = currentTags.filter(tag => !managedTagIds.includes(tag.id));
-          
-          // Add conference exhibitor tag if attending
-          if (teamMember.attending && tagIds['26 Conference Exhibitor']) {
-            keepTags.push({ id: tagIds['26 Conference Exhibitor'] });
-          }
-          
-          // Add role tag (Primary or Secondary Contact)
-          if (teamMember.isPrimary && tagIds['Primary Contact']) {
-            keepTags.push({ id: tagIds['Primary Contact'] });
-          } else if (!teamMember.isPrimary && tagIds['Secondary Contact']) {
-            keepTags.push({ id: tagIds['Secondary Contact'] });
-          }
-          
-          // Update the contact with new tags
-          const updateData = {
-            properties: {
-              "Personal Tag": {
-                relation: keepTags
-              }
+            
+            console.log(`💾 Saving changes for: ${originalContact.name}`);
+            
+            // Create updated contact with temporary ID to track as "edited"
+            const updatedContact = {
+                id: 'edited_' + originalContactId + '_' + Date.now(), // Track this as an edit
+                originalId: originalContactId, // Remember what we're updating
+                name: name,
+                firstName: name.split(' ')[0],
+                workEmail: email,
+                workPhone: phone,
+                roleTitle: title,
+                contactType: originalContact.contactType || 'Conference Attendee',
+                tags: originalContact.tags || [],
+                notes: (originalContact.notes || '') + ' [Updated during conference registration]',
+                isEdited: true // Flag this as an edited contact
+            };
+            
+            // Replace the original contact in our local array
+            const contactIndex = organizationContacts.findIndex(c => c.id === originalContactId);
+            if (contactIndex >= 0) {
+                organizationContacts[contactIndex] = updatedContact;
             }
-          };
-          
-          const updateResponse = await fetch(`https://api.notion.com/v1/pages/${teamMember.id}`, {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${notionToken}`,
-              'Content-Type': 'application/json',
-              'Notion-Version': '2022-06-28'
-            },
-            body: JSON.stringify(updateData)
-          });
-          
-          if (updateResponse.ok) {
-            const attendingStatus = teamMember.attending ? 'ATTENDING' : 'NOT ATTENDING';
-            const roleStatus = teamMember.isPrimary ? 'PRIMARY CONTACT' : 'SECONDARY CONTACT';
-            console.log(`✅ Updated ${teamMember.id}: ${attendingStatus}, ${roleStatus}`);
-          } else {
-            const errorData = await updateResponse.json();
-            console.error(`❌ Failed to update tags for ${teamMember.id}:`, errorData);
-            results.errors.push(`Failed to update tags for contact: ${errorData.message}`);
-          }
-          
-        } catch (error) {
-          console.error(`💥 Error processing team member ${teamMember.id}:`, error);
-          results.errors.push(`Error processing team member: ${error.message}`);
+            
+            // Update conference team if this person was attending
+            const conferenceIndex = conferenceTeam.findIndex(c => c.id === originalContactId);
+            if (conferenceIndex >= 0) {
+                conferenceTeam[conferenceIndex] = {
+                    id: updatedContact.id,
+                    name: updatedContact.name,
+                    workEmail: updatedContact.workEmail,
+                    roleTitle: updatedContact.roleTitle,
+                    isPrimaryContact: conferenceTeam[conferenceIndex].isPrimaryContact
+                };
+            }
+            
+            console.log(`✅ Contact updated locally: ${name}`);
+            
+            cancelEditContact();
+            displayContacts();
         }
-      }
-    }
+        
+        function cancelEditContact() {
+            // Remove edit form
+            const editForm = document.getElementById('editContactForm');
+            if (editForm) {
+                editForm.remove();
+            }
+            
+            // Show add new contact button again
+            document.getElementById('addContactBtn').style.display = 'block';
+        }
 
-    // Step 6: Return results
-    console.log('🎉 Conference team operations complete!');
-    console.log(`- Created: ${results.created.length}`);
-    console.log(`- Updated: ${results.updated.length}`);
-    console.log(`- Deleted: ${results.deleted.length}`);
-    console.log(`- Errors: ${results.errors.length}`);
+        // ===========================================
+        // FORM SUBMISSION
+        // ===========================================
+        document.getElementById('vendorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            console.log('🚀 Starting FULL form submission (company + contacts)...');
+            showLoading(true);
+            
+            try {
+                const formData = new FormData(e.target);
+                const urlParams = new URLSearchParams(window.location.search);
+                const token = urlParams.get('token');
+                
+                // STEP 1: Handle catalogue upload
+                const fileList = [];
+                const actualFiles = [];
+                
+                const catalogFile = formData.get('catalogFile');
+                if (catalogFile && catalogFile instanceof File && catalogFile.size > 0) {
+                    fileList.push({
+                        name: catalogFile.name,
+                        type: catalogFile.type,
+                        size: catalogFile.size,
+                        fieldName: 'catalogFile'
+                    });
+                    actualFiles.push({
+                        file: catalogFile,
+                        fieldName: 'catalogFile'
+                    });
+                    console.log(`📄 Found catalogue: ${catalogFile.name} (${(catalogFile.size / 1024 / 1024).toFixed(2)} MB)`);
+                }
 
-    res.status(200).json({
-      success: true,
-      results: results,
-      message: `Processed ${results.created.length + results.updated.length + results.deleted.length} contact operations`
-    });
+                let uploadResults = {
+                    catalogueUrl: null
+                };
 
-  } catch (error) {
-    console.error('💥 Error processing conference team:', error);
-    res.status(500).json({ 
-      error: 'Failed to save conference team', 
-      details: error.message 
-    });
-  }
-}
+                // Upload catalogue if we have one
+                if (fileList.length > 0) {
+                    console.log('📁 Getting presigned URL for catalogue...');
+                    
+                    const urlResponse = await fetch(`${API_BASE}/get-presigned-urls`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            fileList: fileList,
+                            organizationName: vendorData.organization?.name || 'Unknown Organization',
+                            token: token
+                        })
+                    });
+
+                    if (!urlResponse.ok) {
+                        const errorData = await urlResponse.json();
+                        throw new Error(`Failed to get upload URL: ${errorData.error}`);
+                    }
+
+                    const urlData = await urlResponse.json();
+                    console.log('🎫 Got presigned URL!');
+                    
+                    if (urlData.uploadUrls.length > 0) {
+                        const urlInfo = urlData.uploadUrls[0];
+                        const fileInfo = actualFiles[0];
+                        
+                        console.log(`⬆️ Uploading ${urlInfo.fileName} directly to S3...`);
+                        
+                        const uploadResponse = await fetch(urlInfo.presignedUrl, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': fileInfo.file.type
+                            },
+                            body: fileInfo.file
+                        });
+                        
+                        if (uploadResponse.ok) {
+                            uploadResults.catalogueUrl = urlInfo.publicUrl;
+                            console.log(`📄 Catalogue uploaded: ${urlInfo.publicUrl}`);
+                        } else {
+                            const errorText = await uploadResponse.text();
+                            console.error(`❌ Upload failed:`, errorText);
+                            throw new Error('Catalogue upload failed');
+                        }
+                    }
+                    
+                    console.log('🎉 Catalogue upload complete!', uploadResults);
+                }
+
+                // STEP 2: Save company profile
+                const companyData = {
+                    token: token,
+                    uploadResults: uploadResults
+                };
+                
+                // Add all text form fields
+                for (let [key, value] of formData.entries()) {
+                    if (key !== 'catalogFile' && value && typeof value === 'string') {
+                        companyData[key] = value;
+                    }
+                }
+                
+                console.log('📤 Submitting company data to backend...');
+                
+                const companyResponse = await fetch(`${API_BASE}/update-vendor-profile`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(companyData)
+                });
+                
+                if (!companyResponse.ok) {
+                    const errorData = await companyResponse.json();
+                    throw new Error(`Company profile error: ${errorData.error}`);
+                }
+                
+                const companyResult = await companyResponse.json();
+                console.log('✅ Company profile saved!', companyResult);
+
+                // STEP 3: Save conference team
+                if (conferenceTeam.length > 0 || hasNewContacts() || hasEditedContacts() || hasDeletedContacts()) {
+                    console.log('👥 Saving conference team...');
+                    
+                    const contactOperations = {
+                        create: getNewContacts(),
+                        update: getUpdatedContacts(),
+                        delete: getDeletedContacts(),
+                        conferenceTeam: conferenceTeam.map(member => ({
+                            id: member.id,
+                            attending: true,
+                            isPrimary: member.isPrimaryContact
+                        }))
+                    };
+                    
+                    // Add non-attending contacts with Secondary Contact tag
+                    const nonAttendingContacts = organizationContacts
+                        .filter(contact => !conferenceTeam.some(member => member.id === contact.id))
+                        .filter(contact => !contact.id.startsWith('temp_'))
+                        .map(contact => ({
+                            id: contact.id,
+                            attending: false,
+                            isPrimary: false
+                        }));
+                    
+                    contactOperations.conferenceTeam.push(...nonAttendingContacts);
+                    
+                    console.log('📋 Contact operations:', contactOperations);
+                    
+                    const contactResponse = await fetch(`${API_BASE}/save-conference-team`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            token: token,
+                            contactOperations: contactOperations
+                        })
+                    });
+                    
+                    if (!contactResponse.ok) {
+                        const errorData = await contactResponse.json();
+                        console.error('❌ Contact save failed:', errorData);
+                        showError('Company profile saved, but there was an issue saving contact information.');
+                        return;
+                    }
+                    
+                    const contactResult = await contactResponse.json();
+                    console.log('✅ Conference team saved!', contactResult);
+                } else {
+                    console.log('👥 No contact changes to save');
+                }
+                
+                // SUCCESS!
+                showLoading(false);
+                document.getElementById('profileForm').style.display = 'none';
+                document.getElementById('successState').style.display = 'block';
+                
+            } catch (error) {
+                console.error('💥 Form submission failed:', error);
+                showLoading(false);
+                showError('Failed to update profile. Please try again.');
+            }
+        });
+
+        // ===========================================
+        // HELPER FUNCTIONS FOR CONTACT TRACKING
+        // ===========================================
+        function hasNewContacts() {
+            return organizationContacts.some(contact => contact.id.startsWith('temp_'));
+        }
+
+        function hasDeletedContacts() {
+            return false; // TODO: Implement contact deletion later
+        }
+
+        function hasEditedContacts() {
+            return organizationContacts.some(contact => contact.id.startsWith('edited_'));
+        }
+
+        function getNewContacts() {
+            return organizationContacts
+                .filter(contact => contact.id.startsWith('temp_'))
+                .map(contact => ({
+                    name: contact.name,
+                    firstName: contact.firstName,
+                    workEmail: contact.workEmail,
+                    workPhone: contact.workPhone,
+                    roleTitle: contact.roleTitle
+                }));
+        }
+
+        function getUpdatedContacts() {
+            return organizationContacts
+                .filter(contact => contact.id.startsWith('edited_'))
+                .map(contact => ({
+                    originalId: contact.originalId, // The original Notion contact ID
+                    name: contact.name,
+                    firstName: contact.firstName,
+                    workEmail: contact.workEmail,
+                    workPhone: contact.workPhone,
+                    roleTitle: contact.roleTitle
+                }));
+        }
+
+        function getDeletedContacts() {
+            return []; // TODO: Implement contact deletion later
+        }
+    </script>
+</body>
+</html>

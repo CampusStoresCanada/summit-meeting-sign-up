@@ -866,9 +866,134 @@
         
         function editContact(contactId) {
             const contact = organizationContacts.find(c => c.id === contactId);
-            if (contact) {
-                alert(`Edit contact functionality coming soon!\n\nContact: ${contact.name}\nEmail: ${contact.workEmail}`);
+            if (!contact) return;
+            
+            console.log(`✏️ Editing contact: ${contact.name}`);
+            
+            // Hide the add new contact button and form
+            document.getElementById('addContactBtn').style.display = 'none';
+            document.getElementById('newContactForm').style.display = 'none';
+            
+            // Show edit form with pre-populated data
+            showEditContactForm(contact);
+        }
+        
+        function showEditContactForm(contact) {
+            // Create edit form HTML
+            const editFormHTML = `
+                <div id="editContactForm" style="margin-top: 15px; padding: 20px; border: 2px solid #ffc107; border-radius: 8px; background: #fff8e1;">
+                    <h4>Edit Team Member: ${contact.name}</h4>
+                    <div class="two-column">
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" id="editContactName" value="${contact.name}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Job Title</label>
+                            <input type="text" id="editContactTitle" value="${contact.roleTitle || ''}" placeholder="Sales Director">
+                        </div>
+                    </div>
+                    <div class="two-column">
+                        <div class="form-group">
+                            <label>Work Email *</label>
+                            <input type="email" id="editContactEmail" value="${contact.workEmail}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Work Phone</label>
+                            <input type="tel" id="editContactPhone" value="${contact.workPhone || ''}" placeholder="+1 (555) 123-4567">
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <button type="button" onclick="saveEditedContact('${contact.id}')" style="background: #ffc107; color: #333; border: none; padding: 8px 16px; border-radius: 4px; margin-right: 10px;">Save Changes</button>
+                        <button type="button" onclick="cancelEditContact()" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px;">Cancel</button>
+                    </div>
+                </div>
+            `;
+            
+            // Insert the edit form after the contacts list
+            const addNewContactDiv = document.getElementById('addNewContact');
+            addNewContactDiv.insertAdjacentHTML('beforebegin', editFormHTML);
+        }
+        
+        function saveEditedContact(originalContactId) {
+            const name = document.getElementById('editContactName').value.trim();
+            const title = document.getElementById('editContactTitle').value.trim();
+            const email = document.getElementById('editContactEmail').value.trim();
+            const phone = document.getElementById('editContactPhone').value.trim();
+            
+            if (!name || !email) {
+                alert('Name and email are required!');
+                return;
             }
+            
+            // Find the original contact
+            const originalContact = organizationContacts.find(c => c.id === originalContactId);
+            if (!originalContact) return;
+            
+            // Check if anything actually changed
+            const hasChanges = (
+                name !== originalContact.name ||
+                title !== (originalContact.roleTitle || '') ||
+                email !== originalContact.workEmail ||
+                phone !== (originalContact.workPhone || '')
+            );
+            
+            if (!hasChanges) {
+                console.log('👍 No changes detected, canceling edit');
+                cancelEditContact();
+                return;
+            }
+            
+            console.log(`💾 Saving changes for: ${originalContact.name}`);
+            
+            // Create updated contact with temporary ID to track as "edited"
+            const updatedContact = {
+                id: 'edited_' + originalContactId + '_' + Date.now(), // Track this as an edit
+                originalId: originalContactId, // Remember what we're updating
+                name: name,
+                firstName: name.split(' ')[0],
+                workEmail: email,
+                workPhone: phone,
+                roleTitle: title,
+                contactType: originalContact.contactType || 'Conference Attendee',
+                tags: originalContact.tags || [],
+                notes: (originalContact.notes || '') + ' [Updated during conference registration]',
+                isEdited: true // Flag this as an edited contact
+            };
+            
+            // Replace the original contact in our local array
+            const contactIndex = organizationContacts.findIndex(c => c.id === originalContactId);
+            if (contactIndex >= 0) {
+                organizationContacts[contactIndex] = updatedContact;
+            }
+            
+            // Update conference team if this person was attending
+            const conferenceIndex = conferenceTeam.findIndex(c => c.id === originalContactId);
+            if (conferenceIndex >= 0) {
+                conferenceTeam[conferenceIndex] = {
+                    id: updatedContact.id,
+                    name: updatedContact.name,
+                    workEmail: updatedContact.workEmail,
+                    roleTitle: updatedContact.roleTitle,
+                    isPrimaryContact: conferenceTeam[conferenceIndex].isPrimaryContact
+                };
+            }
+            
+            console.log(`✅ Contact updated locally: ${name}`);
+            
+            cancelEditContact();
+            displayContacts();
+        }
+        
+        function cancelEditContact() {
+            // Remove edit form
+            const editForm = document.getElementById('editContactForm');
+            if (editForm) {
+                editForm.remove();
+            }
+            
+            // Show add new contact button again
+            document.getElementById('addContactBtn').style.display = 'block';
         }
 
         // ===========================================
@@ -987,7 +1112,7 @@
                 console.log('✅ Company profile saved!', companyResult);
 
                 // STEP 3: Save conference team
-                if (conferenceTeam.length > 0 || hasNewContacts() || hasDeletedContacts()) {
+                if (conferenceTeam.length > 0 || hasNewContacts() || hasEditedContacts() || hasDeletedContacts()) {
                     console.log('👥 Saving conference team...');
                     
                     const contactOperations = {
@@ -1060,6 +1185,10 @@
             return false; // TODO: Implement contact deletion later
         }
 
+        function hasEditedContacts() {
+            return organizationContacts.some(contact => contact.id.startsWith('edited_'));
+        }
+
         function getNewContacts() {
             return organizationContacts
                 .filter(contact => contact.id.startsWith('temp_'))
@@ -1073,7 +1202,16 @@
         }
 
         function getUpdatedContacts() {
-            return []; // TODO: Implement contact editing later
+            return organizationContacts
+                .filter(contact => contact.id.startsWith('edited_'))
+                .map(contact => ({
+                    originalId: contact.originalId, // The original Notion contact ID
+                    name: contact.name,
+                    firstName: contact.firstName,
+                    workEmail: contact.workEmail,
+                    workPhone: contact.workPhone,
+                    roleTitle: contact.roleTitle
+                }));
         }
 
         function getDeletedContacts() {

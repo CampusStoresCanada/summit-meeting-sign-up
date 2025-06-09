@@ -108,6 +108,7 @@
         input[type="text"], 
         input[type="url"], 
         input[type="email"],
+        input[type="tel"],
         select, 
         textarea {
             width: 100%;
@@ -170,15 +171,75 @@
             color: #1976d2;
         }
 
-        .contact-row {
-            display: grid;
-            grid-template-columns: 2fr 2fr 1fr 2fr 1fr;
-            gap: 15px;
-            align-items: end;
-            margin-bottom: 15px;
+        .contact-item {
+            display: flex;
+            align-items: center;
             padding: 15px;
+            margin-bottom: 10px;
             border: 1px solid #e9ecef;
             border-radius: 8px;
+            background: white;
+            transition: all 0.2s;
+        }
+        
+        .contact-item:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+        
+        .contact-checkbox {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+        
+        .contact-info {
+            flex-grow: 1;
+        }
+        
+        .contact-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .contact-details {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .primary-contact-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .primary-contact-radio {
+            margin-left: 15px;
+        }
+        
+        .contact-actions {
+            margin-left: 15px;
+        }
+        
+        .edit-contact-btn {
+            background: #ffc107;
+            color: #333;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        .no-contacts-message {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
         }
 
         .add-contact-btn {
@@ -190,16 +251,6 @@
             cursor: pointer;
             font-size: 0.9rem;
             margin-top: 10px;
-        }
-
-        .remove-contact-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
         }
 
         .submit-section {
@@ -270,83 +321,9 @@
                 grid-template-columns: 1fr;
             }
             
-            .contact-row {
-                grid-template-columns: 1fr;
-            }
-            
             .container {
                 margin: 10px;
             }
-        }
-        .contact-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            margin-bottom: 10px;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            background: white;
-            transition: all 0.2s;
-        }
-        
-        .contact-item:hover {
-            border-color: #667eea;
-            background: #f8f9fa;
-        }
-        
-        .contact-checkbox {
-            margin-right: 15px;
-            transform: scale(1.2);
-        }
-        
-        .contact-info {
-            flex-grow: 1;
-        }
-        
-        .contact-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-        
-        .contact-details {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        
-        .primary-contact-badge {
-            background: #667eea;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            margin-left: 10px;
-        }
-        
-        .primary-contact-radio {
-            margin-left: 15px;
-        }
-        
-        .contact-actions {
-            margin-left: 15px;
-        }
-        
-        .edit-contact-btn {
-            background: #ffc107;
-            color: #333;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-        
-        .no-contacts-message {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-            font-style: italic;
         }
     </style>
 </head>
@@ -448,6 +425,7 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- Conference Team Section -->
                 <div class="section">
                     <h3>👥 Conference Team</h3>
@@ -530,32 +508,50 @@
     </div>
 
     <script>
-        // Configuration
-        const API_BASE = '/api'; // Will point to your Vercel functions
+        // ===========================================
+        // CONFIGURATION & GLOBAL VARIABLES
+        // ===========================================
+        const API_BASE = '/api';
         let vendorData = {};
-        let contactCounter = 0;
         let organizationContacts = [];
-        let conferenceTeam = []; 
-            
+        let conferenceTeam = [];
+
+        // ===========================================
+        // UTILITY FUNCTIONS
+        // ===========================================
         function showLoading(show) {
             document.getElementById('loadingState').style.display = show ? 'block' : 'none';
         }
-    
+
         function showError(message) {
             document.getElementById('errorMessage').textContent = message;
             document.getElementById('errorState').style.display = 'block';
         }
-    
-        // SINGLE DOMContentLoaded handler that does everything in the right order
+
+        function handleFileSelect(input, displayElementId) {
+            const file = input.files[0];
+            const displayElement = document.getElementById(displayElementId);
+            
+            if (file) {
+                displayElement.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                displayElement.style.color = '#28a745';
+            } else {
+                displayElement.textContent = '';
+            }
+        }
+
+        // ===========================================
+        // MAIN INITIALIZATION
+        // ===========================================
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             
-            // FIRST: Check for OAuth callback success/error
+            // Check for OAuth callback success/error
             if (urlParams.get('success') === 'true') {
                 console.log('🎉 OAuth callback success!');
                 document.getElementById('profileForm').style.display = 'none';
                 document.getElementById('successState').style.display = 'block';
-                return; // Stop here, don't load form
+                return;
             }
             
             if (urlParams.get('error')) {
@@ -579,16 +575,16 @@
                 }
                 
                 showError(errorMessage);
-                return; // Stop here, don't load form
+                return;
             }
             
-            // SECOND: Normal page load - get token and load vendor data
+            // Normal page load - get token and load vendor data
             const token = urlParams.get('token');
             if (!token) {
                 showError('Invalid access link. Please check your email for the correct URL.');
                 return;
             }
-    
+
             try {
                 console.log('🪄 Loading vendor data for token:', token);
                 await loadVendorData(token);
@@ -597,7 +593,10 @@
                 showError('Unable to load your profile information. Please try again later.');
             }
         });
-    
+
+        // ===========================================
+        // DATA LOADING FUNCTIONS
+        // ===========================================
         async function loadVendorData(token) {
             showLoading(true);
             
@@ -613,8 +612,6 @@
                 console.log('✅ Vendor data loaded:', vendorData);
                 
                 populateForm(vendorData);
-                
-                // 👥 NEW: Load organization contacts
                 await loadOrganizationContacts(token);
                 
                 showLoading(false);
@@ -626,102 +623,7 @@
                 throw error;
             }
         }
-    
-        function populateForm(data) {
-            console.log('📝 Populating form with:', data);
-            
-            // Update booth info
-            document.getElementById('boothNumber').textContent = `Booth ${data.boothNumber}`;
-        
-            // Populate current company data
-            document.getElementById('companyNameValue').textContent = data.organization?.name || 'No company name on file';
-            document.getElementById('companyName').value = data.organization?.name || '';
-            document.getElementById('websiteValue').textContent = data.organization?.website || 'No website on file';
-            document.getElementById('websiteUrl').value = data.organization?.website || '';
-            
-            // Pre-select category if exists
-            if (data.organization?.primaryCategory) {
-                document.getElementById('primaryCategory').value = data.organization.primaryCategory;
-            }
-            
-            // Populate description if exists
-            if (data.organization?.description) {
-                document.getElementById('companyDescription').value = data.organization.description;
-            }
-            
-            // Populate highlight product if exists
-            if (data.organization?.highlightProduct) {
-                document.getElementById('highlightProductName').value = data.organization.highlightProduct.name || '';
-                document.getElementById('highlightProductDescription').value = data.organization.highlightProduct.description || '';
-            }
-        }
-    
-        function addContactRow(contactData = {}) {
-            const container = document.getElementById('contactsContainer');
-            const contactId = `contact_${contactCounter++}`;
-            
-            const contactRow = document.createElement('div');
-            contactRow.className = 'contact-row';
-            contactRow.innerHTML = `
-                <div>
-                    <label>Full Name</label>
-                    <input type="text" name="contacts[${contactId}][name]" value="${contactData.name || ''}" placeholder="Sarah Johnson">
-                </div>
-                <div>
-                    <label>Job Title</label>
-                    <input type="text" name="contacts[${contactId}][title]" value="${contactData.title || ''}" placeholder="Sales Director">
-                </div>
-                <div>
-                    <label>Circle Username</label>
-                    <input type="text" name="contacts[${contactId}][circle]" value="${contactData.circle || ''}" placeholder="@sarahj">
-                </div>
-                <div>
-                    <label>Email</label>
-                    <input type="email" name="contacts[${contactId}][email]" value="${contactData.email || ''}" placeholder="sarah@company.com">
-                </div>
-                <div>
-                    <button type="button" class="remove-contact-btn" onclick="removeContactRow(this)">Remove</button>
-                </div>
-            `;
-            
-            container.appendChild(contactRow);
-        }
-    
-        function removeContactRow(button) {
-            const row = button.closest('.contact-row');
-            row.remove();
-        }
-    
-        function handleFileSelect(input, displayElementId) {
-            const file = input.files[0];
-            const displayElement = document.getElementById(displayElementId);
-            
-            if (file) {
-                displayElement.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                displayElement.style.color = '#28a745';
-            } else {
-                displayElement.textContent = '';
-            }
-        }
-    
-        function handleMultipleFiles(input, displayElementId) {
-            const files = Array.from(input.files);
-            const displayElement = document.getElementById(displayElementId);
-            
-            if (files.length > 0) {
-                const fileList = files.map(file => 
-                    `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`
-                ).join('<br>');
-                displayElement.innerHTML = `Selected ${files.length} file(s):<br>${fileList}`;
-                displayElement.style.color = '#28a745';
-            } else {
-                displayElement.innerHTML = '';
-            }
-        }
-        let organizationContacts = [];
-        let conferenceTeam = []; // People attending the conference
-        
-        // Load organization contacts after vendor data is loaded
+
         async function loadOrganizationContacts(token) {
             console.log('👥 Loading organization contacts...');
             
@@ -754,8 +656,39 @@
                 document.getElementById('contactsErrorMessage').textContent = error.message;
             }
         }
+
+        function populateForm(data) {
+            console.log('📝 Populating form with:', data);
+            
+            // Update booth info
+            document.getElementById('boothNumber').textContent = `Booth ${data.boothNumber}`;
         
-        // Display contacts in the UI
+            // Populate current company data
+            document.getElementById('companyNameValue').textContent = data.organization?.name || 'No company name on file';
+            document.getElementById('companyName').value = data.organization?.name || '';
+            document.getElementById('websiteValue').textContent = data.organization?.website || 'No website on file';
+            document.getElementById('websiteUrl').value = data.organization?.website || '';
+            
+            // Pre-select category if exists
+            if (data.organization?.primaryCategory) {
+                document.getElementById('primaryCategory').value = data.organization.primaryCategory;
+            }
+            
+            // Populate description if exists
+            if (data.organization?.description) {
+                document.getElementById('companyDescription').value = data.organization.description;
+            }
+            
+            // Populate highlight product if exists
+            if (data.organization?.highlightProduct) {
+                document.getElementById('highlightProductName').value = data.organization.highlightProduct.name || '';
+                document.getElementById('highlightProductDescription').value = data.organization.highlightProduct.description || '';
+            }
+        }
+
+        // ===========================================
+        // CONTACT MANAGEMENT FUNCTIONS
+        // ===========================================
         function displayContacts() {
             const contactsLoading = document.getElementById('contactsLoading');
             const contactsList = document.getElementById('contactsList');
@@ -822,7 +755,6 @@
             contactsList.innerHTML = contactsHTML;
         }
         
-        // Toggle whether a contact is attending the conference
         function toggleContactAttendance(contactId) {
             const contact = organizationContacts.find(c => c.id === contactId);
             if (!contact) return;
@@ -845,16 +777,14 @@
                 console.log(`✅ Added ${contact.name} to conference team`);
             }
             
-            // If this was the primary contact and they're removed, clear primary status
+            // Auto-assign primary contact logic
             if (existingIndex >= 0 && conferenceTeam.length > 0) {
                 const hadPrimary = conferenceTeam.some(c => c.isPrimaryContact);
                 if (!hadPrimary && conferenceTeam.length > 0) {
-                    // Auto-assign first person as primary if no one else is
                     conferenceTeam[0].isPrimaryContact = true;
                 }
             }
             
-            // If this is the first person added, make them primary
             if (conferenceTeam.length === 1) {
                 conferenceTeam[0].isPrimaryContact = true;
             }
@@ -862,7 +792,6 @@
             displayContacts();
         }
         
-        // Set primary contact
         function setPrimaryContact(contactId) {
             // Clear all primary statuses
             conferenceTeam.forEach(c => c.isPrimaryContact = false);
@@ -877,13 +806,11 @@
             displayContacts();
         }
         
-        // Show add contact form
         function showAddContactForm() {
             document.getElementById('newContactForm').style.display = 'block';
             document.getElementById('addContactBtn').style.display = 'none';
         }
         
-        // Hide add contact form
         function hideAddContactForm() {
             document.getElementById('newContactForm').style.display = 'none';
             document.getElementById('addContactBtn').style.display = 'block';
@@ -895,7 +822,6 @@
             document.getElementById('newContactPhone').value = '';
         }
         
-        // Add new contact (temporarily, we'll save to Notion later)
         function addNewContact() {
             const name = document.getElementById('newContactName').value.trim();
             const title = document.getElementById('newContactTitle').value.trim();
@@ -938,14 +864,16 @@
             displayContacts();
         }
         
-        // Edit contact (placeholder for now)
         function editContact(contactId) {
             const contact = organizationContacts.find(c => c.id === contactId);
             if (contact) {
                 alert(`Edit contact functionality coming soon!\n\nContact: ${contact.name}\nEmail: ${contact.workEmail}`);
             }
         }
-        // Form submission with S3 upload
+
+        // ===========================================
+        // FORM SUBMISSION
+        // ===========================================
         document.getElementById('vendorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -957,7 +885,7 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const token = urlParams.get('token');
                 
-                // STEP 1: Handle catalogue upload (existing logic)
+                // STEP 1: Handle catalogue upload
                 const fileList = [];
                 const actualFiles = [];
                 
@@ -975,11 +903,11 @@
                     });
                     console.log(`📄 Found catalogue: ${catalogFile.name} (${(catalogFile.size / 1024 / 1024).toFixed(2)} MB)`);
                 }
-        
+
                 let uploadResults = {
                     catalogueUrl: null
                 };
-        
+
                 // Upload catalogue if we have one
                 if (fileList.length > 0) {
                     console.log('📁 Getting presigned URL for catalogue...');
@@ -993,12 +921,12 @@
                             token: token
                         })
                     });
-        
+
                     if (!urlResponse.ok) {
                         const errorData = await urlResponse.json();
                         throw new Error(`Failed to get upload URL: ${errorData.error}`);
                     }
-        
+
                     const urlData = await urlResponse.json();
                     console.log('🎫 Got presigned URL!');
                     
@@ -1028,8 +956,8 @@
                     
                     console.log('🎉 Catalogue upload complete!', uploadResults);
                 }
-        
-                // STEP 2: Save company profile (existing logic)
+
+                // STEP 2: Save company profile
                 const companyData = {
                     token: token,
                     uploadResults: uploadResults
@@ -1057,8 +985,8 @@
                 
                 const companyResult = await companyResponse.json();
                 console.log('✅ Company profile saved!', companyResult);
-        
-                // STEP 3: Save conference team (NEW!)
+
+                // STEP 3: Save conference team
                 if (conferenceTeam.length > 0 || hasNewContacts() || hasDeletedContacts()) {
                     console.log('👥 Saving conference team...');
                     
@@ -1068,7 +996,7 @@
                         delete: getDeletedContacts(),
                         conferenceTeam: conferenceTeam.map(member => ({
                             id: member.id,
-                            attending: true, // If they're in conferenceTeam, they're attending
+                            attending: true,
                             isPrimary: member.isPrimaryContact
                         }))
                     };
@@ -1076,11 +1004,11 @@
                     // Add non-attending contacts with Secondary Contact tag
                     const nonAttendingContacts = organizationContacts
                         .filter(contact => !conferenceTeam.some(member => member.id === contact.id))
-                        .filter(contact => !contact.id.startsWith('temp_')) // Skip temporary contacts
+                        .filter(contact => !contact.id.startsWith('temp_'))
                         .map(contact => ({
                             id: contact.id,
                             attending: false,
-                            isPrimary: false // Non-attending get Secondary Contact tag
+                            isPrimary: false
                         }));
                     
                     contactOperations.conferenceTeam.push(...nonAttendingContacts);
@@ -1099,7 +1027,6 @@
                     if (!contactResponse.ok) {
                         const errorData = await contactResponse.json();
                         console.error('❌ Contact save failed:', errorData);
-                        // Don't throw here - company profile already saved
                         showError('Company profile saved, but there was an issue saving contact information.');
                         return;
                     }
@@ -1121,17 +1048,18 @@
                 showError('Failed to update profile. Please try again.');
             }
         });
-        
-        // Helper functions to track contact changes
+
+        // ===========================================
+        // HELPER FUNCTIONS FOR CONTACT TRACKING
+        // ===========================================
         function hasNewContacts() {
             return organizationContacts.some(contact => contact.id.startsWith('temp_'));
         }
-        
+
         function hasDeletedContacts() {
-            // We'll implement contact deletion later
-            return false;
+            return false; // TODO: Implement contact deletion later
         }
-        
+
         function getNewContacts() {
             return organizationContacts
                 .filter(contact => contact.id.startsWith('temp_'))
@@ -1143,15 +1071,13 @@
                     roleTitle: contact.roleTitle
                 }));
         }
-        
+
         function getUpdatedContacts() {
-            // We'll implement contact editing later
-            return [];
+            return []; // TODO: Implement contact editing later
         }
-        
+
         function getDeletedContacts() {
-            // We'll implement contact deletion later
-            return [];
+            return []; // TODO: Implement contact deletion later
         }
     </script>
 </body>

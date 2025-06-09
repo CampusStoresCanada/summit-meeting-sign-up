@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   const notionToken = process.env.NOTION_TOKEN;
   const organizationsDbId = process.env.NOTION_ORGANIZATIONS_DB_ID;
   const contactsDbId = process.env.NOTION_CONTACTS_DB_ID;
-  const tagSystemDbId = process.enc.NOTION_TAG_SYSTEM_DB_ID;
+  const tagSystemDbId = process.env.NOTION_TAG_SYSTEM_DB_ID;
   
   // Safety check
   if (!notionToken || !organizationsDbId || !contactsDbId) {
@@ -174,7 +174,7 @@ export default async function handler(req, res) {
             };
           }
 
-          const updateResponse = await fetch(`https://api.notion.com/v1/pages/${updateContact.id}`, {
+          const updateResponse = await fetch(`https://api.notion.com/v1/pages/${updateContact.originalId}`, {
             method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${notionToken}`,
@@ -251,7 +251,7 @@ export default async function handler(req, res) {
       console.log(`🏷️ Processing conference team tagging...`);
       
       // First, we need to get the tag IDs from the Tag System database
-      const tagSystemDbId = process.env.NOTION_TAG_SYSTEM_DB_ID || '1f9a69bf0cfd8034b919f51b7c4f2c67';
+      const tagSystemDbId = process.env.NOTION_TAG_SYSTEM_DB_ID
       
       // Get the tags we need
       const tagsToFind = ['26 Conference Exhibitor', 'Primary Contact', 'Secondary Contact'];

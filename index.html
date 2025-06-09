@@ -534,6 +534,17 @@
         const API_BASE = '/api'; // Will point to your Vercel functions
         let vendorData = {};
         let contactCounter = 0;
+        let organizationContacts = [];
+        let conferenceTeam = []; 
+            
+        function showLoading(show) {
+            document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+        }
+    
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorState').style.display = 'block';
+        }
     
         // SINGLE DOMContentLoaded handler that does everything in the right order
         document.addEventListener('DOMContentLoaded', async () => {

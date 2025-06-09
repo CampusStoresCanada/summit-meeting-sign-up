@@ -938,7 +938,7 @@
         document.getElementById('vendorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            console.log('🚀 Starting CATALOGUE-ONLY form submission...');
+            console.log('🚀 Starting FULL form submission (company + contacts)...');
             showLoading(true);
             
             try {
@@ -946,7 +946,7 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const token = urlParams.get('token');
                 
-                // Collect catalogue file only
+                // STEP 1: Handle catalogue upload (existing logic)
                 const fileList = [];
                 const actualFiles = [];
                 
@@ -969,11 +969,10 @@
                     catalogueUrl: null
                 };
         
-                // If we have a catalogue, upload it to S3
+                // Upload catalogue if we have one
                 if (fileList.length > 0) {
                     console.log('📁 Getting presigned URL for catalogue...');
                     
-                    // Step 1: Get presigned URL
                     const urlResponse = await fetch(`${API_BASE}/get-presigned-urls`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -992,42 +991,35 @@
                     const urlData = await urlResponse.json();
                     console.log('🎫 Got presigned URL!');
                     
-                    // Step 2: Upload catalogue directly to S3
                     if (urlData.uploadUrls.length > 0) {
                         const urlInfo = urlData.uploadUrls[0];
                         const fileInfo = actualFiles[0];
                         
-                        try {
-                            console.log(`⬆️ Uploading ${urlInfo.fileName} directly to S3...`);
-                            
-                            const uploadResponse = await fetch(urlInfo.presignedUrl, {
-                                method: 'PUT',
-                                headers: {
-                                    'Content-Type': fileInfo.file.type
-                                },
-                                body: fileInfo.file
-                            });
-                            
-                            if (uploadResponse.ok) {
-                                uploadResults.catalogueUrl = urlInfo.publicUrl;
-                                console.log(`📄 Catalogue uploaded: ${urlInfo.publicUrl}`);
-                            } else {
-                                const errorText = await uploadResponse.text();
-                                console.error(`❌ Upload failed:`, errorText);
-                                throw new Error('Catalogue upload failed');
-                            }
-                            
-                        } catch (uploadError) {
-                            console.error(`💥 Error uploading catalogue:`, uploadError);
-                            throw uploadError;
+                        console.log(`⬆️ Uploading ${urlInfo.fileName} directly to S3...`);
+                        
+                        const uploadResponse = await fetch(urlInfo.presignedUrl, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': fileInfo.file.type
+                            },
+                            body: fileInfo.file
+                        });
+                        
+                        if (uploadResponse.ok) {
+                            uploadResults.catalogueUrl = urlInfo.publicUrl;
+                            console.log(`📄 Catalogue uploaded: ${urlInfo.publicUrl}`);
+                        } else {
+                            const errorText = await uploadResponse.text();
+                            console.error(`❌ Upload failed:`, errorText);
+                            throw new Error('Catalogue upload failed');
                         }
                     }
                     
                     console.log('🎉 Catalogue upload complete!', uploadResults);
                 }
         
-                // Step 3: Submit form data to backend
-                const jsonData = {
+                // STEP 2: Save company profile (existing logic)
+                const companyData = {
                     token: token,
                     uploadResults: uploadResults
                 };
@@ -1035,26 +1027,79 @@
                 // Add all text form fields
                 for (let [key, value] of formData.entries()) {
                     if (key !== 'catalogFile' && value && typeof value === 'string') {
-                        jsonData[key] = value;
+                        companyData[key] = value;
                     }
                 }
                 
-                console.log('📤 Submitting form data to backend...');
+                console.log('📤 Submitting company data to backend...');
                 
-                const response = await fetch(`${API_BASE}/update-vendor-profile`, {
+                const companyResponse = await fetch(`${API_BASE}/update-vendor-profile`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(jsonData)
+                    body: JSON.stringify(companyData)
                 });
                 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Backend error: ${errorData.error}`);
+                if (!companyResponse.ok) {
+                    const errorData = await companyResponse.json();
+                    throw new Error(`Company profile error: ${errorData.error}`);
                 }
                 
-                const result = await response.json();
-                console.log('✨ Backend response:', result);
+                const companyResult = await companyResponse.json();
+                console.log('✅ Company profile saved!', companyResult);
+        
+                // STEP 3: Save conference team (NEW!)
+                if (conferenceTeam.length > 0 || hasNewContacts() || hasDeletedContacts()) {
+                    console.log('👥 Saving conference team...');
+                    
+                    const contactOperations = {
+                        create: getNewContacts(),
+                        update: getUpdatedContacts(),
+                        delete: getDeletedContacts(),
+                        conferenceTeam: conferenceTeam.map(member => ({
+                            id: member.id,
+                            attending: true, // If they're in conferenceTeam, they're attending
+                            isPrimary: member.isPrimaryContact
+                        }))
+                    };
+                    
+                    // Add non-attending contacts with Secondary Contact tag
+                    const nonAttendingContacts = organizationContacts
+                        .filter(contact => !conferenceTeam.some(member => member.id === contact.id))
+                        .filter(contact => !contact.id.startsWith('temp_')) // Skip temporary contacts
+                        .map(contact => ({
+                            id: contact.id,
+                            attending: false,
+                            isPrimary: false // Non-attending get Secondary Contact tag
+                        }));
+                    
+                    contactOperations.conferenceTeam.push(...nonAttendingContacts);
+                    
+                    console.log('📋 Contact operations:', contactOperations);
+                    
+                    const contactResponse = await fetch(`${API_BASE}/save-conference-team`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            token: token,
+                            contactOperations: contactOperations
+                        })
+                    });
+                    
+                    if (!contactResponse.ok) {
+                        const errorData = await contactResponse.json();
+                        console.error('❌ Contact save failed:', errorData);
+                        // Don't throw here - company profile already saved
+                        showError('Company profile saved, but there was an issue saving contact information.');
+                        return;
+                    }
+                    
+                    const contactResult = await contactResponse.json();
+                    console.log('✅ Conference team saved!', contactResult);
+                } else {
+                    console.log('👥 No contact changes to save');
+                }
                 
+                // SUCCESS!
                 showLoading(false);
                 document.getElementById('profileForm').style.display = 'none';
                 document.getElementById('successState').style.display = 'block';
@@ -1065,14 +1110,37 @@
                 showError('Failed to update profile. Please try again.');
             }
         });
-    
-          function showLoading(show) {
-            document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+        
+        // Helper functions to track contact changes
+        function hasNewContacts() {
+            return organizationContacts.some(contact => contact.id.startsWith('temp_'));
         }
-
-        function showError(message) {
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorState').style.display = 'block';
+        
+        function hasDeletedContacts() {
+            // We'll implement contact deletion later
+            return false;
+        }
+        
+        function getNewContacts() {
+            return organizationContacts
+                .filter(contact => contact.id.startsWith('temp_'))
+                .map(contact => ({
+                    name: contact.name,
+                    firstName: contact.firstName,
+                    workEmail: contact.workEmail,
+                    workPhone: contact.workPhone,
+                    roleTitle: contact.roleTitle
+                }));
+        }
+        
+        function getUpdatedContacts() {
+            // We'll implement contact editing later
+            return [];
+        }
+        
+        function getDeletedContacts() {
+            // We'll implement contact deletion later
+            return [];
         }
     </script>
 </body>

@@ -171,7 +171,7 @@ export default async function handler(req, res) {
             };
           }
 
-          const updateResponse = await fetch(`https://api.notion.com/v1/pages/${updateContact.originalId}`, {
+          const updateResponse = await fetch(`https://api.notion.com/v1/pages/${teamMember.id}`, {
             method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${notionToken}`,

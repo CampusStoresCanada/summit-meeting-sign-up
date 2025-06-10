@@ -49,7 +49,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.66);
             border-radius: 20px;
             border: 3px solid #000000;
             overflow: hidden;
@@ -187,7 +187,7 @@
         .welcome-title {
             font-family: 'davis-sans', sans-serif;
             font-weight: 700;
-            font-size: 48px;
+            font-size: 76px;
             color: #000000;
             margin-bottom: 30px;
             line-height: 1.1;
@@ -206,16 +206,22 @@
             background: #0071bc;
             color: #ffffff;
             border: none;
-            padding: 16px 32px;
+            width: 12.5vw;
+            height: auto;
+            padding: 16px 20px;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 24px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 20px;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
+            position: absolute;
+            left: 77vw;
+            top: 82.5vh;
+            transform: translate(-50%, -50%);
         }
 
         .get-started-btn:hover {
@@ -399,7 +405,7 @@
             }
 
             .welcome-title {
-                font-size: 32px;
+                font-size: 48px;
             }
 
             .navigation-buttons {
@@ -518,22 +524,16 @@
                 <div class="welcome-section">
                     <h1 class="welcome-title">Welcome</h1>
                     <p class="welcome-text">
-                        This is a welcome screen. We'll write an intro paragraph that instructs people to 
-                        have contacts, products, and maybe a conference sale or highlight item ready.
+                        Thank you for participating in the Campus Stores Canada Conference 2026. To help conference attendees discover your products and services, please complete your booth profile.
                     </p>
                     <p class="welcome-text">
-                        We're going to warn them that this stuff will go live to the conference map, that 
-                        while there is a human reviewing the information we are mostly there to make sure 
-                        that it looks good on the map, not that it is factually accurate.
+                        You'll need to provide company information, highlight a featured product or service, select your conference team members, and optionally upload a product catalogue.
                     </p>
                     <p class="welcome-text">
-                        We'll also let them know that they will need to complete the process to save. Not 
-                        everything needs to be done, but we do need them to hit submit for their answers to 
-                        be uploaded.
+                        Your information will be reviewed before appearing on the conference map. Please complete all sections and submit the form to save your profile.
                     </p>
                     <p class="welcome-text">
-                        Then we'll thank them again for being a partner. That we really appreciate them 
-                        doing this and that we're happy to have them come to the conference.
+                        We appreciate your partnership and look forward to seeing you at the conference!
                     </p>
                     <button class="get-started-btn" onclick="startWizard()">
                         Get started

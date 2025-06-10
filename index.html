@@ -151,21 +151,31 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-            color: #666666;
             margin-right: 16px;
             transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .step-number svg {
+            width: 28px;
+            height: 28px;
+            fill: #666666;
         }
 
         .step-item.active .step-number {
             background: #0071bc;
-            color: #ffffff;
+        }
+
+        .step-item.active .step-number svg {
+            fill: #ffffff;
         }
 
         .step-item.completed .step-number {
             background: #28a745;
-            color: #ffffff;
+        }
+
+        .step-item.completed .step-number svg {
+            fill: #ffffff;
         }
 
         .step-title {
@@ -354,31 +364,52 @@
         }
 
         /* Responsive Design */
-        @media (max-width: 768px) {
+        @media (orientation: portrait), (max-width: 768px) {
+            body::before {
+                display: none;
+            }
+            
             .wizard-container {
+                position: static;
+                transform: none;
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+                margin: 0;
+                border-radius: 0;
+                border: none;
                 flex-direction: column;
-                margin: 10px;
-                border-radius: 12px;
+                box-shadow: none;
             }
 
             .sidebar {
                 width: 100%;
                 padding: 20px;
-                border-right: none;
-                border-bottom: 1px solid #e6e6e6;
+                box-shadow: none;
+                border-bottom: 1px solid #cccccc;
             }
 
             .logo-section {
-                display: flex;
-                align-items: center;
-                gap: 20px;
+                height: auto;
                 margin-bottom: 20px;
             }
 
             .logo {
                 width: 40px;
                 height: 40px;
-                margin-bottom: 0;
+            }
+
+            .logo-text {
+                height: auto;
+            }
+
+            .conference-title {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+
+            .booth-number {
+                font-size: 24px;
             }
 
             .step-navigation {
@@ -421,6 +452,10 @@
             .nav-btn {
                 width: 100%;
             }
+
+            .booth-number {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
@@ -438,7 +473,12 @@
 
             <div class="step-navigation">
                 <div class="step-item active" data-step="0">
-                    <div class="step-number">1</div>
+                    <div class="step-number">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.01">
+                            <path d="M14.01,28.01C6.28,28.01,0,21.73,0,14.01S6.28,0,14.01,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2C7.39,2,2,7.39,2,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2,14.01,2Z"/>
+                            <path d="M13.25,22.55v-13.78l-1.63.89-1.06-1.8,4.51-2.4h.38v17.09h-2.21Z"/>
+                        </svg>
+                    </div>
                     <div class="step-title">Company information</div>
                 </div>
                 <div class="step-item disabled" data-step="1">

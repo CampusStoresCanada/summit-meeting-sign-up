@@ -214,7 +214,6 @@
             font-size: 24px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -227,15 +226,17 @@
 
         .get-started-btn:hover {
             background: #005a94;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 113, 188, 0.3);
         }
 
         /* Loading State */
         .loading {
             display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             text-align: center;
-            padding: 60px;
+            z-index: 10;
         }
 
         .spinner {
@@ -248,14 +249,15 @@
             margin: 0 auto 20px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         .loading-text {
             font-size: 18px;
             color: #808080;
+            margin-top: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Error State */
@@ -442,8 +444,16 @@
 </head>
 <body>
     <div class="wizard-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
+        <!-- Loading State - Centered in Container -->
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading your profile information...</div>
+        </div>
+
+        <!-- Main Content - Wrapped for fade-in -->
+        <div class="wizard-content" id="wizardContent">
+            <!-- Sidebar -->
+            <div class="sidebar">
             <div class="logo-section">
                 <div class="logo-and-title">
                     <img src="https://images.squarespace-cdn.com/content/v1/5cf7db4cc0827b0001c9ff81/3c43cc7d-5f2a-4b5e-888e-887d3bb38ebc/Logo+Only.png?format=750w" alt="Campus Stores Conference" class="logo">
@@ -701,12 +711,16 @@
             hideLoadingState();
             hideErrorState();
             hideSuccessState();
+            // Fade in content
+            document.getElementById('wizardContent').classList.add('loaded');
         }
 
         function showLoadingState() {
             document.getElementById('loadingState').style.display = 'block';
             hideErrorState();
             hideSuccessState();
+            // Hide content while loading
+            document.getElementById('wizardContent').classList.remove('loaded');
         }
 
         function hideLoadingState() {

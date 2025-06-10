@@ -105,12 +105,13 @@
 
         .booth-section {
             width: 100%;
+            margin-left: 95px; /* Logo width (80px) + gap (15px) = 95px */
         }
 
         .conference-title {
             font-family: 'davis-sans', sans-serif;
             font-weight: 700;
-            font-size: 36px;
+            font-size: 40px;
             color: #000000;
             line-height: 1.1;
             margin: 0;
@@ -125,7 +126,7 @@
             line-height: 1;
         }
 
-        /* Step Navigation */
+        /* Step Navigation - CLEAN VERSION */
         .step-navigation {
             flex: 1;
         }
@@ -134,70 +135,29 @@
             display: flex;
             align-items: center;
             margin-bottom: 30px;
-            cursor: pointer;
-            transition: all 0.2s ease;
             padding: 12px 0;
         }
 
-        .step-item:hover {
-            opacity: 0.7;
-        }
-
-        .step-item.active {
-            opacity: 1;
-        }
-
-        .step-item.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
         .step-number {
-            width: 32px;
-            height: 32px;
-            background: #f2f2f2;
-            border-radius: 50%;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 16px;
-            transition: all 0.2s ease;
-            position: relative;
+            margin-right: 20px;
+            flex-shrink: 0;
         }
 
         .step-number svg {
-            width: 28px;
-            height: 28px;
-            fill: #666666;
-        }
-
-        .step-item.active .step-number {
-            background: #0071bc;
-        }
-
-        .step-item.active .step-number svg {
-            fill: #ffffff;
-        }
-
-        .step-item.completed .step-number {
-            background: #28a745;
-        }
-
-        .step-item.completed .step-number svg {
-            fill: #ffffff;
+            width: 40px;
+            height: 40px;
         }
 
         .step-title {
             font-weight: 500;
-            font-size: 14px;
+            font-size: 18px;
             color: #333333;
             line-height: 1.2;
-            max-width: 140px;
-        }
-
-        .step-item.active .step-title {
-            color: #000000;
-            font-weight: 600;
         }
 
         /* Main Content */
@@ -417,7 +377,7 @@
             }
 
             .conference-title {
-                font-size: 14px;
+                font-size: 24px;
                 margin-bottom: 8px;
             }
 
@@ -434,7 +394,7 @@
             }
 
             .main-content {
-                padding: 40px 20px;
+                padding: 20px;
             }
 
             .welcome-title {
@@ -489,7 +449,7 @@
             </div>
 
             <div class="step-navigation">
-                <div class="step-item active" data-step="0">
+                <div class="step-item" data-step="0">
                     <div class="step-number">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.01">
                             <path d="M14.01,28.01C6.28,28.01,0,21.73,0,14.01S6.28,0,14.01,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2C7.39,2,2,7.39,2,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2,14.01,2Z"/>
@@ -498,7 +458,7 @@
                     </div>
                     <div class="step-title">Company information</div>
                 </div>
-                <div class="step-item disabled" data-step="1">
+                <div class="step-item" data-step="1">
                     <div class="step-number">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.04 28.01">
                             <path d="M13.98,28.01C6.25,28.01-.03,21.73-.03,14.01S6.25,0,13.98,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM13.98,2C7.36,2,1.97,7.39,1.97,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.6,2,13.98,2Z"/>
@@ -507,7 +467,7 @@
                     </div>
                     <div class="step-title">Conference highlight</div>
                 </div>
-                <div class="step-item disabled" data-step="2">
+                <div class="step-item" data-step="2">
                     <div class="step-number">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.25">
                             <path d="M14.01,28.25C6.28,28.25,0,21.97,0,14.25S6.28.24,14.01.24s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2.24C7.39,2.24,2,7.63,2,14.25s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2.24,14.01,2.24Z"/>
@@ -516,7 +476,7 @@
                     </div>
                     <div class="step-title">Conference team</div>
                 </div>
-                <div class="step-item disabled" data-step="3">
+                <div class="step-item" data-step="3">
                     <div class="step-number">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.01">
                             <path d="M14.01,28.01C6.28,28.01,0,21.73,0,14.01S6.28,0,14.01,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2C7.39,2,2,7.39,2,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2,14.01,2Z"/>
@@ -713,21 +673,7 @@
         }
 
         function updateStepNavigation() {
-            const stepItems = document.querySelectorAll('.step-item');
-            
-            stepItems.forEach((item, index) => {
-                const stepIndex = index + 1;
-                
-                item.classList.remove('active', 'completed', 'disabled');
-                
-                if (stepIndex === currentStep) {
-                    item.classList.add('active');
-                } else if (stepIndex < currentStep) {
-                    item.classList.add('completed');
-                } else {
-                    item.classList.add('disabled');
-                }
-            });
+            // No visual updates needed since steps are just static SVGs
         }
 
         function updateMobileProgress() {

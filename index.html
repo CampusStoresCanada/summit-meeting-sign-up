@@ -239,6 +239,24 @@
             z-index: 10;
         }
 
+        .loading-title {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 700;
+            font-size: 48px;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        /* Content fade-in animation */
+        .wizard-content {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .wizard-content.loaded {
+            opacity: 1;
+        }
+
         .spinner {
             border: 4px solid #f2f2f2;
             border-top: 4px solid #0071bc;
@@ -444,13 +462,12 @@
 </head>
 <body>
     <div class="wizard-container">
-        <!-- Loading State - Centered in Container -->
+        <!-- Loading State - Clean container with just "Loading..." -->
         <div id="loadingState" class="loading">
-            <div class="spinner"></div>
-            <div class="loading-text">Loading your profile information...</div>
+            <div class="loading-title">Loading...</div>
         </div>
 
-        <!-- Main Content - Wrapped for fade-in -->
+        <!-- All Content - Hidden until loaded -->
         <div class="wizard-content" id="wizardContent">
             <!-- Sidebar -->
             <div class="sidebar">
@@ -717,14 +734,14 @@
 
         function showLoadingState() {
             document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('wizardContent').style.display = 'none';
             hideErrorState();
             hideSuccessState();
-            // Hide content while loading
-            document.getElementById('wizardContent').classList.remove('loaded');
         }
 
         function hideLoadingState() {
             document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('wizardContent').style.display = 'flex';
         }
 
         function showErrorState(message) {

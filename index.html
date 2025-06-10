@@ -17,7 +17,6 @@
             background: #ffffff;
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
         }
 
         /* Background image - right side only in landscape */
@@ -33,18 +32,13 @@
             z-index: -1;
         }
 
-        /* Hide background in portrait orientation */
-        @media (orientation: portrait) {
-            body::before {
-                display: none;
-            }
-        }
-
+        /* DESKTOP: 16:9 Container */
         .wizard-container {
             display: flex;
             width: 87.5vw;
-            height: calc(87.5vw * 9 / 16); /* Maintain 16:9 aspect ratio */
-            max-height: 90vh; /* Don't let it get too tall */
+            height: calc(87.5vw * 9 / 16);
+            max-width: 1600px;
+            max-height: 900px;
             margin: 0 auto;
             position: absolute;
             top: 50%;
@@ -55,15 +49,6 @@
             border: 3px solid #000000;
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-        }
-
-        /* When background disappears (portrait), use different sizing if needed */
-        @media (orientation: portrait) {
-            .wizard-container {
-                width: 87.5vw;
-                height: calc(87.5vw * 9 / 16);
-                /* Keep 16:9 in portrait too */
-            }
         }
 
         /* Sidebar */
@@ -88,7 +73,7 @@
             align-items: flex-start;
             gap: 15px;
             height: 80px;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
         }
 
         .logo {
@@ -107,8 +92,7 @@
 
         .booth-section {
             width: 100%;
-            margin-left: 95px; /* Logo width (80px) + gap (15px) = 95px */
-            margin-top: 25px; /* Add spacing between title and booth number */
+            margin-left: 95px;
         }
 
         .conference-title {
@@ -118,7 +102,6 @@
             color: #000000;
             line-height: 1.1;
             margin: 0;
-            white-space: nowrap; /* Prevent unwanted line breaks */
         }
 
         .booth-number {
@@ -130,7 +113,7 @@
             line-height: 1;
         }
 
-        /* Step Navigation - CLEAN VERSION */
+        /* Step Navigation */
         .step-navigation {
             flex: 1;
         }
@@ -185,7 +168,8 @@
         /* Welcome Screen */
         .welcome-section {
             width: 44vw;
-            margin-top: 140px; /* Align with Step 1 - accounts for logo section + spacing */
+            max-width: 600px;
+            margin-top: 140px;
         }
 
         .welcome-title {
@@ -211,6 +195,7 @@
             color: #ffffff;
             border: none;
             width: 12.5vw;
+            min-width: 180px;
             height: auto;
             padding: 16px 20px;
             border-radius: 8px;
@@ -222,9 +207,9 @@
             justify-content: center;
             gap: 8px;
             position: absolute;
-            right: 10%; /* Center on the edge of the background photo (20% background / 2 = 10% from right) */
-            bottom: 50px; /* Same gap as logo has from top of sidebar */
-            transform: translateX(50%); /* Center the button on that edge */
+            right: 10%;
+            bottom: 50px;
+            transform: translateX(50%);
         }
 
         .get-started-btn:hover {
@@ -254,31 +239,13 @@
         .wizard-content {
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
+            display: flex;
+            width: 100%;
+            height: 100%;
         }
 
         .wizard-content.loaded {
             opacity: 1;
-        }
-
-        .spinner {
-            border: 4px solid #f2f2f2;
-            border-top: 4px solid #0071bc;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        .loading-text {
-            font-size: 18px;
-            color: #808080;
-            margin-top: 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         /* Error State */
@@ -288,7 +255,7 @@
             color: #721c24;
             padding: 20px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin: 20px;
             display: none;
         }
 
@@ -300,6 +267,7 @@
             padding: 30px;
             border-radius: 8px;
             text-align: center;
+            margin: 20px;
             display: none;
         }
 
@@ -323,7 +291,6 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
             border: none;
         }
 
@@ -365,7 +332,7 @@
             transition: width 0.3s ease;
         }
 
-        /* Responsive Design */
+        /* MOBILE/TABLET: Complete Layout Change */
         @media (orientation: portrait), (max-width: 768px) {
             body::before {
                 display: none;
@@ -377,38 +344,28 @@
                 width: 100%;
                 height: auto;
                 min-height: 100vh;
+                max-width: none;
+                max-height: none;
                 margin: 0;
                 border-radius: 0;
                 border: none;
                 flex-direction: column;
                 box-shadow: none;
-                top: 0;
-                left: 0;
+                background: #ffffff;
             }
 
             .sidebar {
                 width: 100%;
-                padding: 15px 20px;
+                padding: 20px;
                 box-shadow: none;
                 border-bottom: 1px solid #cccccc;
-                flex-shrink: 0; /* Don't let sidebar grow */
-                height: auto; /* Only take space needed */
-                min-height: auto; /* Override any min-height */
-            }
-
-            .logo-section {
+                flex-shrink: 0;
                 height: auto;
-                margin-bottom: 15px;
             }
 
             .logo-and-title {
                 height: auto;
                 margin-bottom: 10px;
-            }
-
-            .booth-section {
-                margin-left: 55px; /* Adjust for smaller logo */
-                margin-top: 10px;
             }
 
             .logo {
@@ -425,8 +382,13 @@
                 margin-bottom: 5px;
             }
 
+            .booth-section {
+                margin-left: 55px;
+                margin-top: 10px;
+            }
+
             .booth-number {
-                font-size: 18px;
+                font-size: 20px;
             }
 
             .step-navigation {
@@ -439,25 +401,47 @@
 
             .main-content {
                 padding: 20px;
-                flex: 1; /* Take remaining space */
+                flex: 1;
+            }
+
+            .welcome-section {
+                width: 100%;
+                max-width: none;
+                margin-top: 0;
             }
 
             .welcome-title {
                 font-size: 48px;
             }
-        }
+
+            .welcome-text {
+                font-size: 16px;
+            }
+
+            .get-started-btn {
+                position: static;
+                transform: none;
+                width: 100%;
+                max-width: 300px;
+                margin-top: 30px;
+                right: auto;
+                bottom: auto;
+            }
 
             .navigation-buttons {
                 position: static;
                 justify-content: center;
                 margin-top: 40px;
             }
+        }
+
+        @media (max-width: 480px) {
             .welcome-title {
-                font-size: 28px;
+                font-size: 36px;
             }
 
             .welcome-text {
-                font-size: 16px;
+                font-size: 14px;
             }
 
             .navigation-buttons {
@@ -470,149 +454,144 @@
             }
 
             .booth-number {
-                font-size: 20px;
+                font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
     <div class="wizard-container">
-        <!-- Loading State - Clean container with just "Loading..." -->
+        <!-- Loading State -->
         <div id="loadingState" class="loading">
             <div class="loading-title">Loading...</div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="error">
+            <strong>Oops!</strong> <span id="errorMessage"></span>
+        </div>
+
+        <!-- Success State -->
+        <div id="successState" class="success">
+            <h3>✅ Profile Updated Successfully!</h3>
+            <p>Thank you for completing your booth profile. Your information is now under review and will appear on the conference map once approved.</p>
         </div>
 
         <!-- All Content - Hidden until loaded -->
         <div class="wizard-content" id="wizardContent">
             <!-- Sidebar -->
             <div class="sidebar">
-            <div class="logo-section">
-                <div class="logo-and-title">
-                    <img src="https://images.squarespace-cdn.com/content/v1/5cf7db4cc0827b0001c9ff81/3c43cc7d-5f2a-4b5e-888e-887d3bb38ebc/Logo+Only.png?format=750w" alt="Campus Stores Conference" class="logo">
-                    <div class="logo-text">
-                        <div class="conference-title">CAMPUS STORES<br>CONFERENCE</div>
+                <div class="logo-section">
+                    <div class="logo-and-title">
+                        <img src="https://images.squarespace-cdn.com/content/v1/5cf7db4cc0827b0001c9ff81/3c43cc7d-5f2a-4b5e-888e-887d3bb38ebc/Logo+Only.png?format=750w" alt="Campus Stores Conference" class="logo">
+                        <div class="logo-text">
+                            <div class="conference-title">CAMPUS STORES<br>CONFERENCE</div>
+                        </div>
+                    </div>
+                    <div class="booth-section">
+                        <div class="booth-number" id="boothNumber">Booth 501</div>
                     </div>
                 </div>
-                <div class="booth-section">
-                    <div class="booth-number" id="boothNumber">Booth 501</div>
-                </div>
-            </div>
 
-            <div class="step-navigation">
-                <div class="step-item" data-step="0">
-                    <div class="step-number">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.01">
-                            <path d="M14.01,28.01C6.28,28.01,0,21.73,0,14.01S6.28,0,14.01,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2C7.39,2,2,7.39,2,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2,14.01,2Z"/>
-                            <path d="M13.25,22.55v-13.78l-1.63.89-1.06-1.8,4.51-2.4h.38v17.09h-2.21Z"/>
-                        </svg>
+                <div class="step-navigation">
+                    <div class="step-item" data-step="0">
+                        <div class="step-number">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.01">
+                                <path d="M14.01,28.01C6.28,28.01,0,21.73,0,14.01S6.28,0,14.01,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2C7.39,2,2,7.39,2,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2,14.01,2Z"/>
+                                <path d="M13.25,22.55v-13.78l-1.63.89-1.06-1.8,4.51-2.4h.38v17.09h-2.21Z"/>
+                            </svg>
+                        </div>
+                        <div class="step-title">Company information</div>
                     </div>
-                    <div class="step-title">Company information</div>
-                </div>
-                <div class="step-item" data-step="1">
-                    <div class="step-number">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.04 28.01">
-                            <path d="M13.98,28.01C6.25,28.01-.03,21.73-.03,14.01S6.25,0,13.98,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM13.98,2C7.36,2,1.97,7.39,1.97,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.6,2,13.98,2Z"/>
-                            <path d="M8.94,22.55v-.82l5.21-7.15c1.44-1.97,2.18-3.34,2.18-4.73,0-1.66-1.06-2.47-2.42-2.47-1.46,0-2.47.94-2.47,2.35,0,1.27.84,1.78.84,1.78l-1.7,1.25s-1.44-1.15-1.44-3c0-1.49.96-4.3,4.99-4.3s4.58,2.98,4.58,4.51c0,.79-.12,2.16-2.06,4.8l-4.32,5.9h6.7v1.87h-10.08Z"/>
-                        </svg>
+                    <div class="step-item" data-step="1">
+                        <div class="step-number">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.04 28.01">
+                                <path d="M13.98,28.01C6.25,28.01-.03,21.73-.03,14.01S6.25,0,13.98,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM13.98,2C7.36,2,1.97,7.39,1.97,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.6,2,13.98,2Z"/>
+                                <path d="M8.94,22.55v-.82l5.21-7.15c1.44-1.97,2.18-3.34,2.18-4.73,0-1.66-1.06-2.47-2.42-2.47-1.46,0-2.47.94-2.47,2.35,0,1.27.84,1.78.84,1.78l-1.7,1.25s-1.44-1.15-1.44-3c0-1.49.96-4.3,4.99-4.3s4.58,2.98,4.58,4.51c0,.79-.12,2.16-2.06,4.8l-4.32,5.9h6.7v1.87h-10.08Z"/>
+                            </svg>
+                        </div>
+                        <div class="step-title">Conference highlight</div>
                     </div>
-                    <div class="step-title">Conference highlight</div>
-                </div>
-                <div class="step-item" data-step="2">
-                    <div class="step-number">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.25">
-                            <path d="M14.01,28.25C6.28,28.25,0,21.97,0,14.25S6.28.24,14.01.24s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2.24C7.39,2.24,2,7.63,2,14.25s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2.24,14.01,2.24Z"/>
-                            <path d="M10.36,18.67c.46,1.03,1.46,2.33,3.41,2.33,2.09,0,3.1-1.51,3.1-3.43,0-1.8-.86-3.22-3.41-3.22h-1.32v-1.87h1.37c2.02,0,2.78-.89,2.78-2.47s-.79-2.52-2.35-2.52c-1.39,0-2.23.72-2.86,2.11l-1.73-1.1c.79-1.58,2.14-2.93,4.66-2.93,2.93,0,4.66,1.82,4.66,4.25s-1.63,3.24-2.4,3.48c.65.19,2.98.94,2.98,4.22s-2.45,5.42-5.47,5.42c-2.69,0-4.32-1.63-4.99-3.12l1.58-1.15Z"/>
-                        </svg>
+                    <div class="step-item" data-step="2">
+                        <div class="step-number">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.25">
+                                <path d="M14.01,28.25C6.28,28.25,0,21.97,0,14.25S6.28.24,14.01.24s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2.24C7.39,2.24,2,7.63,2,14.25s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2.24,14.01,2.24Z"/>
+                                <path d="M10.36,18.67c.46,1.03,1.46,2.33,3.41,2.33,2.09,0,3.1-1.51,3.1-3.43,0-1.8-.86-3.22-3.41-3.22h-1.32v-1.87h1.37c2.02,0,2.78-.89,2.78-2.47s-.79-2.52-2.35-2.52c-1.39,0-2.23.72-2.86,2.11l-1.73-1.1c.79-1.58,2.14-2.93,4.66-2.93,2.93,0,4.66,1.82,4.66,4.25s-1.63,3.24-2.4,3.48c.65.19,2.98.94,2.98,4.22s-2.45,5.42-5.47,5.42c-2.69,0-4.32-1.63-4.99-3.12l1.58-1.15Z"/>
+                            </svg>
+                        </div>
+                        <div class="step-title">Conference team</div>
                     </div>
-                    <div class="step-title">Conference team</div>
-                </div>
-                <div class="step-item" data-step="3">
-                    <div class="step-number">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.01">
-                            <path d="M14.01,28.01C6.28,28.01,0,21.73,0,14.01S6.28,0,14.01,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2C7.39,2,2,7.39,2,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2,14.01,2Z"/>
-                            <path d="M15.23,22.31v-5.38h-6.84v-1.15l4.22-10.27h2.35l-3.84,9.55h4.1v-5.62h2.26v5.62h2.23v1.87h-2.23v5.38h-2.26Z"/>
-                        </svg>
+                    <div class="step-item" data-step="3">
+                        <div class="step-number">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.01">
+                                <path d="M14.01,28.01C6.28,28.01,0,21.73,0,14.01S6.28,0,14.01,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2C7.39,2,2,7.39,2,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2,14.01,2Z"/>
+                                <path d="M15.23,22.31v-5.38h-6.84v-1.15l4.22-10.27h2.35l-3.84,9.55h4.1v-5.62h2.26v5.62h2.23v1.87h-2.23v5.38h-2.26Z"/>
+                            </svg>
+                        </div>
+                        <div class="step-title">Product catalogue</div>
                     </div>
-                    <div class="step-title">Product catalogue</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Mobile Progress Bar -->
-            <div class="mobile-progress">
-                <div class="mobile-progress-fill" style="width: 0%"></div>
-            </div>
-
-            <!-- Loading State -->
-            <div id="loadingState" class="loading">
-                <div class="spinner"></div>
-                <div class="loading-text">Loading your profile information...</div>
-            </div>
-
-            <!-- Error State -->
-            <div id="errorState" class="error">
-                <strong>Oops!</strong> <span id="errorMessage"></span>
-            </div>
-
-            <!-- Success State -->
-            <div id="successState" class="success">
-                <h3>✅ Profile Updated Successfully!</h3>
-                <p>Thank you for completing your booth profile. Your information is now under review and will appear on the conference map once approved.</p>
-            </div>
-
-            <!-- Welcome Screen -->
-            <div id="welcomeSection" class="content-section active">
-                <div class="welcome-section">
-                    <h1 class="welcome-title">Welcome</h1>
-                    <p class="welcome-text">
-                        Thank you for being a valued partner of Campus Stores Canada! To help our conference attendees discover your amazing products and services, we'd love your help completing your booth profile.
-                    </p>
-                    <p class="welcome-text">
-                        You'll be asked to provide <strong>company information</strong>, highlight a <strong>featured product or service</strong>, select your <strong>conference team members</strong>, and optionally upload a <strong>product catalogue</strong>.
-                    </p>
-                    <p class="welcome-text">
-                        Your information will be reviewed by our team before appearing on the conference map. While we're here to help make everything look great, you know your business best, so please share what you think will be most helpful for our members.
-                    </p>
-                    <p class="welcome-text">
-                        We truly appreciate you taking the time to do this - our members are going to love having this information available, and we're excited to showcase your participation at the conference!
-                    </p>
-                    <button class="get-started-btn" onclick="startWizard()">
-                        Get started
-                        <span>→</span>
-                    </button>
                 </div>
             </div>
 
-            <!-- Step 1: Company Information -->
-            <div id="step1Section" class="content-section">
-                <h2>Company Information</h2>
-                <!-- Content will be added here -->
-            </div>
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Mobile Progress Bar -->
+                <div class="mobile-progress">
+                    <div class="mobile-progress-fill" style="width: 0%"></div>
+                </div>
 
-            <!-- Step 2: Conference Highlight -->
-            <div id="step2Section" class="content-section">
-                <h2>Conference Highlight</h2>
-                <!-- Content will be added here -->
-            </div>
+                <!-- Welcome Screen -->
+                <div id="welcomeSection" class="content-section active">
+                    <div class="welcome-section">
+                        <h1 class="welcome-title">Welcome</h1>
+                        <p class="welcome-text">
+                            Thank you for being a valued partner of Campus Stores Canada! To help our conference attendees discover your amazing products and services, we'd love your help completing your booth profile.
+                        </p>
+                        <p class="welcome-text">
+                            You'll be asked to provide <strong>company information</strong>, highlight a <strong>featured product or service</strong>, select your <strong>conference team members</strong>, and optionally upload a <strong>product catalogue</strong>.
+                        </p>
+                        <p class="welcome-text">
+                            Your information will be reviewed by our team before appearing on the conference map. While we're here to help make everything look great, you know your business best, so please share what you think will be most helpful for our members.
+                        </p>
+                        <p class="welcome-text">
+                            We truly appreciate you taking the time to do this - our members are going to love having this information available, and we're excited to showcase your participation at the conference!
+                        </p>
+                        <button class="get-started-btn" onclick="startWizard()">
+                            Get started
+                            <span>→</span>
+                        </button>
+                    </div>
+                </div>
 
-            <!-- Step 3: Conference Team -->
-            <div id="step3Section" class="content-section">
-                <h2>Conference Team</h2>
-                <!-- Content will be added here -->
-            </div>
+                <!-- Step 1: Company Information -->
+                <div id="step1Section" class="content-section">
+                    <h2>Company Information</h2>
+                    <!-- Content will be added here -->
+                </div>
 
-            <!-- Step 4: Product Catalogue -->
-            <div id="step4Section" class="content-section">
-                <h2>Product Catalogue</h2>
-                <!-- Content will be added here -->
-            </div>
+                <!-- Step 2: Conference Highlight -->
+                <div id="step2Section" class="content-section">
+                    <h2>Conference Highlight</h2>
+                    <!-- Content will be added here -->
+                </div>
 
-            <!-- Navigation Buttons -->
-            <div class="navigation-buttons" id="navigationButtons" style="display: none;">
-                <button class="nav-btn nav-btn-secondary" onclick="previousStep()" id="prevBtn">Previous</button>
-                <button class="nav-btn nav-btn-primary" onclick="nextStep()" id="nextBtn">Next</button>
+                <!-- Step 3: Conference Team -->
+                <div id="step3Section" class="content-section">
+                    <h2>Conference Team</h2>
+                    <!-- Content will be added here -->
+                </div>
+
+                <!-- Step 4: Product Catalogue -->
+                <div id="step4Section" class="content-section">
+                    <h2>Product Catalogue</h2>
+                    <!-- Content will be added here -->
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="navigation-buttons" id="navigationButtons" style="display: none;">
+                    <button class="nav-btn nav-btn-secondary" onclick="previousStep()" id="prevBtn">Previous</button>
+                    <button class="nav-btn nav-btn-primary" onclick="nextStep()" id="nextBtn">Next</button>
+                </div>
             </div>
         </div>
     </div>
@@ -870,9 +849,5 @@
                 displayElement.textContent = '';
             }
         }
-
-        // Keep all existing form submission logic here...
-        // (This will be added when we build the individual step forms)
     </script>
 </body>
-</html>

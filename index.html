@@ -44,6 +44,7 @@
             display: flex;
             width: 87.5vw;
             height: calc(87.5vw * 9 / 16); /* Maintain 16:9 aspect ratio */
+            max-height: 90vh; /* Don't let it get too tall */
             margin: 0 auto;
             position: absolute;
             top: 50%;
@@ -117,6 +118,7 @@
             color: #000000;
             line-height: 1.1;
             margin: 0;
+            white-space: nowrap; /* Prevent unwanted line breaks */
         }
 
         .booth-number {

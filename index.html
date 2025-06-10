@@ -61,6 +61,7 @@
             .wizard-container {
                 width: 87.5vw;
                 height: calc(87.5vw * 9 / 16);
+                /* Keep 16:9 in portrait too */
             }
         }
 
@@ -385,14 +386,27 @@
 
             .sidebar {
                 width: 100%;
-                padding: 20px;
+                padding: 15px 20px;
                 box-shadow: none;
                 border-bottom: 1px solid #cccccc;
+                flex-shrink: 0; /* Don't let sidebar grow */
+                height: auto; /* Only take space needed */
+                min-height: auto; /* Override any min-height */
             }
 
             .logo-section {
                 height: auto;
-                margin-bottom: 20px;
+                margin-bottom: 15px;
+            }
+
+            .logo-and-title {
+                height: auto;
+                margin-bottom: 10px;
+            }
+
+            .booth-section {
+                margin-left: 55px; /* Adjust for smaller logo */
+                margin-top: 10px;
             }
 
             .logo {
@@ -405,12 +419,12 @@
             }
 
             .conference-title {
-                font-size: 24px;
-                margin-bottom: 8px;
+                font-size: 16px;
+                margin-bottom: 5px;
             }
 
             .booth-number {
-                font-size: 24px;
+                font-size: 18px;
             }
 
             .step-navigation {
@@ -423,20 +437,19 @@
 
             .main-content {
                 padding: 20px;
+                flex: 1; /* Take remaining space */
             }
 
             .welcome-title {
                 font-size: 48px;
             }
+        }
 
             .navigation-buttons {
                 position: static;
                 justify-content: center;
                 margin-top: 40px;
             }
-        }
-
-        @media (max-width: 480px) {
             .welcome-title {
                 font-size: 28px;
             }

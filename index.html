@@ -343,13 +343,37 @@
             pointer-events: all;
         }
 
-        /* Simple Border - No Animation */
+        /* Border with Drawing Animation */
         .field-border {
             position: absolute;
-            border: 2px solid #0071bc;
+            border: 2px solid transparent;
             border-radius: 8px;
             background: transparent;
             pointer-events: none;
+            position: relative;
+        }
+
+        .field-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 2px solid #0071bc;
+            border-radius: 8px;
+            
+            /* Start with no border visible */
+            clip-path: inset(0 100% 0 0);
+            animation: drawBorderSimple 0.5s ease-out forwards;
+        }
+
+        @keyframes drawBorderSimple {
+            0% { clip-path: inset(0 100% 0 0); }      /* No border visible */
+            25% { clip-path: inset(0 0 100% 0); }     /* Top edge visible */
+            50% { clip-path: inset(0 0 0 100%); }     /* Top + right edges */
+            75% { clip-path: inset(100% 0 0 0); }     /* Top + right + bottom */
+            100% { clip-path: inset(0 0 0 0); }      /* Full border visible */
         }
 
         /* Simple Label - No Animation */

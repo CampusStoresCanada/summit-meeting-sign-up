@@ -384,11 +384,11 @@
             }
         }
 
-        /* Field label that sits ON the border line, positioned relative to border edge */
+        /* Field label - now positioned relative to the border edge */
         .field-label {
             position: absolute;
-            top: -1px;
-            left: 0.8vw;
+            top: 0.8vw;
+            left: 1.8vw;
             background: #ffffff;
             color: #0071bc;
             font-family: 'davis-sans', sans-serif;
@@ -944,8 +944,8 @@
                             </div>
                             <!-- Animated field editor -->
                             <div class="animated-field-editor" id="companyNameEditor">
+                                <div class="field-label">Company name</div>
                                 <div class="field-border">
-                                    <div class="field-label">Company name</div>
                                     <input type="text" class="field-input company-name" id="companyNameInput" />
                                 </div>
                             </div>
@@ -964,8 +964,8 @@
                             </div>
                             <!-- Animated field editor -->
                             <div class="animated-field-editor" id="websiteEditor">
+                                <div class="field-label">Website</div>
                                 <div class="field-border">
-                                    <div class="field-label">Website</div>
                                     <input type="url" class="field-input website" id="websiteInput" placeholder="https://example.com" />
                                 </div>
                             </div>
@@ -984,8 +984,8 @@
                             </div>
                             <!-- Animated field editor -->
                             <div class="animated-field-editor" id="categoryEditor">
+                                <div class="field-label">Primary category</div>
                                 <div class="field-border">
-                                    <div class="field-label">Primary category</div>
                                     <select class="field-input category" id="categoryInput">
                                         <option value="">Select your primary category</option>
                                         <option value="Accessories">Accessories</option>
@@ -1018,8 +1018,8 @@
                             </div>
                             <!-- Animated field editor -->
                             <div class="animated-field-editor" id="descriptionEditor">
+                                <div class="field-label">Company description</div>
                                 <div class="field-border">
-                                    <div class="field-label">Company description</div>
                                     <textarea class="field-input description" id="descriptionInput" maxlength="300" placeholder="Give our members an elevator pitch of who you are."></textarea>
                                     <div class="character-counter" id="charCounter">300</div>
                                 </div>

@@ -17,7 +17,7 @@
             background: #ffffff;
             min-height: 100vh;
             overflow-x: hidden;
-            padding: 3vh 3vw; /* Add padding to the body instead of positioning container */
+            padding: 3vh 3vw;
         }
 
         /* Background image - right side only in landscape */
@@ -33,23 +33,24 @@
             z-index: -1;
         }
 
-        /* DESKTOP: Container now uses natural height with min-height */
+        /* DESKTOP: Container */
         .wizard-container {
             display: flex;
             width: 100%;
-            min-height: 70vh; /* Minimum height but can grow */
+            height: calc(100vh - 6vh);
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.66);
             border-radius: 20px;
             border: 3px solid #000000;
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            position: relative; /* Important for button positioning */
+            position: relative;
         }
 
         /* Sidebar */
         .sidebar {
             width: 23vw;
+            height: 100%;
             background: #e6e6e6;
             padding: 50px 40px;
             display: flex;
@@ -88,7 +89,7 @@
 
         .booth-section {
             width: 100%;
-            margin-left: 9vw;
+            margin-left: 4.9vw;
         }
 
         .conference-title {
@@ -143,6 +144,16 @@
             line-height: 1.2;
         }
 
+        /* Active step styling */
+        .step-item.active .step-number svg {
+            fill: #0071bc !important;
+        }
+
+        .step-item.active .step-title {
+            color: #0071bc;
+            font-weight: 700;
+        }
+
         /* Main Content */
         .main-content {
             flex: 1;
@@ -151,7 +162,7 @@
             flex-direction: column;
             justify-content: flex-start;
             position: relative;
-            min-height: 400px; /* Ensure minimum height for content */
+            min-height: 400px;
         }
 
         .content-section {
@@ -187,144 +198,13 @@
             margin-bottom: 24px;
         }
 
-        .get-started-btn {
-            background: #0071bc;
-            color: #ffffff;
-            border: none;
-            width: max(12.5vw);
-            min-width: 160px;
-            height: auto;
-            padding: max(1vw, 12px) max(1.5vw, 16px);
-            border-radius: max(0.5vw, 6px);
-            font-size: max(1.0vw, 14px);
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: max(0.5vw, 6px);
-            /* Position relative to container bottom-right */
-            position: absolute;
-            right: max(5vw, 50px);
-            bottom: max(3.5vw, 35px);
-            z-index: 5;
-        }
-
-        .get-started-btn:hover {
-            background: #005a94;
-        }
-
-        /* Loading State */
-        .loading {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 10;
-        }
-
-        .loading-title {
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 700;
-            font-size: 48px;
-            color: #000000;
-            margin-bottom: 20px;
-        }
-
-        /* Content fade-in animation */
-        .wizard-content {
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-            display: flex;
-            width: 100%;
-            height: 100%;
-        }
-
-        .wizard-content.loaded {
-            opacity: 1;
-        }
-
-        /* Error State */
-        .error {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px;
-            display: none;
-            font-size: 16px;
-        }
-
-        /* Success State */
-        .success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-            padding: 30px;
-            border-radius: 8px;
-            text-align: center;
-            margin: 20px;
-            display: none;
-        }
-
-        .success h3 {
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-
-        /* Navigation Buttons */
-        .navigation-buttons {
-            position: absolute;
-            bottom: max(3.5vw, 35px);
-            right: max(5vw, 50px);
-            display: flex;
-            gap: max(1vw, 12px);
-        }
-
-        .nav-btn {
-            padding: max(0.8vw, 10px) max(1.5vw, 18px);
-            border-radius: max(0.5vw, 6px);
-            font-size: max(1.0vw, 14px);
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            min-width: max(6vw, 80px);
-            min-height: 44px;
-        }
-
-        .nav-btn-secondary {
-            background: #f2f2f2;
-            color: #666666;
-        }
-
-        .nav-btn-secondary:hover {
-            background: #e6e6e6;
-        }
-
-        .nav-btn-primary {
-            background: #0071bc;
-            color: #ffffff;
-        }
-
-        .nav-btn-primary:hover {
-            background: #005a94;
-        }
-
-        .nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
         /* Step Content Styles */
         .step-header {
             margin-bottom: 40px;
             margin-top: 60px;
         }
 
-        .step-title {
+        .step-title-main {
             font-family: 'davis-sans', sans-serif;
             font-weight: 700;
             font-size: 3.0vw;
@@ -461,15 +341,126 @@
             color: #0071bc;
         }
 
-        /* Active step styling */
-        .step-item.active .step-number svg {
-            fill: #0071bc;
+        /* Button Styles */
+        .get-started-btn, .next-btn {
+            background: #0071bc;
+            color: #ffffff;
+            border: none;
+            width: max(12.5vw);
+            min-width: 160px;
+            height: auto;
+            padding: max(1vw, 12px) max(1.5vw, 16px);
+            border-radius: max(0.5vw, 6px);
+            font-size: max(1.0vw, 14px);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: max(0.5vw, 6px);
+            position: absolute;
+            right: max(5vw, 50px);
+            bottom: max(3.5vw, 35px);
+            z-index: 5;
+            box-shadow: 6px 0 16px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
         }
 
-        .step-item.active .step-title {
-            color: #0071bc;
-            font-weight: 700;
+        .get-started-btn:hover, .next-btn:hover {
+            background: #005a94;
         }
+
+        .previous-btn {
+            background: #ffffff;
+            color: #666666;
+            border: 2px solid #cccccc;
+            width: max(12.5vw);
+            min-width: 160px;
+            height: auto;
+            padding: max(1vw, 12px) max(1.5vw, 16px);
+            border-radius: max(0.5vw, 6px);
+            font-size: max(1.0vw, 14px);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: max(0.5vw, 6px);
+            position: absolute;
+            left: max(5vw, 50px);
+            bottom: max(3.5vw, 35px);
+            z-index: 5;
+            transition: all 0.2s ease;
+        }
+
+        .previous-btn:hover {
+            background: #f8f8f8;
+            border-color: #999999;
+            color: #333333;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+        }
+
+        .loading-title {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 700;
+            font-size: 48px;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        /* Content fade-in animation */
+        .wizard-content {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .wizard-content.loaded {
+            opacity: 1;
+        }
+
+        /* Error State */
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px;
+            display: none;
+            font-size: 16px;
+        }
+
+        /* Success State */
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px;
+            display: none;
+        }
+
+        .success h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        /* Mobile Progress Bar */
         .mobile-progress {
             display: none;
             height: 4px;
@@ -494,7 +485,7 @@
         /* MOBILE/TABLET: Complete Layout Change */
         @media (orientation: portrait), (max-width: 768px) {
             body {
-                padding: 0; /* Remove body padding on mobile */
+                padding: 0;
             }
             
             body::before {
@@ -592,7 +583,7 @@
                 font-size: 16px;
             }
 
-            .get-started-btn {
+            .get-started-btn, .next-btn, .previous-btn {
                 position: static;
                 transform: none;
                 width: 100%;
@@ -601,15 +592,8 @@
                 font-size: 18px;
                 right: auto;
                 bottom: auto;
+                left: auto;
                 z-index: auto;
-            }
-
-            .navigation-buttons {
-                position: static;
-                justify-content: center;
-                margin-top: 40px;
-                right: auto;
-                bottom: auto;
             }
         }
 
@@ -620,15 +604,6 @@
 
             .welcome-text {
                 font-size: 14px;
-            }
-
-            .navigation-buttons {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .nav-btn {
-                width: 100%;
             }
 
             .booth-number {
@@ -744,7 +719,7 @@
                 <!-- Step 1: Company Information -->
                 <div id="step1Section" class="content-section">
                     <div class="step-header">
-                        <h2 class="step-title">Company information</h2>
+                        <h2 class="step-title-main">Company information</h2>
                         <p class="step-subtitle">Please ensure the following information about your company is accurate:</p>
                     </div>
 
@@ -826,6 +801,16 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Navigation Buttons -->
+                    <button class="previous-btn" onclick="previousStep()" id="prevBtn">
+                        <span>←</span>
+                        Previous step
+                    </button>
+                    <button class="next-btn" onclick="nextStep()" id="nextBtn">
+                        Next step
+                        <span>→</span>
+                    </button>
                 </div>
 
                 <!-- Step 2: Conference Highlight -->
@@ -845,12 +830,6 @@
                     <h2>Product Catalogue</h2>
                     <!-- Content will be added here -->
                 </div>
-
-                <!-- Navigation Buttons -->
-                <div class="navigation-buttons" id="navigationButtons" style="display: none;">
-                    <button class="nav-btn nav-btn-secondary" onclick="previousStep()" id="prevBtn">Previous</button>
-                    <button class="nav-btn nav-btn-primary" onclick="nextStep()" id="nextBtn">Next</button>
-                </div>
             </div>
         </div>
     </div>
@@ -866,233 +845,6 @@
         let conferenceTeam = [];
 
         const API_BASE = '/api';
-
-        // ===========================================
-        // INITIALIZATION
-        // ===========================================
-        document.addEventListener('DOMContentLoaded', async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            // Check for OAuth callback success/error
-            if (urlParams.get('success') === 'true') {
-                console.log('🎉 OAuth callback success!');
-                showSuccessState();
-                return;
-            }
-            
-            if (urlParams.get('error')) {
-                const error = urlParams.get('error');
-                console.error('❌ OAuth callback error:', error);
-                showErrorState(getErrorMessage(error));
-                return;
-            }
-            
-            // Normal page load - get token and load vendor data
-            const token = urlParams.get('token');
-            if (!token) {
-                showErrorState('Invalid access link. Please check your email for the correct URL.');
-                return;
-            }
-
-            try {
-                console.log('🪄 Loading vendor data for token:', token);
-                await loadVendorData(token);
-                showWelcomeScreen();
-            } catch (error) {
-                console.error('Error loading vendor data:', error);
-                showErrorState('Unable to load your profile information. Please try again later.');
-            }
-        });
-
-        // ===========================================
-        // WIZARD NAVIGATION
-        // ===========================================
-        function startWizard() {
-            currentStep = 1;
-            showStep(currentStep);
-            updateStepNavigation();
-            showNavigationButtons();
-        }
-
-        function nextStep() {
-            if (currentStep < totalSteps) {
-                currentStep++;
-                showStep(currentStep);
-                updateStepNavigation();
-                updateMobileProgress();
-            }
-        }
-
-        function previousStep() {
-            if (currentStep > 1) {
-                currentStep--;
-                showStep(currentStep);
-                updateStepNavigation();
-                updateMobileProgress();
-            }
-        }
-
-        function showStep(stepNumber) {
-            // Hide all content sections
-            const sections = document.querySelectorAll('.content-section');
-            sections.forEach(section => section.classList.remove('active'));
-
-            // Show welcome or specific step
-            if (stepNumber === 0) {
-                document.getElementById('welcomeSection').classList.add('active');
-            } else {
-                document.getElementById(`step${stepNumber}Section`).classList.add('active');
-            }
-
-            // Update navigation buttons
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            
-            if (prevBtn && nextBtn) {
-                prevBtn.disabled = stepNumber <= 1;
-                nextBtn.textContent = stepNumber === totalSteps ? 'Submit' : 'Next';
-            }
-        }
-
-        function updateStepNavigation() {
-            // No visual updates needed since steps are just static SVGs
-        }
-
-        function updateMobileProgress() {
-            const progressFill = document.querySelector('.mobile-progress-fill');
-            const progressPercent = ((currentStep - 1) / (totalSteps - 1)) * 100;
-            progressFill.style.width = `${Math.max(0, progressPercent)}%`;
-        }
-
-        function showNavigationButtons() {
-            document.getElementById('navigationButtons').style.display = 'flex';
-        }
-
-        function hideNavigationButtons() {
-            document.getElementById('navigationButtons').style.display = 'none';
-        }
-
-        // ===========================================
-        // STATE MANAGEMENT
-        // ===========================================
-        function showWelcomeScreen() {
-            showStep(0);
-            hideNavigationButtons();
-            hideLoadingState();
-            hideErrorState();
-            hideSuccessState();
-            // Fade in content
-            document.getElementById('wizardContent').classList.add('loaded');
-        }
-
-        function showLoadingState() {
-            document.getElementById('loadingState').style.display = 'block';
-            document.getElementById('wizardContent').style.display = 'none';
-            hideErrorState();
-            hideSuccessState();
-        }
-
-        function hideLoadingState() {
-            document.getElementById('loadingState').style.display = 'none';
-            document.getElementById('wizardContent').style.display = 'flex';
-        }
-
-        function showErrorState(message) {
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorState').style.display = 'block';
-            hideLoadingState();
-            hideSuccessState();
-        }
-
-        function hideErrorState() {
-            document.getElementById('errorState').style.display = 'none';
-        }
-
-        function showSuccessState() {
-            document.getElementById('successState').style.display = 'block';
-            hideLoadingState();
-            hideErrorState();
-            hideNavigationButtons();
-        }
-
-        function hideSuccessState() {
-            document.getElementById('successState').style.display = 'none';
-        }
-
-        function getErrorMessage(error) {
-            switch (error) {
-                case 'oauth_denied':
-                    return 'Google Drive authorization was denied. Your profile was saved without files.';
-                case 'oauth_invalid':
-                    return 'Invalid authorization response. Please try again.';
-                case 'token_failed':
-                    return 'Failed to get authorization token. Please try again.';
-                case 'callback_failed':
-                    return 'Authorization callback failed. Please try again.';
-                default:
-                    return 'An error occurred during authorization.';
-            }
-        }
-
-        // ===========================================
-        // DATA LOADING (Keep existing functionality)
-        // ===========================================
-        async function loadVendorData(token) {
-            showLoadingState();
-            
-            try {
-                console.log('📡 Fetching vendor profile...');
-                const response = await fetch(`${API_BASE}/vendor-profile?token=${token}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                vendorData = await response.json();
-                console.log('✅ Vendor data loaded:', vendorData);
-                
-                populateForm(vendorData);
-                await loadOrganizationContacts(token);
-                
-            } catch (error) {
-                console.error('💥 Failed to load vendor data:', error);
-                throw error;
-            }
-        }
-
-        async function loadOrganizationContacts(token) {
-            console.log('👥 Loading organization contacts...');
-            
-            try {
-                const response = await fetch(`${API_BASE}/get-organization-contacts?token=${token}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                organizationContacts = data.contacts;
-                
-                console.log(`✅ Loaded ${organizationContacts.length} contacts for ${data.organizationName}`);
-                
-            } catch (error) {
-                console.error('💥 Error loading contacts:', error);
-                // Don't throw - contacts are optional
-            }
-        }
-
-        function populateForm(data) {
-            console.log('📝 Populating form with:', data);
-            
-            // Update booth info
-            document.getElementById('boothNumber').textContent = `Booth ${data.boothNumber}`;
-            
-            // Store data for later use in form steps
-            window.formData = {
-                organization: data.organization,
-                boothNumber: data.boothNumber
-            };
-        }
 
         // ===========================================
         // FORM EDITING FUNCTIONALITY
@@ -1205,8 +957,47 @@
             return str.charAt(0).toUpperCase() + str.slice(1);
         }
 
-        // Add event listeners for auto-save
-        document.addEventListener('DOMContentLoaded', () => {
+        // ===========================================
+        // INITIALIZATION
+        // ===========================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Check for OAuth callback success/error
+            if (urlParams.get('success') === 'true') {
+                console.log('🎉 OAuth callback success!');
+                showSuccessState();
+                return;
+            }
+            
+            if (urlParams.get('error')) {
+                const error = urlParams.get('error');
+                console.error('❌ OAuth callback error:', error);
+                showErrorState(getErrorMessage(error));
+                return;
+            }
+            
+            // Normal page load - get token and load vendor data
+            const token = urlParams.get('token');
+            if (!token) {
+                showErrorState('Invalid access link. Please check your email for the correct URL.');
+                return;
+            }
+
+            try {
+                console.log('🪄 Loading vendor data for token:', token);
+                await loadVendorData(token);
+                showWelcomeScreen();
+            } catch (error) {
+                console.error('Error loading vendor data:', error);
+                showErrorState('Unable to load your profile information. Please try again later.');
+            }
+
+            // Add event listeners for auto-save
+            setupFormEventListeners();
+        });
+
+        function setupFormEventListeners() {
             // Text inputs
             ['companyName', 'website'].forEach(fieldName => {
                 const input = document.getElementById(`${fieldName}Input`);
@@ -1249,7 +1040,223 @@
                     }
                 });
             }
-        });
+        }
+
+        // ===========================================
+        // WIZARD NAVIGATION
+        // ===========================================
+        function startWizard() {
+            currentStep = 1;
+            showStep(currentStep);
+            updateStepNavigation();
+        }
+
+        function nextStep() {
+            // Save any active field before moving
+            if (activeField) {
+                saveField(activeField);
+            }
+            
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+                updateStepNavigation();
+                updateMobileProgress();
+            }
+        }
+
+        function previousStep() {
+            // Save any active field before moving
+            if (activeField) {
+                saveField(activeField);
+            }
+            
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+                updateStepNavigation();
+                updateMobileProgress();
+            }
+        }
+
+        function showStep(stepNumber) {
+            // Hide all content sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Show welcome or specific step
+            if (stepNumber === 0) {
+                document.getElementById('welcomeSection').classList.add('active');
+            } else {
+                document.getElementById(`step${stepNumber}Section`).classList.add('active');
+            }
+        }
+
+        function updateStepNavigation() {
+            // Remove active class from all steps
+            document.querySelectorAll('.step-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to current step
+            if (currentStep > 0) {
+                const activeStepItem = document.querySelector(`[data-step="${currentStep - 1}"]`);
+                if (activeStepItem) {
+                    activeStepItem.classList.add('active');
+                    
+                    // Update the SVG for the active step
+                    const stepNumber = activeStepItem.querySelector('.step-number svg');
+                    if (stepNumber && currentStep === 1) {
+                        stepNumber.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29.01 29.01">
+                            <path d="M14.51,29.01C6.51,29.01,0,22.5,0,14.51S6.51,0,14.51,0s14.51,6.51,14.51,14.51-6.51,14.51-14.51,14.51ZM14.51,3c-6.34,0-11.51,5.16-11.51,11.51s5.16,11.51,11.51,11.51,11.51-5.16,11.51-11.51S20.85,3,14.51,3Z" fill="#0071bc"/>
+                            <path d="M13.5,22.81v-12.82l-2.21,1.2-1.37-2.52,5.09-2.76h2.18v16.9h-3.7Z" fill="#0071bc"/>
+                        </svg>`;
+                    }
+                }
+            }
+        }
+
+        function updateMobileProgress() {
+            const progressFill = document.querySelector('.mobile-progress-fill');
+            const progressPercent = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            progressFill.style.width = `${Math.max(0, progressPercent)}%`;
+        }
+
+        // ===========================================
+        // STATE MANAGEMENT
+        // ===========================================
+        function showWelcomeScreen() {
+            showStep(0);
+            hideLoadingState();
+            hideErrorState();
+            hideSuccessState();
+            // Fade in content
+            document.getElementById('wizardContent').classList.add('loaded');
+        }
+
+        function showLoadingState() {
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('wizardContent').style.display = 'none';
+            hideErrorState();
+            hideSuccessState();
+        }
+
+        function hideLoadingState() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('wizardContent').style.display = 'flex';
+        }
+
+        function showErrorState(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorState').style.display = 'block';
+            hideLoadingState();
+            hideSuccessState();
+        }
+
+        function hideErrorState() {
+            document.getElementById('errorState').style.display = 'none';
+        }
+
+        function showSuccessState() {
+            document.getElementById('successState').style.display = 'block';
+            hideLoadingState();
+            hideErrorState();
+        }
+
+        function hideSuccessState() {
+            document.getElementById('successState').style.display = 'none';
+        }
+
+        function getErrorMessage(error) {
+            switch (error) {
+                case 'oauth_denied':
+                    return 'Google Drive authorization was denied. Your profile was saved without files.';
+                case 'oauth_invalid':
+                    return 'Invalid authorization response. Please try again.';
+                case 'token_failed':
+                    return 'Failed to get authorization token. Please try again.';
+                case 'callback_failed':
+                    return 'Authorization callback failed. Please try again.';
+                default:
+                    return 'An error occurred during authorization.';
+            }
+        }
+
+        // ===========================================
+        // DATA LOADING
+        // ===========================================
+        async function loadVendorData(token) {
+            showLoadingState();
+            
+            try {
+                console.log('📡 Fetching vendor profile...');
+                const response = await fetch(`${API_BASE}/vendor-profile?token=${token}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                vendorData = await response.json();
+                console.log('✅ Vendor data loaded:', vendorData);
+                
+                populateForm(vendorData);
+                await loadOrganizationContacts(token);
+                
+            } catch (error) {
+                console.error('💥 Failed to load vendor data:', error);
+                throw error;
+            }
+        }
+
+        async function loadOrganizationContacts(token) {
+            console.log('👥 Loading organization contacts...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/get-organization-contacts?token=${token}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                organizationContacts = data.contacts;
+                
+                console.log(`✅ Loaded ${organizationContacts.length} contacts for ${data.organizationName}`);
+                
+            } catch (error) {
+                console.error('💥 Error loading contacts:', error);
+                // Don't throw - contacts are optional
+            }
+        }
+
+        function populateForm(data) {
+            console.log('📝 Populating form with:', data);
+            
+            // Update booth info
+            document.getElementById('boothNumber').textContent = `Booth ${data.boothNumber}`;
+            
+            // Populate form state with organization data
+            formState.companyName = data.organization?.name || '';
+            formState.website = data.organization?.website || '';
+            formState.category = data.organization?.primaryCategory || '';
+            formState.description = data.organization?.description || '';
+            
+            // Update displays
+            updateFieldDisplay('companyName', formState.companyName);
+            updateFieldDisplay('website', formState.website);
+            updateFieldDisplay('category', formState.category);
+            updateFieldDisplay('description', formState.description);
+            
+            // Store data for later use in form steps
+            window.formData = {
+                organization: data.organization,
+                boothNumber: data.boothNumber
+            };
+        }
+
+        // ===========================================
+        // UTILITY FUNCTIONS
+        // ===========================================
         function handleFileSelect(input, displayElementId) {
             const file = input.files[0];
             const displayElement = document.getElementById(displayElementId);

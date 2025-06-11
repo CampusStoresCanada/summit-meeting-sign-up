@@ -341,49 +341,46 @@
             visibility: visible;
         }
 
-        /* The animated border container */
+        /* The animated border container - positioned to wrap around existing text */
         .field-border {
             position: relative;
             border: 2px solid transparent;
             border-radius: 0.5vw;
             padding: 0.8vw 1vw;
             background: #ffffff;
+            /* Position to wrap around the display text */
+            margin-top: -0.8vw;
+            margin-left: -1vw;
+            margin-right: -1vw;
+            margin-bottom: -0.8vw;
         }
 
-        /* The actual animated border - SVG approach for perfect sweep */
+        /* Clean animated border that draws around the text */
         .field-border::before {
             content: '';
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid #0071bc;
             border-radius: 0.5vw;
-            background: 
-                linear-gradient(to right, #0071bc 0%, #0071bc 100%) 0 0/0% 2px no-repeat,
-                linear-gradient(to bottom, #0071bc 0%, #0071bc 100%) 100% 0/2px 0% no-repeat,
-                linear-gradient(to left, #0071bc 0%, #0071bc 100%) 100% 100%/0% 2px no-repeat,
-                linear-gradient(to top, #0071bc 0%, #0071bc 100%) 0% 100%/2px 0% no-repeat;
-            animation: borderSweep 0.5s ease-out forwards;
+            opacity: 0;
+            transform: scale(0.9);
+            animation: borderAppear 0.5s ease-out forwards;
         }
 
-        /* Border sweep animation - dual sweep from bottom center */
-        @keyframes borderSweep {
+        /* Border appears and scales to surround text */
+        @keyframes borderAppear {
             0% {
-                background-size: 0% 2px, 2px 0%, 0% 2px, 2px 0%;
-                background-position: 50% 100%, 100% 100%, 50% 0%, 0% 0%;
-            }
-            33% {
-                background-size: 50% 2px, 2px 0%, 50% 2px, 2px 0%;
-                background-position: 0% 100%, 100% 100%, 100% 0%, 0% 0%;
-            }
-            66% {
-                background-size: 50% 2px, 2px 50%, 50% 2px, 2px 50%;
-                background-position: 0% 100%, 100% 50%, 100% 0%, 0% 50%;
+                opacity: 0;
+                transform: scale(0.9);
             }
             100% {
-                background-size: 50% 2px, 2px 50%, 50% 2px, 2px 50%;
-                background-position: 0% 100%, 100% 0%, 100% 0%, 0% 100%;
+                opacity: 1;
+                transform: scale(1);
+            }
+        } 100%;
             }
         }
 
@@ -399,6 +396,7 @@
             font-size: 0.9vw;
             padding: 0 0.4vw;
             opacity: 0;
+            z-index: 12;
             animation: labelFadeIn 0.5s ease-out 0.2s forwards;
         }
 
@@ -413,7 +411,7 @@
             }
         }
 
-        /* The actual input field */
+        /* The actual input field - positioned so text aligns with display text */
         .field-input {
             width: 100%;
             border: none;
@@ -423,9 +421,11 @@
             color: #000000;
             padding: 0;
             margin: 0;
+            position: relative;
+            z-index: 11;
         }
 
-        /* Input type-specific styles */
+        /* Input type-specific styles - match display text positioning exactly */
         .field-input.company-name {
             font-weight: 700;
             font-size: 1.8vw;
@@ -436,6 +436,20 @@
             font-weight: 400;
             font-size: 1.0vw;
             line-height: 1.2;
+        }
+
+        .field-input.category {
+            font-weight: 400;
+            font-size: 1.2vw;
+            line-height: 1.2;
+        }
+
+        .field-input.description {
+            font-weight: 400;
+            font-size: 1.0vw;
+            line-height: 1.5;
+            min-height: 6vw;
+            resize: vertical;
         }
 
         /* Special styling for select fields */

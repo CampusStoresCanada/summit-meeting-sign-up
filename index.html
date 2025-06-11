@@ -51,7 +51,7 @@
 
         /* Sidebar */
         .sidebar {
-            width: 23%;
+            width: 23vw;
             background: #e6e6e6;
             padding: 50px 40px;
             display: flex;
@@ -119,23 +119,23 @@
         .step-item {
             display: flex;
             align-items: center;
-            margin-bottom: 30px;
-            padding: 12px 0;
+            margin-bottom: 2vw;
+            padding: 0.8vw 0;
         }
 
         .step-number {
-            width: 40px;
-            height: 40px;
+            width: 2.5vw;
+            height: 2.5vw;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 20px;
+            margin-right: 1.2vw;
             flex-shrink: 0;
         }
 
         .step-number svg {
-            width: 40px;
-            height: 40px;
+            width: 2.5vw;
+            height: 2.5vw;
         }
 
         .step-title {
@@ -192,18 +192,18 @@
             background: #0071bc;
             color: #ffffff;
             border: none;
-            width: 12.5vw;
-            min-width: 180px;
+            width: max(12.5vw, 160px);
+            min-width: 160px;
             height: auto;
-            padding: 16px 20px;
-            border-radius: 8px;
-            font-size: 1.0vw;
+            padding: max(1vw, 12px) max(1.5vw, 16px);
+            border-radius: max(0.5vw, 6px);
+            font-size: max(1.0vw, 14px);
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: max(0.5vw, 6px);
             position: fixed;
             left: 77vw;
             bottom: calc(88vw * 9 / 16 * 0.05);
@@ -250,47 +250,50 @@
         /* Error State */
         .error {
             background: #f8d7da;
-            border: 1px solid #f5c6cb;
+            border: max(0.1vw, 1px) solid #f5c6cb;
             color: #721c24;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px;
+            padding: max(1.5vw, 15px);
+            border-radius: max(0.5vw, 6px);
+            margin: max(1.5vw, 15px);
             display: none;
+            font-size: max(1.0vw, 14px);
         }
 
         /* Success State */
         .success {
             background: #d4edda;
-            border: 1px solid #c3e6cb;
+            border: max(0.1vw, 1px) solid #c3e6cb;
             color: #155724;
-            padding: 30px;
-            border-radius: 8px;
+            padding: max(2vw, 20px);
+            border-radius: max(0.5vw, 6px);
             text-align: center;
-            margin: 20px;
+            margin: max(1.5vw, 15px);
             display: none;
         }
 
         .success h3 {
-            font-size: 24px;
-            margin-bottom: 12px;
+            font-size: max(1.5vw, 18px);
+            margin-bottom: max(1vw, 10px);
         }
 
         /* Navigation Buttons */
         .navigation-buttons {
             position: absolute;
-            bottom: 60px;
-            right: 80px;
+            bottom: max(3.5vw, 35px);
+            right: max(5vw, 50px);
             display: flex;
-            gap: 16px;
+            gap: max(1vw, 12px);
         }
 
         .nav-btn {
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: max(0.8vw, 10px) max(1.5vw, 18px);
+            border-radius: max(0.5vw, 6px);
+            font-size: max(1.0vw, 14px);
             font-weight: 600;
             cursor: pointer;
             border: none;
+            min-width: max(6vw, 80px);
+            min-height: 44px;
         }
 
         .nav-btn-secondary {

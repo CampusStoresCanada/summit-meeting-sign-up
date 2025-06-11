@@ -229,50 +229,96 @@
         }
 
         .form-field {
-            margin-bottom: 30px;
+            margin-bottom: 2.5vw;
+            position: relative;
         }
 
-        .field-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .field-label {
+        /* Company Name - Large Bold Display */
+        .form-field:first-child .field-display {
             font-family: 'davis-sans', sans-serif;
-            font-weight: 600;
-            font-size: 1.2vw;
+            font-weight: 700;
+            font-size: 1.8vw;
             color: #000000;
-            margin: 0;
+            line-height: 1.2;
+            display: inline-block;
+        }
+
+        .form-field:first-child .edit-btn {
+            display: inline-flex;
+            margin-left: 0.8vw;
+            vertical-align: middle;
+        }
+
+        /* Website - Smaller, lighter */
+        .form-field:nth-child(2) .field-display {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 400;
+            font-size: 1.0vw;
+            color: #666666;
+            line-height: 1.2;
+            display: inline-block;
+        }
+
+        .form-field:nth-child(2) .edit-btn {
+            display: inline-flex;
+            margin-left: 0.8vw;
+            vertical-align: middle;
+        }
+
+        /* Category - Normal text */
+        .form-field:nth-child(3) .field-display {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 400;
+            font-size: 1.2vw;
+            color: #333333;
+            line-height: 1.2;
+            display: inline-block;
+        }
+
+        .form-field:nth-child(3) .edit-btn {
+            display: inline-flex;
+            margin-left: 0.8vw;
+            vertical-align: middle;
+        }
+
+        /* Description - Paragraph text */
+        .form-field:nth-child(4) .field-display {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 400;
+            font-size: 1.0vw;
+            color: #666666;
+            line-height: 1.5;
+            display: block;
+            margin-bottom: 0.5vw;
+        }
+
+        .form-field:nth-child(4) .edit-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
         }
 
         .edit-btn {
             background: none;
             border: none;
-            color: #666666;
+            color: #999999;
             cursor: pointer;
-            padding: 4px;
-            display: flex;
+            padding: 0.2vw;
             align-items: center;
             justify-content: center;
-            border-radius: 4px;
+            border-radius: 0.2vw;
             transition: all 0.2s ease;
+            width: 1.2vw;
+            height: 1.2vw;
+        }
+
+        .edit-btn svg {
+            width: 1vw;
+            height: 1vw;
         }
 
         .edit-btn:hover {
-            color: #0071bc;
-            background: rgba(0, 113, 188, 0.1);
-        }
-
-        .field-display {
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 400;
-            font-size: 1.0vw;
-            color: #333333;
-            min-height: 24px;
-            display: flex;
-            align-items: center;
+            color: #666666;
         }
 
         .field-display.placeholder {
@@ -280,39 +326,46 @@
             font-style: italic;
         }
 
-        .description-display {
-            align-items: flex-start;
-            padding: 8px 0;
-            line-height: 1.5;
-        }
-
-        /* Input Styles */
+        /* Input Styles when editing */
         .field-input, .field-select, .field-textarea {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #0071bc;
-            border-radius: 8px;
+            padding: 0.8vw 1vw;
+            border: 0.15vw solid #0071bc;
+            border-radius: 0.5vw;
             font-family: 'davis-sans', sans-serif;
-            font-size: 1.0vw;
             color: #000000;
             background: #ffffff;
             outline: none;
             transition: all 0.2s ease;
+            line-height: 1.4;
+        }
+
+        /* Match font sizes to their display counterparts */
+        #companyNameInput {
+            font-size: 1.8vw;
+            font-weight: 700;
+        }
+
+        #websiteInput {
+            font-size: 1.0vw;
+            font-weight: 400;
+        }
+
+        #categorySelect {
+            font-size: 1.2vw;
+            font-weight: 400;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%230071bc' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.8vw center;
+            background-repeat: no-repeat;
+            background-size: 1vw;
+            padding-right: 2.5vw;
+            appearance: none;
         }
 
         .field-input:focus, .field-select:focus, .field-textarea:focus {
             border-color: #005a94;
-            box-shadow: 0 0 0 3px rgba(0, 113, 188, 0.1);
-        }
-
-        .field-select {
-            cursor: pointer;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 12px center;
-            background-repeat: no-repeat;
-            background-size: 16px;
-            padding-right: 40px;
-            appearance: none;
+            box-shadow: 0 0 0 0.2vw rgba(0, 113, 188, 0.15);
         }
 
         .textarea-container {
@@ -320,17 +373,19 @@
         }
 
         .field-textarea {
-            min-height: 100px;
+            min-height: 6vw;
             resize: vertical;
-            padding-bottom: 35px;
+            padding-bottom: 2vw;
+            font-size: 1.0vw;
+            font-weight: 400;
         }
 
         .character-counter {
             position: absolute;
-            bottom: 8px;
-            right: 12px;
+            bottom: 0.5vw;
+            right: 0.8vw;
             font-family: 'davis-sans', sans-serif;
-            font-size: 0.8vw;
+            font-size: 0.7vw;
             color: #999999;
             font-weight: 400;
             transition: all 0.2s ease;
@@ -387,7 +442,7 @@
             justify-content: center;
             gap: max(0.5vw, 6px);
             position: absolute;
-            left: max(5vw, 50px);
+            left: 0;
             bottom: max(3.5vw, 35px);
             z-index: 5;
             transition: all 0.2s ease;
@@ -726,46 +781,37 @@
                     <div class="form-container">
                         <!-- Company Name Field -->
                         <div class="form-field">
-                            <div class="field-header">
-                                <label class="field-label">Company name</label>
-                                <button class="edit-btn" onclick="editField('companyName')" id="editCompanyName">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
-                                        <path d="m14.5 5.5 4 4"/>
-                                    </svg>
-                                </button>
-                            </div>
                             <div class="field-display" id="companyNameDisplay">Loading...</div>
+                            <button class="edit-btn" onclick="editField('companyName')" id="editCompanyName">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                    <path d="m14.5 5.5 4 4"/>
+                                </svg>
+                            </button>
                             <input type="text" class="field-input" id="companyNameInput" style="display: none;" />
                         </div>
 
                         <!-- Website Field -->
                         <div class="form-field">
-                            <div class="field-header">
-                                <label class="field-label">Website</label>
-                                <button class="edit-btn" onclick="editField('website')" id="editWebsite">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
-                                        <path d="m14.5 5.5 4 4"/>
-                                    </svg>
-                                </button>
-                            </div>
                             <div class="field-display" id="websiteDisplay">website (example.com)</div>
+                            <button class="edit-btn" onclick="editField('website')" id="editWebsite">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                    <path d="m14.5 5.5 4 4"/>
+                                </svg>
+                            </button>
                             <input type="url" class="field-input" id="websiteInput" style="display: none;" />
                         </div>
 
                         <!-- Category Field -->
                         <div class="form-field">
-                            <div class="field-header">
-                                <label class="field-label">Primary category</label>
-                                <button class="edit-btn" onclick="editField('category')" id="editCategory">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
-                                        <path d="m14.5 5.5 4 4"/>
-                                    </svg>
-                                </button>
-                            </div>
                             <div class="field-display" id="categoryDisplay">Selected category</div>
+                            <button class="edit-btn" onclick="editField('category')" id="editCategory">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                    <path d="m14.5 5.5 4 4"/>
+                                </svg>
+                            </button>
                             <select class="field-select" id="categorySelect" style="display: none;">
                                 <option value="">Select your primary category</option>
                                 <option value="Accessories">Accessories</option>
@@ -785,16 +831,13 @@
 
                         <!-- Company Description Field -->
                         <div class="form-field">
-                            <div class="field-header">
-                                <label class="field-label">Company description</label>
-                                <button class="edit-btn" onclick="editField('description')" id="editDescription">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
-                                        <path d="m14.5 5.5 4 4"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="field-display description-display" id="descriptionDisplay">Give our members an elevator pitch of who you are.</div>
+                            <div class="field-display" id="descriptionDisplay">Give our members an elevator pitch of who you are.</div>
+                            <button class="edit-btn" onclick="editField('description')" id="editDescription">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                    <path d="m14.5 5.5 4 4"/>
+                                </svg>
+                            </button>
                             <div class="textarea-container" style="display: none;">
                                 <textarea class="field-textarea" id="descriptionTextarea" maxlength="300" placeholder="Give our members an elevator pitch of who you are.&#10;Max 300 characters"></textarea>
                                 <div class="character-counter" id="charCounter">300</div>
@@ -930,14 +973,19 @@
             const display = document.getElementById(`${fieldName}Display`);
             
             if (fieldName === 'website') {
-                display.textContent = value || 'website (example.com)';
-                display.className = value ? 'field-display' : 'field-display placeholder';
+                // Strip https://, http://, and www. from display
+                let cleanUrl = value || '';
+                if (cleanUrl) {
+                    cleanUrl = cleanUrl.replace(/^https?:\/\//, '').replace(/^www\./, '');
+                }
+                display.textContent = cleanUrl || 'website (example.com)';
+                display.className = cleanUrl ? 'field-display' : 'field-display placeholder';
             } else if (fieldName === 'category') {
                 display.textContent = value || 'Selected category';
                 display.className = value ? 'field-display' : 'field-display placeholder';
             } else if (fieldName === 'description') {
                 display.textContent = value || 'Give our members an elevator pitch of who you are.';
-                display.className = value ? 'field-display description-display' : 'field-display description-display placeholder';
+                display.className = value ? 'field-display' : 'field-display placeholder';
             } else {
                 display.textContent = value || 'Company name';
                 display.className = value ? 'field-display' : 'field-display placeholder';

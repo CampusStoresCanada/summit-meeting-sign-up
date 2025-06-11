@@ -222,7 +222,11 @@
             margin: 0;
         }
 
-        /* Form Styles */
+        /* =====================================================
+           ANIMATED FIELD SYSTEM
+           ===================================================== */
+
+        /* Form container and basic field layout */
         .form-container {
             max-width: 600px;
             width: 100%;
@@ -233,103 +237,62 @@
             position: relative;
         }
 
+        /* Field display container - holds both display text and edit button */
+        .field-display-container {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8vw;
+        }
+
+        /* Base field display styles */
+        .field-display {
+            font-family: 'davis-sans', sans-serif;
+            line-height: 1.2;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        .field-display:hover {
+            opacity: 0.8;
+        }
+
+        .field-display.placeholder {
+            color: #999999;
+            font-style: italic;
+        }
+
         /* Company Name - Large Bold Display */
-        .form-field:first-child .field-display {
-            font-family: 'davis-sans', sans-serif;
+        .field-display.company-name {
             font-weight: 700;
             font-size: 1.8vw;
             color: #000000;
-            line-height: 1.2;
-            display: inline-block;
-        }
-
-        .form-field:first-child .edit-btn {
-            display: inline-flex;
-            margin-left: 0.8vw;
-            vertical-align: middle;
-        }
-
-        /* Company Name Fieldset Edit Mode */
-        .company-name-fieldset {
-            border: 0.15vw solid #0071bc;
-            border-radius: 0.5vw;
-            padding: 0.8vw 1vw;
-            margin: 0;
-            width: 100%;
-        }
-
-        .company-name-fieldset legend {
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 600;
-            font-size: 1.0vw;
-            color: #0071bc;
-            padding: 0 0.5vw;
-            margin-left: -0.5vw;
-        }
-
-        .company-name-fieldset input {
-            border: none;
-            outline: none;
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 700;
-            font-size: 1.8vw;
-            color: #000000;
-            line-height: 1.2;
-            width: 100%;
-            background: transparent;
-            padding: 0;
-            margin: 0;
         }
 
         /* Website - Smaller, lighter */
-        .form-field:nth-child(2) .field-display {
-            font-family: 'davis-sans', sans-serif;
+        .field-display.website {
             font-weight: 400;
             font-size: 1.0vw;
             color: #666666;
-            line-height: 1.2;
-            display: inline-block;
-        }
-
-        .form-field:nth-child(2) .edit-btn {
-            display: inline-flex;
-            margin-left: 0.8vw;
-            vertical-align: middle;
         }
 
         /* Category - Normal text */
-        .form-field:nth-child(3) .field-display {
-            font-family: 'davis-sans', sans-serif;
+        .field-display.category {
             font-weight: 400;
             font-size: 1.2vw;
             color: #333333;
-            line-height: 1.2;
-            display: inline-block;
-        }
-
-        .form-field:nth-child(3) .edit-btn {
-            display: inline-flex;
-            margin-left: 0.8vw;
-            vertical-align: middle;
         }
 
         /* Description - Paragraph text */
-        .form-field:nth-child(4) .field-display {
-            font-family: 'davis-sans', sans-serif;
+        .field-display.description {
             font-weight: 400;
             font-size: 1.0vw;
             color: #666666;
             line-height: 1.5;
-            display: block;
-            margin-bottom: 0.5vw;
         }
 
-        .form-field:nth-child(4) .edit-btn {
-            position: absolute;
-            top: 0;
-            right: 0;
-        }
-
+        /* Edit button */
         .edit-btn {
             background: none;
             border: none;
@@ -342,6 +305,9 @@
             transition: all 0.2s ease;
             width: 1.2vw;
             height: 1.2vw;
+            display: flex;
+            flex-shrink: 0;
+            margin-top: 0.1vw; /* Slight vertical alignment adjustment */
         }
 
         .edit-btn svg {
@@ -353,126 +319,146 @@
             color: #666666;
         }
 
-        .field-display.placeholder {
-            color: #999999;
-            font-style: italic;
-        }
+        /* =====================================================
+           ANIMATED FIELD EDITOR
+           ===================================================== */
 
-        /* Other Input Styles when editing (website, category, description) */
-        .field-input, .field-select, .field-textarea {
-            width: 100%;
-            padding: 0.8vw 1vw;
-            border: 0.15vw solid #0071bc;
-            border-radius: 0.5vw;
-            font-family: 'davis-sans', sans-serif;
-            color: #000000;
-            background: #ffffff;
-            outline: none;
-            transition: all 0.2s ease;
-            line-height: 1.4;
-        }
-
-        #websiteInput {
-            font-size: 1.0vw;
-            font-weight: 400;
-        }
-
-        #categorySelect {
-            font-size: 1.2vw;
-            font-weight: 400;
-            cursor: pointer;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%230071bc' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.8vw center;
-            background-repeat: no-repeat;
-            background-size: 1vw;
-            padding-right: 2.5vw;
-            appearance: none;
-        }
-
-        .field-input:focus, .field-select:focus, .field-textarea:focus {
-            border-color: #005a94;
-            box-shadow: 0 0 0 0.2vw rgba(0, 113, 188, 0.15);
-        }
-
-        .textarea-container {
-            position: relative;
-        }
-
-        .field-textarea {
-            min-height: 6vw;
-            resize: vertical;
-            padding-bottom: 2vw;
-            font-size: 1.0vw;
-            font-weight: 400;
-        }
-
-        .character-counter {
+        .animated-field-editor {
             position: absolute;
-            bottom: 0.5vw;
-            right: 0.8vw;
-            font-family: 'davis-sans', sans-serif;
-            font-size: 0.7vw;
-            color: #999999;
-            font-weight: 400;
-            transition: all 0.2s ease;
+            top: 0;
+            left: 0;
+            right: 0;
+            pointer-events: none;
+            z-index: 10;
         }
 
-        .character-counter.warning {
-            font-weight: 700;
-            color: #0071bc;
-        }textarea {
-            width: 100%;
-            padding: 0.8vw 1vw;
-            border: 0.15vw solid #0071bc;
+        .animated-field-editor.active {
+            pointer-events: all;
+        }
+
+        /* The animated border container */
+        .field-border {
+            position: relative;
+            border: 2px solid transparent;
             border-radius: 0.5vw;
+            padding: 0.8vw 1vw;
+            background: #ffffff;
+        }
+
+        /* The actual animated border - using SVG for smooth animation */
+        .field-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 0.5vw;
+            padding: 2px;
+            background: linear-gradient(45deg, #0071bc, #0071bc);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            opacity: 0;
+            animation: borderDraw 0.3s ease-out forwards;
+        }
+
+        /* Border draw animation */
+        @keyframes borderDraw {
+            0% {
+                opacity: 0;
+                clip-path: polygon(0 0, 0 0, 0 0, 0 0);
+            }
+            25% {
+                opacity: 1;
+                clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+            }
+            50% {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+            75% {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+            100% {
+                opacity: 1;
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+        }
+
+        /* Field label that appears at the top */
+        .field-label {
+            position: absolute;
+            top: -0.6vw;
+            left: 0.8vw;
+            background: #ffffff;
+            color: #0071bc;
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.9vw;
+            padding: 0 0.4vw;
+            opacity: 0;
+            animation: labelFadeIn 0.3s ease-out 0.1s forwards;
+        }
+
+        @keyframes labelFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(0.2vw);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* The actual input field */
+        .field-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
             font-family: 'davis-sans', sans-serif;
             color: #000000;
-            background: #ffffff;
-            outline: none;
-            transition: all 0.2s ease;
-            line-height: 1.4;
+            padding: 0;
+            margin: 0;
         }
 
-        /* Match font sizes to their display counterparts */
-        #companyNameInput {
+        /* Input type-specific styles */
+        .field-input.company-name {
+            font-weight: 700;
             font-size: 1.8vw;
-            font-weight: 700;
+            line-height: 1.2;
         }
 
-        #websiteInput {
+        .field-input.website {
+            font-weight: 400;
             font-size: 1.0vw;
-            font-weight: 400;
+            line-height: 1.2;
         }
 
-        #categorySelect {
+        .field-input.category {
+            font-weight: 400;
             font-size: 1.2vw;
+            line-height: 1.2;
+        }
+
+        .field-input.description {
             font-weight: 400;
-            cursor: pointer;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%230071bc' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.8vw center;
-            background-repeat: no-repeat;
-            background-size: 1vw;
-            padding-right: 2.5vw;
-            appearance: none;
-        }
-
-        .field-input:focus, .field-select:focus, .field-textarea:focus {
-            border-color: #005a94;
-            box-shadow: 0 0 0 0.2vw rgba(0, 113, 188, 0.15);
-        }
-
-        .textarea-container {
-            position: relative;
-        }
-
-        .field-textarea {
+            font-size: 1.0vw;
+            line-height: 1.5;
             min-height: 6vw;
             resize: vertical;
-            padding-bottom: 2vw;
-            font-size: 1.0vw;
-            font-weight: 400;
         }
 
+        /* Textarea specific adjustments */
+        .field-input[type="textarea"] {
+            min-height: 6vw;
+            resize: vertical;
+            font-family: 'davis-sans', sans-serif;
+        }
+
+        /* Character counter for textarea */
         .character-counter {
             position: absolute;
             bottom: 0.5vw;
@@ -482,11 +468,19 @@
             color: #999999;
             font-weight: 400;
             transition: all 0.2s ease;
+            background: #ffffff;
+            padding: 0 0.2vw;
         }
 
         .character-counter.warning {
             font-weight: 700;
             color: #0071bc;
+        }
+
+        /* Hide display when editing */
+        .form-field.editing .field-display-container {
+            opacity: 0;
+            pointer-events: none;
         }
 
         /* Button Styles */
@@ -873,70 +867,97 @@
 
                     <div class="form-container">
                         <!-- Company Name Field -->
-                        <div class="form-field">
-                            <div class="field-display" id="companyNameDisplay">Loading...</div>
-                            <button class="edit-btn" onclick="editField('companyName')" id="editCompanyName">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
-                                    <path d="m14.5 5.5 4 4"/>
-                                </svg>
-                            </button>
-                            <fieldset class="company-name-fieldset" id="companyNameFieldset" style="display: none;">
-                                <legend>Company name</legend>
-                                <input type="text" id="companyNameInput" />
-                            </fieldset>
+                        <div class="form-field" data-field="companyName">
+                            <div class="field-display-container">
+                                <div class="field-display company-name" id="companyNameDisplay">Loading...</div>
+                                <button class="edit-btn" onclick="editField('companyName')">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                        <path d="m14.5 5.5 4 4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <!-- Animated field editor -->
+                            <div class="animated-field-editor" id="companyNameEditor">
+                                <div class="field-border">
+                                    <div class="field-label">Company name</div>
+                                    <input type="text" class="field-input company-name" id="companyNameInput" />
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Website Field -->
-                        <div class="form-field">
-                            <div class="field-display" id="websiteDisplay">website (example.com)</div>
-                            <button class="edit-btn" onclick="editField('website')" id="editWebsite">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
-                                    <path d="m14.5 5.5 4 4"/>
-                                </svg>
-                            </button>
-                            <input type="url" class="field-input" id="websiteInput" style="display: none;" />
+                        <div class="form-field" data-field="website">
+                            <div class="field-display-container">
+                                <div class="field-display website" id="websiteDisplay">website (example.com)</div>
+                                <button class="edit-btn" onclick="editField('website')">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                        <path d="m14.5 5.5 4 4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <!-- Animated field editor -->
+                            <div class="animated-field-editor" id="websiteEditor">
+                                <div class="field-border">
+                                    <div class="field-label">Website</div>
+                                    <input type="url" class="field-input website" id="websiteInput" placeholder="https://example.com" />
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Category Field -->
-                        <div class="form-field">
-                            <div class="field-display" id="categoryDisplay">Selected category</div>
-                            <button class="edit-btn" onclick="editField('category')" id="editCategory">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
-                                    <path d="m14.5 5.5 4 4"/>
-                                </svg>
-                            </button>
-                            <select class="field-select" id="categorySelect" style="display: none;">
-                                <option value="">Select your primary category</option>
-                                <option value="Accessories">Accessories</option>
-                                <option value="Apparel">Apparel</option>
-                                <option value="Books">Books</option>
-                                <option value="Campus Living">Campus Living</option>
-                                <option value="Food & Beverages">Food & Beverages</option>
-                                <option value="Gifts & Promotional Products">Gifts & Promotional Products</option>
-                                <option value="Graduation & Regalia">Graduation & Regalia</option>
-                                <option value="Health & Beauty">Health & Beauty</option>
-                                <option value="School Office & Lab Supplies">School Office & Lab Supplies</option>
-                                <option value="Store Operations">Store Operations</option>
-                                <option value="Technology & Electronics">Technology & Electronics</option>
-                                <option value="Other">Other</option>
-                            </select>
+                        <div class="form-field" data-field="category">
+                            <div class="field-display-container">
+                                <div class="field-display category" id="categoryDisplay">Selected category</div>
+                                <button class="edit-btn" onclick="editField('category')">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                        <path d="m14.5 5.5 4 4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <!-- Animated field editor -->
+                            <div class="animated-field-editor" id="categoryEditor">
+                                <div class="field-border">
+                                    <div class="field-label">Primary category</div>
+                                    <select class="field-input category" id="categoryInput">
+                                        <option value="">Select your primary category</option>
+                                        <option value="Accessories">Accessories</option>
+                                        <option value="Apparel">Apparel</option>
+                                        <option value="Books">Books</option>
+                                        <option value="Campus Living">Campus Living</option>
+                                        <option value="Food & Beverages">Food & Beverages</option>
+                                        <option value="Gifts & Promotional Products">Gifts & Promotional Products</option>
+                                        <option value="Graduation & Regalia">Graduation & Regalia</option>
+                                        <option value="Health & Beauty">Health & Beauty</option>
+                                        <option value="School Office & Lab Supplies">School Office & Lab Supplies</option>
+                                        <option value="Store Operations">Store Operations</option>
+                                        <option value="Technology & Electronics">Technology & Electronics</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Company Description Field -->
-                        <div class="form-field">
-                            <div class="field-display" id="descriptionDisplay">Give our members an elevator pitch of who you are.</div>
-                            <button class="edit-btn" onclick="editField('description')" id="editDescription">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
-                                    <path d="m14.5 5.5 4 4"/>
-                                </svg>
-                            </button>
-                            <div class="textarea-container" style="display: none;">
-                                <textarea class="field-textarea" id="descriptionTextarea" maxlength="300" placeholder="Give our members an elevator pitch of who you are.&#10;Max 300 characters"></textarea>
-                                <div class="character-counter" id="charCounter">300</div>
+                        <div class="form-field" data-field="description">
+                            <div class="field-display-container">
+                                <div class="field-display description" id="descriptionDisplay">Give our members an elevator pitch of who you are.</div>
+                                <button class="edit-btn" onclick="editField('description')">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                        <path d="m14.5 5.5 4 4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <!-- Animated field editor -->
+                            <div class="animated-field-editor" id="descriptionEditor">
+                                <div class="field-border">
+                                    <div class="field-label">Company description</div>
+                                    <textarea class="field-input description" id="descriptionInput" maxlength="300" placeholder="Give our members an elevator pitch of who you are."></textarea>
+                                    <div class="character-counter" id="charCounter">300</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -986,7 +1007,7 @@
         const API_BASE = '/api';
 
         // ===========================================
-        // FORM EDITING FUNCTIONALITY
+        // ANIMATED FIELD EDITING SYSTEM
         // ===========================================
         let activeField = null;
         let formState = {
@@ -996,6 +1017,10 @@
             description: ''
         };
 
+        /**
+         * Edit a field with animated border and label
+         * @param {string} fieldName - The field to edit (companyName, website, category, description)
+         */
         function editField(fieldName) {
             // If another field is being edited, save it first
             if (activeField && activeField !== fieldName) {
@@ -1004,71 +1029,54 @@
 
             activeField = fieldName;
             
-            if (fieldName === 'companyName') {
-                // Hide display and edit button
-                document.getElementById('companyNameDisplay').style.display = 'none';
-                document.getElementById('editCompanyName').style.display = 'none';
-                
-                // Show fieldset and focus input
-                const fieldset = document.getElementById('companyNameFieldset');
-                const input = document.getElementById('companyNameInput');
-                fieldset.style.display = 'block';
-                input.value = formState.companyName || '';
-                input.focus();
-                input.select();
-                return;
-            }
+            // Mark field as editing (hides display, shows editor)
+            const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
+            fieldElement.classList.add('editing');
             
-            // Hide edit button and display for other fields
-            document.getElementById(`edit${capitalizeFirst(fieldName)}`).style.display = 'none';
-            document.getElementById(`${fieldName}Display`).style.display = 'none';
+            // Show the animated editor
+            const editor = document.getElementById(`${fieldName}Editor`);
+            const input = document.getElementById(`${fieldName}Input`);
             
-            // Show and focus input field for other fields
-            if (fieldName === 'description') {
-                document.querySelector('.textarea-container').style.display = 'block';
-                const textarea = document.getElementById('descriptionTextarea');
-                textarea.value = formState.description || '';
-                textarea.focus();
-                textarea.select();
-                updateCharCounter();
-            } else if (fieldName === 'category') {
-                const select = document.getElementById('categorySelect');
-                select.style.display = 'block';
-                select.value = formState.category || '';
-                select.focus();
-            } else {
-                const input = document.getElementById(`${fieldName}Input`);
-                input.style.display = 'block';
+            editor.classList.add('active');
+            
+            // Set the current value
+            if (fieldName === 'category') {
                 input.value = formState[fieldName] || '';
-                input.focus();
-                input.select();
+            } else {
+                input.value = formState[fieldName] || '';
             }
+            
+            // Focus and select text (slight delay to allow animation)
+            setTimeout(() => {
+                input.focus();
+                if (input.type !== 'select-one' && input.tagName !== 'SELECT') {
+                    input.select();
+                }
+                
+                // Update character counter for textarea
+                if (fieldName === 'description') {
+                    updateCharCounter();
+                }
+            }, 100);
+            
+            console.log('🎬 Editing field:', fieldName);
         }
 
+        /**
+         * Save the field and hide the editor
+         * @param {string} fieldName - The field to save
+         */
         function saveField(fieldName) {
-            let newValue = '';
+            const input = document.getElementById(`${fieldName}Input`);
+            const newValue = input.value.trim();
             
-            if (fieldName === 'companyName') {
-                newValue = document.getElementById('companyNameInput').value;
-                // Hide fieldset, show display and edit button
-                document.getElementById('companyNameFieldset').style.display = 'none';
-                document.getElementById('companyNameDisplay').style.display = 'inline-block';
-                document.getElementById('editCompanyName').style.display = 'inline-flex';
-            } else if (fieldName === 'description') {
-                newValue = document.getElementById('descriptionTextarea').value;
-                document.querySelector('.textarea-container').style.display = 'none';
-            } else if (fieldName === 'category') {
-                newValue = document.getElementById('categorySelect').value;
-                document.getElementById('categorySelect').style.display = 'none';
-                
-                // If category was cleared, reopen it
-                if (!newValue) {
-                    setTimeout(() => editField('category'), 100);
-                    return;
-                }
-            } else {
-                newValue = document.getElementById(`${fieldName}Input`).value;
-                document.getElementById(`${fieldName}Input`).style.display = 'none';
+            // Special validation for category - don't allow empty
+            if (fieldName === 'category' && !newValue) {
+                // Keep editor open if category is empty
+                setTimeout(() => {
+                    input.focus();
+                }, 100);
+                return;
             }
             
             // Update form state
@@ -1077,17 +1085,23 @@
             // Update display
             updateFieldDisplay(fieldName, newValue);
             
-            // Show edit button and display for non-company name fields
-            if (fieldName !== 'companyName') {
-                document.getElementById(`edit${capitalizeFirst(fieldName)}`).style.display = 'flex';
-                document.getElementById(`${fieldName}Display`).style.display = 'flex';
-            }
+            // Hide editor and show display
+            const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
+            const editor = document.getElementById(`${fieldName}Editor`);
+            
+            fieldElement.classList.remove('editing');
+            editor.classList.remove('active');
             
             activeField = null;
             
-            console.log('📝 Updated field:', fieldName, '=', newValue);
+            console.log('💾 Saved field:', fieldName, '=', newValue);
         }
 
+        /**
+         * Update the field display with new value
+         * @param {string} fieldName - The field name
+         * @param {string} value - The new value
+         */
         function updateFieldDisplay(fieldName, value) {
             const display = document.getElementById(`${fieldName}Display`);
             
@@ -1098,30 +1112,100 @@
                     cleanUrl = cleanUrl.replace(/^https?:\/\//, '').replace(/^www\./, '');
                 }
                 display.textContent = cleanUrl || 'website (example.com)';
-                display.className = cleanUrl ? 'field-display' : 'field-display placeholder';
+                display.className = cleanUrl ? 'field-display website' : 'field-display website placeholder';
             } else if (fieldName === 'category') {
                 display.textContent = value || 'Selected category';
-                display.className = value ? 'field-display' : 'field-display placeholder';
+                display.className = value ? 'field-display category' : 'field-display category placeholder';
             } else if (fieldName === 'description') {
                 display.textContent = value || 'Give our members an elevator pitch of who you are.';
-                display.className = value ? 'field-display' : 'field-display placeholder';
+                display.className = value ? 'field-display description' : 'field-display description placeholder';
             } else {
                 display.textContent = value || 'Company name';
-                display.className = value ? 'field-display' : 'field-display placeholder';
+                display.className = value ? 'field-display company-name' : 'field-display company-name placeholder';
             }
         }
 
+        /**
+         * Update character counter for textarea
+         */
         function updateCharCounter() {
-            const textarea = document.getElementById('descriptionTextarea');
+            const textarea = document.getElementById('descriptionInput');
             const counter = document.getElementById('charCounter');
-            const remaining = 300 - textarea.value.length;
-            
-            counter.textContent = remaining;
-            counter.className = remaining <= 75 ? 'character-counter warning' : 'character-counter';
+            if (textarea && counter) {
+                const remaining = 300 - textarea.value.length;
+                counter.textContent = remaining;
+                counter.className = remaining <= 75 ? 'character-counter warning' : 'character-counter';
+            }
         }
 
-        function capitalizeFirst(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
+        // ===========================================
+        // EVENT LISTENERS SETUP
+        // ===========================================
+        function setupFormEventListeners() {
+            // Set up event listeners for all field inputs
+            const fields = ['companyName', 'website', 'category', 'description'];
+            
+            fields.forEach(fieldName => {
+                const input = document.getElementById(`${fieldName}Input`);
+                if (!input) return;
+                
+                // Auto-save on blur (when user clicks away)
+                input.addEventListener('blur', () => {
+                    if (activeField === fieldName) {
+                        saveField(fieldName);
+                    }
+                });
+                
+                // Save on Enter key (except for textarea)
+                if (fieldName !== 'description') {
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            input.blur(); // This will trigger save
+                        }
+                        if (e.key === 'Escape') {
+                            // Cancel editing - restore original value
+                            input.value = formState[fieldName] || '';
+                            input.blur();
+                        }
+                    });
+                }
+                
+                // Special handling for select (category)
+                if (fieldName === 'category') {
+                    input.addEventListener('change', () => {
+                        if (activeField === fieldName) {
+                            saveField(fieldName);
+                        }
+                    });
+                }
+                
+                // Special handling for textarea (description)
+                if (fieldName === 'description') {
+                    input.addEventListener('input', updateCharCounter);
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') {
+                            input.value = formState[fieldName] || '';
+                            input.blur();
+                        }
+                    });
+                }
+            });
+            
+            // Click outside to save
+            document.addEventListener('click', (e) => {
+                if (activeField) {
+                    const activeEditor = document.getElementById(`${activeField}Editor`);
+                    const isClickInsideEditor = activeEditor && activeEditor.contains(e.target);
+                    const isEditButton = e.target.closest('.edit-btn');
+                    
+                    if (!isClickInsideEditor && !isEditButton) {
+                        saveField(activeField);
+                    }
+                }
+            });
+            
+            console.log('🎯 Form event listeners set up');
         }
 
         // ===========================================
@@ -1154,75 +1238,13 @@
             try {
                 console.log('🪄 Loading vendor data for token:', token);
                 await loadVendorData(token);
+                setupFormEventListeners();
                 showWelcomeScreen();
             } catch (error) {
                 console.error('Error loading vendor data:', error);
                 showErrorState('Unable to load your profile information. Please try again later.');
             }
-
-            // Add event listeners for auto-save
-            setupFormEventListeners();
         });
-
-        function setupFormEventListeners() {
-            // Company name fieldset input
-            const companyNameInput = document.getElementById('companyNameInput');
-            if (companyNameInput) {
-                companyNameInput.addEventListener('blur', () => {
-                    if (activeField === 'companyName') {
-                        saveField('companyName');
-                    }
-                });
-                companyNameInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        companyNameInput.blur();
-                    }
-                });
-            }
-            
-            // Other text inputs
-            ['website'].forEach(fieldName => {
-                const input = document.getElementById(`${fieldName}Input`);
-                if (input) {
-                    input.addEventListener('blur', () => {
-                        if (activeField === fieldName) {
-                            saveField(fieldName);
-                        }
-                    });
-                    input.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter') {
-                            input.blur();
-                        }
-                    });
-                }
-            });
-            
-            // Category select
-            const categorySelect = document.getElementById('categorySelect');
-            if (categorySelect) {
-                categorySelect.addEventListener('change', () => {
-                    if (activeField === 'category') {
-                        saveField('category');
-                    }
-                });
-                categorySelect.addEventListener('blur', () => {
-                    if (activeField === 'category') {
-                        saveField('category');
-                    }
-                });
-            }
-            
-            // Description textarea
-            const descriptionTextarea = document.getElementById('descriptionTextarea');
-            if (descriptionTextarea) {
-                descriptionTextarea.addEventListener('input', updateCharCounter);
-                descriptionTextarea.addEventListener('blur', () => {
-                    if (activeField === 'description') {
-                        saveField('description');
-                    }
-                });
-            }
-        }
 
         // ===========================================
         // WIZARD NAVIGATION
@@ -1285,15 +1307,6 @@
                 const activeStepItem = document.querySelector(`[data-step="${currentStep - 1}"]`);
                 if (activeStepItem) {
                     activeStepItem.classList.add('active');
-                    
-                    // Update the SVG for the active step
-                    const stepNumber = activeStepItem.querySelector('.step-number svg');
-                    if (stepNumber && currentStep === 1) {
-                        stepNumber.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29.01 29.01">
-                            <path d="M14.51,29.01C6.51,29.01,0,22.5,0,14.51S6.51,0,14.51,0s14.51,6.51,14.51,14.51-6.51,14.51-14.51,14.51ZM14.51,3c-6.34,0-11.51,5.16-11.51,11.51s5.16,11.51,11.51,11.51,11.51-5.16,11.51-11.51S20.85,3,14.51,3Z" fill="#0071bc"/>
-                            <path d="M13.5,22.81v-12.82l-2.21,1.2-1.37-2.52,5.09-2.76h2.18v16.9h-3.7Z" fill="#0071bc"/>
-                        </svg>`;
-                    }
                 }
             }
         }

@@ -391,12 +391,12 @@
             transform: translateY(0);
         }
 
-        /* Input Field Positioning - Full Width */
+        /* Input Field Positioning - 50vw Width Only */
         .field-input-container {
             position: absolute;
             top: 0;
             left: 0;
-            width: 60%; /* Take up substantial portion of available space */
+            width: 50vw; /* The ONLY change - everything else untouched */
         }
 
         .field-input, .field-select, .field-textarea {
@@ -424,10 +424,10 @@
             line-height: 1.2;
         }
 
-        /* Category Select - Match Input Width */
+        /* Category Select - 50vw Width Only */
         .category-dropdown {
             position: relative;
-            width: 60%; /* Same as other inputs */
+            width: 50vw; /* The ONLY change - everything else untouched */
         }
 
         .category-select {
@@ -472,8 +472,7 @@
             font-weight: 400;
             font-size: 1.0vw;
             line-height: 1.5;
-            min-height: 4vw; /* Reasonable height, not massive */
-            max-height: 8vw; /* Prevent it from getting too tall */
+            min-height: 6vw; /* Back to original logic */
         }
 
         /* Character Counter for Description */
@@ -1124,13 +1123,11 @@
             // Position input container to align text exactly with display text
             inputContainer.style.left = x + 'px';
             inputContainer.style.top = y + 'px';
+            inputContainer.style.width = '50vw'; // ONLY width change - rest stays same
             
-            // Set width based on field type
             if (config.type === 'textarea') {
-                inputContainer.style.width = '60%'; // Large width for textarea
                 inputContainer.style.height = Math.max(height, 120) + 'px';
             } else {
-                inputContainer.style.width = '60%'; // Same width for all inputs
                 inputContainer.style.height = height + 'px';
             }
             

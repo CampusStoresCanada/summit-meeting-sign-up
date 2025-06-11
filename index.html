@@ -17,6 +17,7 @@
             background: #ffffff;
             min-height: 100vh;
             overflow-x: hidden;
+            padding: 3vh 3vw; /* Add padding to the body instead of positioning container */
         }
 
         /* Background image - right side only in landscape */
@@ -32,20 +33,18 @@
             z-index: -1;
         }
 
-        /* DESKTOP: 16:9 Container */
+        /* DESKTOP: Container now uses natural height with min-height */
         .wizard-container {
             display: flex;
-            width: 88vw;
-            height: calc(88vw * 1 / 2);
+            width: 100%;
+            min-height: 70vh; /* Minimum height but can grow */
             margin: 0 auto;
-            position: absolute;
-            top: 6vh;
-            left: 6vw;
             background: rgba(255, 255, 255, 0.66);
             border-radius: 20px;
             border: 3px solid #000000;
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            position: relative; /* Important for button positioning */
         }
 
         /* Sidebar */
@@ -147,11 +146,12 @@
         /* Main Content */
         .main-content {
             flex: 1;
-            padding: 0px 0px 60px 5%;
+            padding: 0px 60px 80px 5%;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             position: relative;
+            min-height: 400px; /* Ensure minimum height for content */
         }
 
         .content-section {
@@ -203,10 +203,10 @@
             align-items: center;
             justify-content: center;
             gap: max(0.5vw, 6px);
-            position: fixed;
-            left: 77vw;
-            bottom: calc(88vw * 1 / 2 * 0.05);
-            transform: translateX(-50%);
+            /* Position relative to container bottom-right */
+            position: absolute;
+            right: max(5vw, 50px);
+            bottom: max(3.5vw, 35px);
             z-index: 5;
         }
 
@@ -249,30 +249,30 @@
         /* Error State */
         .error {
             background: #f8d7da;
-            border: max(0.1vw, 1px) solid #f5c6cb;
+            border: 1px solid #f5c6cb;
             color: #721c24;
-            padding: max(1.5vw, 15px);
-            border-radius: max(0.5vw, 6px);
-            margin: max(1.5vw, 15px);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px;
             display: none;
-            font-size: max(1.0vw, 14px);
+            font-size: 16px;
         }
 
         /* Success State */
         .success {
             background: #d4edda;
-            border: max(0.1vw, 1px) solid #c3e6cb;
+            border: 1px solid #c3e6cb;
             color: #155724;
-            padding: max(2vw, 20px);
-            border-radius: max(0.5vw, 6px);
+            padding: 30px;
+            border-radius: 8px;
             text-align: center;
-            margin: max(1.5vw, 15px);
+            margin: 20px;
             display: none;
         }
 
         .success h3 {
-            font-size: max(1.5vw, 18px);
-            margin-bottom: max(1vw, 10px);
+            font-size: 24px;
+            margin-bottom: 15px;
         }
 
         /* Navigation Buttons */
@@ -333,8 +333,19 @@
             transition: width 0.3s ease;
         }
 
+        /* Responsive breakpoints */
+        @media (max-width: 1000px) {
+            .welcome-section {
+                width: 60%;
+            }
+        }
+
         /* MOBILE/TABLET: Complete Layout Change */
         @media (orientation: portrait), (max-width: 768px) {
+            body {
+                padding: 0; /* Remove body padding on mobile */
+            }
+            
             body::before {
                 display: none;
             }
@@ -346,10 +357,7 @@
                 height: auto;
                 min-height: 100vh;
                 max-width: none;
-                max-height: none;
                 margin: 0;
-                top: 0;
-                left: 0;
                 border-radius: 0;
                 border: none;
                 flex-direction: column;
@@ -426,7 +434,7 @@
             }
 
             .welcome-title {
-                font-size: 48px;
+                font-size: 36px;
             }
 
             .welcome-text {
@@ -440,7 +448,7 @@
                 max-width: 300px;
                 margin-top: 30px;
                 font-size: 18px;
-                left: auto;
+                right: auto;
                 bottom: auto;
                 z-index: auto;
             }
@@ -449,6 +457,8 @@
                 position: static;
                 justify-content: center;
                 margin-top: 40px;
+                right: auto;
+                bottom: auto;
             }
         }
 
@@ -533,7 +543,7 @@
                         <div class="step-number">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.25">
                                 <path d="M14.01,28.25C6.28,28.25,0,21.97,0,14.25S6.28.24,14.01.24s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2.24C7.39,2.24,2,7.63,2,14.25s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2.24,14.01,2.24Z"/>
-                                <path d="M10.36,18.67c.46,1.03,1.46,2.33,3.41,2.33,2.09,0,3.1-1.51,3.1-3.43,0-1.8-.86-3.22-3.41-3.22h-1.32v-1.87h1.37c2.02,0,2.78-.89,2.78-2.47s-.79-2.52-2.35-2.52c-1.39,0-2.23.72-2.86,2.11l-1.73-1.1c.79-1.58,2.14-2.93,4.66-2.93,2.93,0,4.66,1.82,4.66,4.25s-1.63,3.24-2.4,3.48c.65.19,2.98.94,2.98,4.22s-2.45,5.42-5.47,5.42c-2.69,0-4.32-1.63-4.99-3.12l1.58-1.15Z"/>
+                                <path d="M10.36,18.67c.46,1.03,1.46,2.33,3.41,2.33,2.09,0,3.1-1.51,3.1-3.43,0-1.8-.86-3.22-3.41-3.22h-1.32v-1.87h1.37c2.02,0,2.78-.89,2.78-2.47s-.79-2.52-2.35-2.52c-1.39,0-2.23.72-2.86,2.11l-1.73-1.10c.79-1.58,2.14-2.93,4.66-2.93,2.93,0,4.66,1.82,4.66,4.25s-1.63,3.24-2.4,3.48c.65.19,2.98.94,2.98,4.22s-2.45,5.42-5.47,5.42c-2.69,0-4.32-1.63-4.99-3.12l1.58-1.15Z"/>
                             </svg>
                         </div>
                         <div class="step-title">Conference team</div>
@@ -868,3 +878,4 @@
         }
     </script>
 </body>
+</html>

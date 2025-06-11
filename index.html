@@ -230,7 +230,7 @@
 
         .form-field {
             margin-bottom: 1.5vw;
-            position: relative;
+            position: relative; /* Add positioning context for absolute positioned children */
             width: 100%;
         }
 
@@ -1181,12 +1181,14 @@
                 counter.id = `charCounter-${fieldName}`;
                 counter.textContent = config.maxLength - (formState[fieldName] || '').length;
                 
-                // Position counter on bottom border line (same pattern as label)
+                // Position counter on bottom border line (same pattern as label on top)
+                const borderHeight = config.type === 'textarea' ? Math.max(height, 120) + padding * 2 : height + padding * 2;
                 counter.style.position = 'absolute';
-                counter.style.right = (padding - 12) + 'px'; // 12px from right edge of border
-                counter.style.bottom = (y + (config.type === 'textarea' ? Math.max(height, 120) : height) - 9) + 'px'; // Centered on bottom border
+                counter.style.right = (x - padding + 12) + 'px'; // 12px from right edge of border
+                counter.style.top = (y - padding + borderHeight - 9) + 'px'; // Centered on bottom border
                 counter.style.background = '#ffffff';
                 counter.style.padding = '0 0.4vw';
+                counter.style.zIndex = '1'; // Ensure it appears above border
                 
                 overlay.appendChild(counter); // Sibling to border, not child
                 

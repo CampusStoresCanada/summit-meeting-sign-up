@@ -422,21 +422,22 @@
             line-height: 1.2;
         }
 
-        /* Category Select - Proper Sizing and Hover */
+        /* Category Select - Match Text Input Sizing and Fonts Exactly */
         .category-dropdown {
             position: relative;
             width: 100%;
-            max-width: 332px; /* Same as text inputs (300px + 32px padding) */
         }
 
         .category-select {
             width: 100%;
+            max-width: 300px; /* Same as text inputs */
             padding: 12px 40px 12px 16px;
             border: 2px solid #cccccc;
             border-radius: 8px;
             font-family: 'davis-sans', sans-serif;
             font-weight: 400;
-            font-size: 1.2vw;
+            font-size: 1.2vw; /* Same as category display */
+            line-height: 1.2; /* Same as category display */
             color: #333333;
             background: #ffffff;
             cursor: pointer;

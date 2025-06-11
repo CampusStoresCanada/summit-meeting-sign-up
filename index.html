@@ -330,10 +330,15 @@
             right: 0;
             pointer-events: none;
             z-index: 10;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
         }
 
         .animated-field-editor.active {
             pointer-events: all;
+            opacity: 1;
+            visibility: visible;
         }
 
         /* The animated border container */
@@ -343,6 +348,24 @@
             border-radius: 0.5vw;
             padding: 0.8vw 1vw;
             background: #ffffff;
+            opacity: 0;
+            transform: scale(0.98);
+            animation: fieldAppear 0.3s ease-out forwards;
+        }
+
+        .animated-field-editor.active .field-border {
+            animation: fieldAppear 0.3s ease-out forwards;
+        }
+
+        @keyframes fieldAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         /* The actual animated border - using SVG for smooth animation */
@@ -437,10 +460,51 @@
             line-height: 1.2;
         }
 
+        /* Special styling for select fields */
         .field-input.category {
             font-weight: 400;
             font-size: 1.2vw;
             line-height: 1.2;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%230071bc' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.8vw center;
+            background-repeat: no-repeat;
+            background-size: 1vw;
+            padding-right: 2.5vw;
+            appearance: none;
+            border: 2px solid #0071bc;
+            border-radius: 0.5vw;
+        }
+
+        .field-input.category:focus {
+            border-color: #005a94;
+            box-shadow: 0 0 0 0.2vw rgba(0, 113, 188, 0.15);
+        }
+
+        /* Category field gets a different border style */
+        .animated-field-editor[id="categoryEditor"] .field-border {
+            border: none;
+            padding: 0;
+            background: transparent;
+        }
+
+        .animated-field-editor[id="categoryEditor"] .field-border::before {
+            display: none;
+        }
+
+        .animated-field-editor[id="categoryEditor"] .field-label {
+            position: absolute;
+            top: -0.6vw;
+            left: 0.8vw;
+            background: #ffffff;
+            color: #0071bc;
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.9vw;
+            padding: 0 0.4vw;
+            opacity: 0;
+            animation: labelFadeIn 0.3s ease-out 0.1s forwards;
+            z-index: 11;
         }
 
         .field-input.description {

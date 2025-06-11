@@ -422,11 +422,11 @@
             line-height: 1.2;
         }
 
-        /* Category Select - Persistent Grey Border with Custom Arrow */
+        /* Category Select - Proper Sizing and Hover */
         .category-dropdown {
             position: relative;
             width: 100%;
-            max-width: 350px;
+            max-width: 332px; /* Same as text inputs (300px + 32px padding) */
         }
 
         .category-select {
@@ -444,9 +444,14 @@
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
+            transition: border-color 0.2s ease;
         }
 
-        .category-select:first-child {
+        .category-select:hover {
+            border-color: #999999;
+        }
+
+        .category-select option:first-child {
             color: #999999;
             font-style: italic;
         }

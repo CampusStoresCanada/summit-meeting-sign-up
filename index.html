@@ -222,82 +222,141 @@
             margin: 0;
         }
 
-        /* Form Styles */
-        .form-container {
-            max-width: 600px;
-            width: 100%;
-        }
-
-        .form-field {
-            margin-bottom: 1.5vw;
+        /* Reusable Editable Text Field System */
+        .editable-field {
             position: relative;
+            margin-bottom: 1.5vw;
         }
 
-        /* Company Name - Large Bold Display */
-        .form-field:first-child .field-display {
+        .field-display {
             font-family: 'davis-sans', sans-serif;
-            font-weight: 700;
-            font-size: 1.8vw;
-            color: #000000;
             line-height: 1.2;
             display: inline-block;
         }
 
-        .form-field:first-child .edit-btn {
+        .field-edit-btn {
+            background: none;
+            border: none;
+            color: #999999;
+            cursor: pointer;
+            padding: 0.2vw;
             display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.2vw;
+            transition: all 0.2s ease;
+            width: 1.2vw;
+            height: 1.2vw;
             margin-left: 0.8vw;
             vertical-align: middle;
         }
 
-        /* Company Name Fieldset Edit Mode */
-        .company-name-fieldset {
-            border: 0.15vw solid #0071bc;
+        .field-edit-btn svg {
+            width: 1vw;
+            height: 1vw;
+        }
+
+        .field-edit-btn:hover {
+            color: #666666;
+        }
+
+        /* Edit Container - Positioned exactly over display */
+        .field-edit-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: var(--field-width, 100%);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .field-edit-container.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Animated Fieldset */
+        .animated-fieldset {
+            border: 0.15vw solid transparent;
             border-radius: 0.5vw;
             padding: 0.8vw 1vw;
             margin: 0;
             width: 100%;
+            position: relative;
+            background: #ffffff;
         }
 
-        .company-name-fieldset legend {
+        .animated-fieldset.animating {
+            animation: borderDraw 0.25s ease-out forwards;
+        }
+
+        @keyframes borderDraw {
+            0% {
+                border-color: transparent;
+            }
+            100% {
+                border-color: #0071bc;
+            }
+        }
+
+        .field-legend {
             font-family: 'davis-sans', sans-serif;
             font-weight: 600;
             font-size: 1.0vw;
             color: #0071bc;
             padding: 0 0.5vw;
             margin-left: -0.5vw;
+            opacity: 0;
+            transform: translateY(-0.2vw);
+            transition: opacity 0.2s ease 0.15s, transform 0.2s ease 0.15s;
         }
 
-        .company-name-fieldset input {
+        .field-legend.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .field-input-element {
             border: none;
             outline: none;
             font-family: 'davis-sans', sans-serif;
-            font-weight: 700;
-            font-size: 1.8vw;
             color: #000000;
             line-height: 1.2;
             width: 100%;
             background: transparent;
             padding: 0;
             margin: 0;
+            font-size: var(--field-font-size, 1vw);
+            font-weight: var(--field-font-weight, 400);
         }
 
-        /* Website - Smaller, lighter */
-        .form-field:nth-child(2) .field-display {
-            font-family: 'davis-sans', sans-serif;
+        /* Field Type Styles */
+        .editable-field[data-field="companyName"] {
+            --field-font-size: 1.8vw;
+            --field-font-weight: 700;
+            --field-width: 100%;
+        }
+
+        .editable-field[data-field="companyName"] .field-display {
+            font-weight: 700;
+            font-size: 1.8vw;
+            color: #000000;
+        }
+
+        .editable-field[data-field="website"] {
+            --field-font-size: 1.0vw;
+            --field-font-weight: 400;
+            --field-width: 80%;
+        }
+
+        .editable-field[data-field="website"] .field-display {
             font-weight: 400;
             font-size: 1.0vw;
             color: #666666;
-            line-height: 1.2;
-            display: inline-block;
         }
 
-        .form-field:nth-child(2) .edit-btn {
-            display: inline-flex;
-            margin-left: 0.8vw;
-            vertical-align: middle;
-        }
-
-        /* Category - Normal text */
+        /* Other field styles remain for context */
         .form-field:nth-child(3) .field-display {
             font-family: 'davis-sans', sans-serif;
             font-weight: 400;
@@ -313,7 +372,6 @@
             vertical-align: middle;
         }
 
-        /* Description - Paragraph text */
         .form-field:nth-child(4) .field-display {
             font-family: 'davis-sans', sans-serif;
             font-weight: 400;
@@ -358,7 +416,7 @@
             font-style: italic;
         }
 
-        /* Other Input Styles when editing (website, category, description) */
+        /* Legacy styles for other fields */
         .field-input, .field-select, .field-textarea {
             width: 100%;
             padding: 0.8vw 1vw;
@@ -370,11 +428,6 @@
             outline: none;
             transition: all 0.2s ease;
             line-height: 1.4;
-        }
-
-        #websiteInput {
-            font-size: 1.0vw;
-            font-weight: 400;
         }
 
         #categorySelect {
@@ -872,31 +925,38 @@
                     </div>
 
                     <div class="form-container">
-                        <!-- Company Name Field -->
-                        <div class="form-field">
+                        <!-- Company Name Field - New System -->
+                        <div class="editable-field" data-field="companyName">
                             <div class="field-display" id="companyNameDisplay">Loading...</div>
-                            <button class="edit-btn" onclick="editField('companyName')" id="editCompanyName">
+                            <button class="field-edit-btn" onclick="editTextField('companyName')" id="editCompanyName">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
                                     <path d="m14.5 5.5 4 4"/>
                                 </svg>
                             </button>
-                            <fieldset class="company-name-fieldset" id="companyNameFieldset" style="display: none;">
-                                <legend>Company name</legend>
-                                <input type="text" id="companyNameInput" />
-                            </fieldset>
+                            <div class="field-edit-container" id="companyNameEditContainer">
+                                <fieldset class="animated-fieldset" id="companyNameFieldset">
+                                    <legend class="field-legend" id="companyNameLegend">Company name</legend>
+                                    <input type="text" class="field-input-element" id="companyNameInput" />
+                                </fieldset>
+                            </div>
                         </div>
 
-                        <!-- Website Field -->
-                        <div class="form-field">
+                        <!-- Website Field - New System -->
+                        <div class="editable-field" data-field="website">
                             <div class="field-display" id="websiteDisplay">website (example.com)</div>
-                            <button class="edit-btn" onclick="editField('website')" id="editWebsite">
+                            <button class="field-edit-btn" onclick="editTextField('website')" id="editWebsite">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
                                     <path d="m14.5 5.5 4 4"/>
                                 </svg>
                             </button>
-                            <input type="url" class="field-input" id="websiteInput" style="display: none;" />
+                            <div class="field-edit-container" id="websiteEditContainer">
+                                <fieldset class="animated-fieldset" id="websiteFieldset">
+                                    <legend class="field-legend" id="websiteLegend">Website</legend>
+                                    <input type="url" class="field-input-element" id="websiteInput" />
+                                </fieldset>
+                            </div>
                         </div>
 
                         <!-- Category Field -->
@@ -996,80 +1056,51 @@
             description: ''
         };
 
-        function editField(fieldName) {
+        // ===========================================
+        // REUSABLE TEXT FIELD EDITING SYSTEM
+        // ===========================================
+        
+        function editTextField(fieldName) {
             // If another field is being edited, save it first
             if (activeField && activeField !== fieldName) {
-                saveField(activeField);
+                saveTextField(activeField);
             }
 
             activeField = fieldName;
             
-            if (fieldName === 'companyName') {
-                // Hide display and edit button
-                document.getElementById('companyNameDisplay').style.display = 'none';
-                document.getElementById('editCompanyName').style.display = 'none';
-                
-                // Show fieldset and focus input
-                const fieldset = document.getElementById('companyNameFieldset');
-                const input = document.getElementById('companyNameInput');
-                fieldset.style.display = 'block';
-                input.value = formState.companyName || '';
-                input.focus();
-                input.select();
-                return;
-            }
-            
-            // Hide edit button and display for other fields
-            document.getElementById(`edit${capitalizeFirst(fieldName)}`).style.display = 'none';
+            // Hide display and edit button
             document.getElementById(`${fieldName}Display`).style.display = 'none';
+            document.getElementById(`edit${capitalizeFirst(fieldName)}`).style.display = 'none';
             
-            // Show and focus input field for other fields
-            if (fieldName === 'description') {
-                document.querySelector('.textarea-container').style.display = 'block';
-                const textarea = document.getElementById('descriptionTextarea');
-                textarea.value = formState.description || '';
-                textarea.focus();
-                textarea.select();
-                updateCharCounter();
-            } else if (fieldName === 'category') {
-                const select = document.getElementById('categorySelect');
-                select.style.display = 'block';
-                select.value = formState.category || '';
-                select.focus();
-            } else {
-                const input = document.getElementById(`${fieldName}Input`);
-                input.style.display = 'block';
-                input.value = formState[fieldName] || '';
+            // Show edit container
+            const editContainer = document.getElementById(`${fieldName}EditContainer`);
+            const fieldset = document.getElementById(`${fieldName}Fieldset`);
+            const legend = document.getElementById(`${fieldName}Legend`);
+            const input = document.getElementById(`${fieldName}Input`);
+            
+            // Set input value and show container
+            input.value = formState[fieldName] || '';
+            editContainer.classList.add('active');
+            
+            // Trigger border animation
+            setTimeout(() => {
+                fieldset.classList.add('animating');
+                
+                // Show legend after border starts drawing
+                setTimeout(() => {
+                    legend.classList.add('visible');
+                }, 100);
+            }, 50);
+            
+            // Focus and select after animation
+            setTimeout(() => {
                 input.focus();
                 input.select();
-            }
+            }, 200);
         }
 
-        function saveField(fieldName) {
-            let newValue = '';
-            
-            if (fieldName === 'companyName') {
-                newValue = document.getElementById('companyNameInput').value;
-                // Hide fieldset, show display and edit button
-                document.getElementById('companyNameFieldset').style.display = 'none';
-                document.getElementById('companyNameDisplay').style.display = 'inline-block';
-                document.getElementById('editCompanyName').style.display = 'inline-flex';
-            } else if (fieldName === 'description') {
-                newValue = document.getElementById('descriptionTextarea').value;
-                document.querySelector('.textarea-container').style.display = 'none';
-            } else if (fieldName === 'category') {
-                newValue = document.getElementById('categorySelect').value;
-                document.getElementById('categorySelect').style.display = 'none';
-                
-                // If category was cleared, reopen it
-                if (!newValue) {
-                    setTimeout(() => editField('category'), 100);
-                    return;
-                }
-            } else {
-                newValue = document.getElementById(`${fieldName}Input`).value;
-                document.getElementById(`${fieldName}Input`).style.display = 'none';
-            }
+        function saveTextField(fieldName) {
+            const newValue = document.getElementById(`${fieldName}Input`).value;
             
             // Update form state
             formState[fieldName] = newValue;
@@ -1077,14 +1108,90 @@
             // Update display
             updateFieldDisplay(fieldName, newValue);
             
-            // Show edit button and display for non-company name fields
-            if (fieldName !== 'companyName') {
-                document.getElementById(`edit${capitalizeFirst(fieldName)}`).style.display = 'flex';
-                document.getElementById(`${fieldName}Display`).style.display = 'flex';
-            }
+            // Hide edit container and show display
+            const editContainer = document.getElementById(`${fieldName}EditContainer`);
+            const fieldset = document.getElementById(`${fieldName}Fieldset`);
+            const legend = document.getElementById(`${fieldName}Legend`);
+            
+            // Reset animations
+            fieldset.classList.remove('animating');
+            legend.classList.remove('visible');
+            editContainer.classList.remove('active');
+            
+            // Show display and edit button
+            document.getElementById(`${fieldName}Display`).style.display = 'inline-block';
+            document.getElementById(`edit${capitalizeFirst(fieldName)}`).style.display = 'inline-flex';
             
             activeField = null;
             
+            console.log('📝 Updated field:', fieldName, '=', newValue);
+        }
+
+        // Legacy function for non-text fields
+        function editField(fieldName) {
+            // Handle legacy fields (category, description)
+            if (fieldName === 'description') {
+                if (activeField && activeField !== fieldName) {
+                    if (['companyName', 'website'].includes(activeField)) {
+                        saveTextField(activeField);
+                    } else {
+                        saveField(activeField);
+                    }
+                }
+                
+                activeField = fieldName;
+                document.getElementById('editDescription').style.display = 'none';
+                document.getElementById('descriptionDisplay').style.display = 'none';
+                
+                document.querySelector('.textarea-container').style.display = 'block';
+                const textarea = document.getElementById('descriptionTextarea');
+                textarea.value = formState.description || '';
+                textarea.focus();
+                textarea.select();
+                updateCharCounter();
+            } else if (fieldName === 'category') {
+                if (activeField && activeField !== fieldName) {
+                    if (['companyName', 'website'].includes(activeField)) {
+                        saveTextField(activeField);
+                    } else {
+                        saveField(activeField);
+                    }
+                }
+                
+                activeField = fieldName;
+                document.getElementById('editCategory').style.display = 'none';
+                document.getElementById('categoryDisplay').style.display = 'none';
+                
+                const select = document.getElementById('categorySelect');
+                select.style.display = 'block';
+                select.value = formState.category || '';
+                select.focus();
+            }
+        }
+
+        function saveField(fieldName) {
+            let newValue = '';
+            
+            if (fieldName === 'description') {
+                newValue = document.getElementById('descriptionTextarea').value;
+                document.querySelector('.textarea-container').style.display = 'none';
+            } else if (fieldName === 'category') {
+                newValue = document.getElementById('categorySelect').value;
+                document.getElementById('categorySelect').style.display = 'none';
+                
+                if (!newValue) {
+                    setTimeout(() => editField('category'), 100);
+                    return;
+                }
+            }
+            
+            formState[fieldName] = newValue;
+            updateFieldDisplay(fieldName, newValue);
+            
+            document.getElementById(`edit${capitalizeFirst(fieldName)}`).style.display = 'flex';
+            document.getElementById(`${fieldName}Display`).style.display = fieldName === 'description' ? 'block' : 'flex';
+            
+            activeField = null;
             console.log('📝 Updated field:', fieldName, '=', newValue);
         }
 
@@ -1165,28 +1272,13 @@
         });
 
         function setupFormEventListeners() {
-            // Company name fieldset input
-            const companyNameInput = document.getElementById('companyNameInput');
-            if (companyNameInput) {
-                companyNameInput.addEventListener('blur', () => {
-                    if (activeField === 'companyName') {
-                        saveField('companyName');
-                    }
-                });
-                companyNameInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        companyNameInput.blur();
-                    }
-                });
-            }
-            
-            // Other text inputs
-            ['website'].forEach(fieldName => {
+            // New text field system
+            ['companyName', 'website'].forEach(fieldName => {
                 const input = document.getElementById(`${fieldName}Input`);
                 if (input) {
                     input.addEventListener('blur', () => {
                         if (activeField === fieldName) {
-                            saveField(fieldName);
+                            saveTextField(fieldName);
                         }
                     });
                     input.addEventListener('keydown', (e) => {
@@ -1197,8 +1289,31 @@
                 }
             });
             
-            // Category select
+            // Legacy fields
             const categorySelect = document.getElementById('categorySelect');
+            if (categorySelect) {
+                categorySelect.addEventListener('change', () => {
+                    if (activeField === 'category') {
+                        saveField('category');
+                    }
+                });
+                categorySelect.addEventListener('blur', () => {
+                    if (activeField === 'category') {
+                        saveField('category');
+                    }
+                });
+            }
+            
+            const descriptionTextarea = document.getElementById('descriptionTextarea');
+            if (descriptionTextarea) {
+                descriptionTextarea.addEventListener('input', updateCharCounter);
+                descriptionTextarea.addEventListener('blur', () => {
+                    if (activeField === 'description') {
+                        saveField('description');
+                    }
+                });
+            }
+        }');
             if (categorySelect) {
                 categorySelect.addEventListener('change', () => {
                     if (activeField === 'category') {
@@ -1236,7 +1351,11 @@
         function nextStep() {
             // Save any active field before moving
             if (activeField) {
-                saveField(activeField);
+                if (['companyName', 'website'].includes(activeField)) {
+                    saveTextField(activeField);
+                } else {
+                    saveField(activeField);
+                }
             }
             
             if (currentStep < totalSteps) {
@@ -1250,7 +1369,11 @@
         function previousStep() {
             // Save any active field before moving
             if (activeField) {
-                saveField(activeField);
+                if (['companyName', 'website'].includes(activeField)) {
+                    saveTextField(activeField);
+                } else {
+                    saveField(activeField);
+                }
             }
             
             if (currentStep > 0) {

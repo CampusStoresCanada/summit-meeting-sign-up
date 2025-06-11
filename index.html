@@ -37,7 +37,7 @@
         .wizard-container {
             display: flex;
             width: 100%;
-            height: calc(100vh - 6vh);
+            min-height: 70vh; /* Minimum height but can grow */
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.66);
             border-radius: 20px;
@@ -50,7 +50,6 @@
         /* Sidebar */
         .sidebar {
             width: 23vw;
-            height: 100%
             background: #e6e6e6;
             padding: 50px 40px;
             display: flex;
@@ -89,7 +88,7 @@
 
         .booth-section {
             width: 100%;
-            margin-left: 4.9vw;
+            margin-left: 9vw;
         }
 
         .conference-title {
@@ -204,11 +203,11 @@
             align-items: center;
             justify-content: center;
             gap: max(0.5vw, 6px);
+            /* Position relative to container bottom-right */
             position: absolute;
             right: max(5vw, 50px);
             bottom: max(3.5vw, 35px);
             z-index: 5;
-            box-shadow: 6px 0 16px rgba(0, 0, 0, 0.3);
         }
 
         .get-started-btn:hover {
@@ -319,7 +318,158 @@
             cursor: not-allowed;
         }
 
-        /* Mobile Progress Bar */
+        /* Step Content Styles */
+        .step-header {
+            margin-bottom: 40px;
+            margin-top: 60px;
+        }
+
+        .step-title {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 700;
+            font-size: 3.0vw;
+            color: #000000;
+            margin-bottom: 15px;
+            line-height: 1.1;
+        }
+
+        .step-subtitle {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 400;
+            font-size: 1.0vw;
+            color: #808080;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        /* Form Styles */
+        .form-container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .form-field {
+            margin-bottom: 30px;
+        }
+
+        .field-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .field-label {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 1.2vw;
+            color: #000000;
+            margin: 0;
+        }
+
+        .edit-btn {
+            background: none;
+            border: none;
+            color: #666666;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .edit-btn:hover {
+            color: #0071bc;
+            background: rgba(0, 113, 188, 0.1);
+        }
+
+        .field-display {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 400;
+            font-size: 1.0vw;
+            color: #333333;
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .field-display.placeholder {
+            color: #999999;
+            font-style: italic;
+        }
+
+        .description-display {
+            align-items: flex-start;
+            padding: 8px 0;
+            line-height: 1.5;
+        }
+
+        /* Input Styles */
+        .field-input, .field-select, .field-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #0071bc;
+            border-radius: 8px;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 1.0vw;
+            color: #000000;
+            background: #ffffff;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .field-input:focus, .field-select:focus, .field-textarea:focus {
+            border-color: #005a94;
+            box-shadow: 0 0 0 3px rgba(0, 113, 188, 0.1);
+        }
+
+        .field-select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+            appearance: none;
+        }
+
+        .textarea-container {
+            position: relative;
+        }
+
+        .field-textarea {
+            min-height: 100px;
+            resize: vertical;
+            padding-bottom: 35px;
+        }
+
+        .character-counter {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 0.8vw;
+            color: #999999;
+            font-weight: 400;
+            transition: all 0.2s ease;
+        }
+
+        .character-counter.warning {
+            font-weight: 700;
+            color: #0071bc;
+        }
+
+        /* Active step styling */
+        .step-item.active .step-number svg {
+            fill: #0071bc;
+        }
+
+        .step-item.active .step-title {
+            color: #0071bc;
+            font-weight: 700;
+        }
         .mobile-progress {
             display: none;
             height: 4px;
@@ -593,8 +743,89 @@
 
                 <!-- Step 1: Company Information -->
                 <div id="step1Section" class="content-section">
-                    <h2>Company Information</h2>
-                    <!-- Content will be added here -->
+                    <div class="step-header">
+                        <h2 class="step-title">Company information</h2>
+                        <p class="step-subtitle">Please ensure the following information about your company is accurate:</p>
+                    </div>
+
+                    <div class="form-container">
+                        <!-- Company Name Field -->
+                        <div class="form-field">
+                            <div class="field-header">
+                                <label class="field-label">Company name</label>
+                                <button class="edit-btn" onclick="editField('companyName')" id="editCompanyName">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                        <path d="m14.5 5.5 4 4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="field-display" id="companyNameDisplay">Loading...</div>
+                            <input type="text" class="field-input" id="companyNameInput" style="display: none;" />
+                        </div>
+
+                        <!-- Website Field -->
+                        <div class="form-field">
+                            <div class="field-header">
+                                <label class="field-label">Website</label>
+                                <button class="edit-btn" onclick="editField('website')" id="editWebsite">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                        <path d="m14.5 5.5 4 4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="field-display" id="websiteDisplay">website (example.com)</div>
+                            <input type="url" class="field-input" id="websiteInput" style="display: none;" />
+                        </div>
+
+                        <!-- Category Field -->
+                        <div class="form-field">
+                            <div class="field-header">
+                                <label class="field-label">Primary category</label>
+                                <button class="edit-btn" onclick="editField('category')" id="editCategory">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                        <path d="m14.5 5.5 4 4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="field-display" id="categoryDisplay">Selected category</div>
+                            <select class="field-select" id="categorySelect" style="display: none;">
+                                <option value="">Select your primary category</option>
+                                <option value="Accessories">Accessories</option>
+                                <option value="Apparel">Apparel</option>
+                                <option value="Books">Books</option>
+                                <option value="Campus Living">Campus Living</option>
+                                <option value="Food & Beverages">Food & Beverages</option>
+                                <option value="Gifts & Promotional Products">Gifts & Promotional Products</option>
+                                <option value="Graduation & Regalia">Graduation & Regalia</option>
+                                <option value="Health & Beauty">Health & Beauty</option>
+                                <option value="School Office & Lab Supplies">School Office & Lab Supplies</option>
+                                <option value="Store Operations">Store Operations</option>
+                                <option value="Technology & Electronics">Technology & Electronics</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Company Description Field -->
+                        <div class="form-field">
+                            <div class="field-header">
+                                <label class="field-label">Company description</label>
+                                <button class="edit-btn" onclick="editField('description')" id="editDescription">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                        <path d="m14.5 5.5 4 4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="field-display description-display" id="descriptionDisplay">Give our members an elevator pitch of who you are.</div>
+                            <div class="textarea-container" style="display: none;">
+                                <textarea class="field-textarea" id="descriptionTextarea" maxlength="300" placeholder="Give our members an elevator pitch of who you are.&#10;Max 300 characters"></textarea>
+                                <div class="character-counter" id="charCounter">300</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Step 2: Conference Highlight -->
@@ -864,8 +1095,161 @@
         }
 
         // ===========================================
-        // UTILITY FUNCTIONS
+        // FORM EDITING FUNCTIONALITY
         // ===========================================
+        let activeField = null;
+        let formState = {
+            companyName: '',
+            website: '',
+            category: '',
+            description: ''
+        };
+
+        function editField(fieldName) {
+            // If another field is being edited, save it first
+            if (activeField && activeField !== fieldName) {
+                saveField(activeField);
+            }
+
+            activeField = fieldName;
+            
+            // Hide edit button and display
+            document.getElementById(`edit${capitalizeFirst(fieldName)}`).style.display = 'none';
+            document.getElementById(`${fieldName}Display`).style.display = 'none';
+            
+            // Show and focus input field
+            if (fieldName === 'description') {
+                document.querySelector('.textarea-container').style.display = 'block';
+                const textarea = document.getElementById('descriptionTextarea');
+                textarea.value = formState.description || '';
+                textarea.focus();
+                textarea.select();
+                updateCharCounter();
+            } else if (fieldName === 'category') {
+                const select = document.getElementById('categorySelect');
+                select.style.display = 'block';
+                select.value = formState.category || '';
+                select.focus();
+            } else {
+                const input = document.getElementById(`${fieldName}Input`);
+                input.style.display = 'block';
+                input.value = formState[fieldName] || '';
+                input.focus();
+                input.select();
+            }
+        }
+
+        function saveField(fieldName) {
+            let newValue = '';
+            
+            if (fieldName === 'description') {
+                newValue = document.getElementById('descriptionTextarea').value;
+                document.querySelector('.textarea-container').style.display = 'none';
+            } else if (fieldName === 'category') {
+                newValue = document.getElementById('categorySelect').value;
+                document.getElementById('categorySelect').style.display = 'none';
+                
+                // If category was cleared, reopen it
+                if (!newValue) {
+                    setTimeout(() => editField('category'), 100);
+                    return;
+                }
+            } else {
+                newValue = document.getElementById(`${fieldName}Input`).value;
+                document.getElementById(`${fieldName}Input`).style.display = 'none';
+            }
+            
+            // Update form state
+            formState[fieldName] = newValue;
+            
+            // Update display
+            updateFieldDisplay(fieldName, newValue);
+            
+            // Show edit button and display
+            document.getElementById(`edit${capitalizeFirst(fieldName)}`).style.display = 'flex';
+            document.getElementById(`${fieldName}Display`).style.display = 'flex';
+            
+            activeField = null;
+            
+            console.log('📝 Updated field:', fieldName, '=', newValue);
+        }
+
+        function updateFieldDisplay(fieldName, value) {
+            const display = document.getElementById(`${fieldName}Display`);
+            
+            if (fieldName === 'website') {
+                display.textContent = value || 'website (example.com)';
+                display.className = value ? 'field-display' : 'field-display placeholder';
+            } else if (fieldName === 'category') {
+                display.textContent = value || 'Selected category';
+                display.className = value ? 'field-display' : 'field-display placeholder';
+            } else if (fieldName === 'description') {
+                display.textContent = value || 'Give our members an elevator pitch of who you are.';
+                display.className = value ? 'field-display description-display' : 'field-display description-display placeholder';
+            } else {
+                display.textContent = value || 'Company name';
+                display.className = value ? 'field-display' : 'field-display placeholder';
+            }
+        }
+
+        function updateCharCounter() {
+            const textarea = document.getElementById('descriptionTextarea');
+            const counter = document.getElementById('charCounter');
+            const remaining = 300 - textarea.value.length;
+            
+            counter.textContent = remaining;
+            counter.className = remaining <= 75 ? 'character-counter warning' : 'character-counter';
+        }
+
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Add event listeners for auto-save
+        document.addEventListener('DOMContentLoaded', () => {
+            // Text inputs
+            ['companyName', 'website'].forEach(fieldName => {
+                const input = document.getElementById(`${fieldName}Input`);
+                if (input) {
+                    input.addEventListener('blur', () => {
+                        if (activeField === fieldName) {
+                            saveField(fieldName);
+                        }
+                    });
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            input.blur();
+                        }
+                    });
+                }
+            });
+            
+            // Category select
+            const categorySelect = document.getElementById('categorySelect');
+            if (categorySelect) {
+                categorySelect.addEventListener('change', () => {
+                    if (activeField === 'category') {
+                        saveField('category');
+                    }
+                });
+                categorySelect.addEventListener('blur', () => {
+                    if (activeField === 'category') {
+                        saveField('category');
+                    }
+                });
+            }
+            
+            // Description textarea
+            const descriptionTextarea = document.getElementById('descriptionTextarea');
+            if (descriptionTextarea) {
+                descriptionTextarea.addEventListener('input', updateCharCounter);
+                descriptionTextarea.addEventListener('blur', () => {
+                    if (activeField === 'description') {
+                        saveField('description');
+                    }
+                });
+            }
+        });
         function handleFileSelect(input, displayElementId) {
             const file = input.files[0];
             const displayElement = document.getElementById(displayElementId);

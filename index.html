@@ -343,7 +343,7 @@
             pointer-events: all;
         }
 
-        /* Border with Drawing Animation */
+        /* Border with Simple Single Sweep */
         .field-border {
             position: absolute;
             border: 2px solid transparent;
@@ -363,17 +363,14 @@
             border: 2px solid #0071bc;
             border-radius: 8px;
             
-            /* Start with no border visible */
+            /* Simple single sweep from left to right */
             clip-path: inset(0 100% 0 0);
-            animation: drawBorderSimple 0.5s ease-out forwards;
+            animation: drawBorderSweep 0.3s ease-out forwards;
         }
 
-        @keyframes drawBorderSimple {
-            0% { clip-path: inset(0 100% 0 0); }      /* No border visible */
-            25% { clip-path: inset(0 0 100% 0); }     /* Top edge visible */
-            50% { clip-path: inset(0 0 0 100%); }     /* Top + right edges */
-            75% { clip-path: inset(100% 0 0 0); }     /* Top + right + bottom */
-            100% { clip-path: inset(0 0 0 0); }      /* Full border visible */
+        @keyframes drawBorderSweep {
+            from { clip-path: inset(0 100% 0 0); }    /* Hidden */
+            to { clip-path: inset(0 0 0 0); }         /* Fully visible */
         }
 
         /* Simple Label - No Animation */

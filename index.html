@@ -222,15 +222,16 @@
             margin: 0;
         }
 
-        /* Form Styles */
+        /* Form Styles - Proper Responsive Width */
         .form-container {
-            max-width: 600px;
+            max-width: 100%;
             width: 100%;
         }
 
         .form-field {
             margin-bottom: 1.5vw;
             position: relative;
+            width: 100%;
         }
 
         /* Company Name - Large Bold Display */
@@ -390,11 +391,12 @@
             transform: translateY(0);
         }
 
-        /* Input Field Positioning */
+        /* Input Field Positioning - Full Width */
         .field-input-container {
             position: absolute;
             top: 0;
             left: 0;
+            width: 60%; /* Take up substantial portion of available space */
         }
 
         .field-input, .field-select, .field-textarea {
@@ -422,15 +424,14 @@
             line-height: 1.2;
         }
 
-        /* Category Select - Match Text Input Sizing and Fonts Exactly */
+        /* Category Select - Match Input Width */
         .category-dropdown {
             position: relative;
-            width: 100%;
+            width: 60%; /* Same as other inputs */
         }
 
         .category-select {
             width: 100%;
-            max-width: 300px; /* Same as text inputs */
             padding: 12px 40px 12px 16px;
             border: 2px solid #cccccc;
             border-radius: 8px;
@@ -1122,7 +1123,7 @@
             // Position input container to align text exactly with display text
             inputContainer.style.left = x + 'px';
             inputContainer.style.top = y + 'px';
-            inputContainer.style.width = Math.max(width, 300) + 'px';
+            inputContainer.style.width = '60%'; // Match category dropdown width
             
             if (config.type === 'textarea') {
                 inputContainer.style.height = Math.max(height, 120) + 'px';

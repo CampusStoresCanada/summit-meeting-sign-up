@@ -472,7 +472,8 @@
             font-weight: 400;
             font-size: 1.0vw;
             line-height: 1.5;
-            min-height: 6vw;
+            min-height: 4vw; /* Reasonable height, not massive */
+            max-height: 8vw; /* Prevent it from getting too tall */
         }
 
         /* Character Counter for Description */
@@ -1123,11 +1124,13 @@
             // Position input container to align text exactly with display text
             inputContainer.style.left = x + 'px';
             inputContainer.style.top = y + 'px';
-            inputContainer.style.width = '60%'; // Match category dropdown width
             
+            // Set width based on field type
             if (config.type === 'textarea') {
+                inputContainer.style.width = '60%'; // Large width for textarea
                 inputContainer.style.height = Math.max(height, 120) + 'px';
             } else {
+                inputContainer.style.width = '60%'; // Same width for all inputs
                 inputContainer.style.height = height + 'px';
             }
             

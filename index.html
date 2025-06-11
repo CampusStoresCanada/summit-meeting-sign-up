@@ -1131,8 +1131,10 @@
                 inputContainer.style.height = height + 'px';
             }
             
-            // Position border around input
+            // Position border around input - FIXED CALCULATION
             const padding = 16; // 1vw converted to pixels approximately
+            const inputWidthVw = window.innerWidth * 0.38; // 38vw in pixels
+            const borderWidth = inputWidthVw + (padding * 2);
             border.style.left = (x - padding) + 'px';
             border.style.top = (y - padding) + 'px';
             border.style.width = borderWidth + 'px';

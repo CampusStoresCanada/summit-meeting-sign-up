@@ -384,10 +384,10 @@
             }
         }
 
-        /* Field label that sits ON the border line, not inside */
+        /* Field label that sits ON the border line, positioned relative to border edge */
         .field-label {
             position: absolute;
-            top: 0;
+            top: -1px;
             left: 0.8vw;
             background: #ffffff;
             color: #0071bc;
@@ -396,7 +396,7 @@
             font-size: 0.9vw;
             padding: 0 0.4vw;
             opacity: 0;
-            z-index: 12;
+            z-index: 13;
             transform: translateY(-50%);
             animation: labelFadeIn 0.5s ease-out 0.2s forwards;
         }

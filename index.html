@@ -343,20 +343,50 @@
             pointer-events: all;
         }
 
-        /* Animated Border */
+        /* Animated Border - Drawing Effect */
         .field-border {
             position: absolute;
-            border: 0.15vw solid #0071bc;
+            border: 0.15vw solid transparent;
             border-radius: 0.5vw;
             background: transparent;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.5s cubic-bezier(0.2, 0, 0.2, 1);
+            background-clip: padding-box;
         }
 
-        .field-border.animate-in {
-            opacity: 1;
-            transform: scale(1);
+        .field-border::before {
+            content: '';
+            position: absolute;
+            top: -0.15vw;
+            left: -0.15vw;
+            right: -0.15vw;
+            bottom: -0.15vw;
+            background: #0071bc;
+            border-radius: 0.5vw;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: xor;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            
+            /* Drawing animation */
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+            animation: drawBorder 0.5s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes drawBorder {
+            0% {
+                clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+            }
+            25% {
+                clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+            }
+            50% {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%);
+            }
+            75% {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+            100% {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
         }
 
         /* Animated Label */
@@ -977,9 +1007,9 @@
         };
 
         function editField(fieldName) {
-            // If another field is being edited, save it first
+            // Close any currently active field first (no animation)
             if (activeField && activeField !== fieldName) {
-                saveField(activeField);
+                closeField(activeField);
             }
 
             activeField = fieldName;
@@ -1003,6 +1033,17 @@
             createFieldOverlay(fieldName, relativeLeft, relativeTop, displayRect.width, displayRect.height);
             
             console.log('📝 Editing field:', fieldName);
+        }
+
+        function closeField(fieldName) {
+            // Remove overlay immediately (no animation)
+            removeFieldOverlay(fieldName);
+            
+            // Show display and edit button
+            const displayElement = document.getElementById(`${fieldName}Display`);
+            const editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
+            if (displayElement) displayElement.style.opacity = '1';
+            if (editButton) editButton.style.opacity = '1';
         }
 
         function createFieldOverlay(fieldName, x, y, width, height) {
@@ -1100,7 +1141,7 @@
             
             // Trigger animations on next frame
             requestAnimationFrame(() => {
-                border.classList.add('animate-in');
+                // Border draws itself automatically via CSS animation
                 label.classList.add('animate-in');
                 inputElement.focus();
                 if (inputElement.select) inputElement.select();
@@ -1168,14 +1209,7 @@
         }
 
         function cancelEdit(fieldName) {
-            removeFieldOverlay(fieldName);
-            
-            // Show display and edit button
-            const displayElement = document.getElementById(`${fieldName}Display`);
-            const editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
-            displayElement.style.opacity = '1';
-            editButton.style.opacity = '1';
-            
+            closeField(fieldName);
             activeField = null;
         }
 

@@ -229,7 +229,7 @@
         }
 
         .form-field {
-            margin-bottom: 2.5vw;
+            margin-bottom: 1.5vw;
             position: relative;
         }
 
@@ -247,6 +247,38 @@
             display: inline-flex;
             margin-left: 0.8vw;
             vertical-align: middle;
+        }
+
+        /* Company Name Fieldset Edit Mode */
+        .company-name-fieldset {
+            border: 0.15vw solid #0071bc;
+            border-radius: 0.5vw;
+            padding: 0.8vw 1vw;
+            margin: 0;
+            width: 100%;
+        }
+
+        .company-name-fieldset legend {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 1.0vw;
+            color: #0071bc;
+            padding: 0 0.5vw;
+            margin-left: -0.5vw;
+        }
+
+        .company-name-fieldset input {
+            border: none;
+            outline: none;
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.8vw;
+            color: #000000;
+            line-height: 1.2;
+            width: 100%;
+            background: transparent;
+            padding: 0;
+            margin: 0;
         }
 
         /* Website - Smaller, lighter */
@@ -326,8 +358,69 @@
             font-style: italic;
         }
 
-        /* Input Styles when editing */
+        /* Other Input Styles when editing (website, category, description) */
         .field-input, .field-select, .field-textarea {
+            width: 100%;
+            padding: 0.8vw 1vw;
+            border: 0.15vw solid #0071bc;
+            border-radius: 0.5vw;
+            font-family: 'davis-sans', sans-serif;
+            color: #000000;
+            background: #ffffff;
+            outline: none;
+            transition: all 0.2s ease;
+            line-height: 1.4;
+        }
+
+        #websiteInput {
+            font-size: 1.0vw;
+            font-weight: 400;
+        }
+
+        #categorySelect {
+            font-size: 1.2vw;
+            font-weight: 400;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%230071bc' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.8vw center;
+            background-repeat: no-repeat;
+            background-size: 1vw;
+            padding-right: 2.5vw;
+            appearance: none;
+        }
+
+        .field-input:focus, .field-select:focus, .field-textarea:focus {
+            border-color: #005a94;
+            box-shadow: 0 0 0 0.2vw rgba(0, 113, 188, 0.15);
+        }
+
+        .textarea-container {
+            position: relative;
+        }
+
+        .field-textarea {
+            min-height: 6vw;
+            resize: vertical;
+            padding-bottom: 2vw;
+            font-size: 1.0vw;
+            font-weight: 400;
+        }
+
+        .character-counter {
+            position: absolute;
+            bottom: 0.5vw;
+            right: 0.8vw;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 0.7vw;
+            color: #999999;
+            font-weight: 400;
+            transition: all 0.2s ease;
+        }
+
+        .character-counter.warning {
+            font-weight: 700;
+            color: #0071bc;
+        }textarea {
             width: 100%;
             padding: 0.8vw 1vw;
             border: 0.15vw solid #0071bc;
@@ -788,7 +881,10 @@
                                     <path d="m14.5 5.5 4 4"/>
                                 </svg>
                             </button>
-                            <input type="text" class="field-input" id="companyNameInput" style="display: none;" />
+                            <fieldset class="company-name-fieldset" id="companyNameFieldset" style="display: none;">
+                                <legend>Company name</legend>
+                                <input type="text" id="companyNameInput" />
+                            </fieldset>
                         </div>
 
                         <!-- Website Field -->
@@ -908,11 +1004,26 @@
 
             activeField = fieldName;
             
-            // Hide edit button and display
+            if (fieldName === 'companyName') {
+                // Hide display and edit button
+                document.getElementById('companyNameDisplay').style.display = 'none';
+                document.getElementById('editCompanyName').style.display = 'none';
+                
+                // Show fieldset and focus input
+                const fieldset = document.getElementById('companyNameFieldset');
+                const input = document.getElementById('companyNameInput');
+                fieldset.style.display = 'block';
+                input.value = formState.companyName || '';
+                input.focus();
+                input.select();
+                return;
+            }
+            
+            // Hide edit button and display for other fields
             document.getElementById(`edit${capitalizeFirst(fieldName)}`).style.display = 'none';
             document.getElementById(`${fieldName}Display`).style.display = 'none';
             
-            // Show and focus input field
+            // Show and focus input field for other fields
             if (fieldName === 'description') {
                 document.querySelector('.textarea-container').style.display = 'block';
                 const textarea = document.getElementById('descriptionTextarea');
@@ -937,7 +1048,13 @@
         function saveField(fieldName) {
             let newValue = '';
             
-            if (fieldName === 'description') {
+            if (fieldName === 'companyName') {
+                newValue = document.getElementById('companyNameInput').value;
+                // Hide fieldset, show display and edit button
+                document.getElementById('companyNameFieldset').style.display = 'none';
+                document.getElementById('companyNameDisplay').style.display = 'inline-block';
+                document.getElementById('editCompanyName').style.display = 'inline-flex';
+            } else if (fieldName === 'description') {
                 newValue = document.getElementById('descriptionTextarea').value;
                 document.querySelector('.textarea-container').style.display = 'none';
             } else if (fieldName === 'category') {
@@ -960,9 +1077,11 @@
             // Update display
             updateFieldDisplay(fieldName, newValue);
             
-            // Show edit button and display
-            document.getElementById(`edit${capitalizeFirst(fieldName)}`).style.display = 'flex';
-            document.getElementById(`${fieldName}Display`).style.display = 'flex';
+            // Show edit button and display for non-company name fields
+            if (fieldName !== 'companyName') {
+                document.getElementById(`edit${capitalizeFirst(fieldName)}`).style.display = 'flex';
+                document.getElementById(`${fieldName}Display`).style.display = 'flex';
+            }
             
             activeField = null;
             
@@ -1046,8 +1165,23 @@
         });
 
         function setupFormEventListeners() {
-            // Text inputs
-            ['companyName', 'website'].forEach(fieldName => {
+            // Company name fieldset input
+            const companyNameInput = document.getElementById('companyNameInput');
+            if (companyNameInput) {
+                companyNameInput.addEventListener('blur', () => {
+                    if (activeField === 'companyName') {
+                        saveField('companyName');
+                    }
+                });
+                companyNameInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        companyNameInput.blur();
+                    }
+                });
+            }
+            
+            // Other text inputs
+            ['website'].forEach(fieldName => {
                 const input = document.getElementById(`${fieldName}Input`);
                 if (input) {
                     input.addEventListener('blur', () => {

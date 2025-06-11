@@ -289,14 +289,19 @@
             font-size: 1.0vw;
             color: #666666;
             line-height: 1.5;
-            display: inline-block;
-            margin-right: 0.8vw;
-            vertical-align: middle;
+            display: block; /* Changed from inline-block */
+            margin-bottom: 0.5vw;
+            width: 38vw; /* Force width constraint instead of just max-width */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .form-field:nth-child(4) .edit-btn {
-            display: inline-flex;
-            vertical-align: middle;
+            display: flex;
+            position: absolute;
+            top: 50%; /* Center vertically */
+            right: -30px; /* Offset to the right of the text */
+            transform: translateY(-50%); /* True vertical centering */
         }
 
         .edit-btn {
@@ -397,6 +402,7 @@
             top: 0;
             left: 0;
             width: 38vw; /* Match mockup proportions */
+            max-width: 38vw; /* Ensure it never exceeds this */
         }
 
         .field-input, .field-select, .field-textarea {
@@ -408,6 +414,7 @@
             padding: 0;
             margin: 0;
             width: 100%;
+            max-width: 100%; /* Stay within container */
             resize: none;
         }
 
@@ -472,6 +479,24 @@
             font-weight: 400;
             font-size: 1.0vw;
             line-height: 1.5;
+            min-height: 6vw;
+            max-width: 38vw; /* Ensure textarea doesn't exceed 38vw */
+        }
+
+        /* Character Counter - now positioned on border */
+        .character-counter {
+            font-family: 'davis-sans', sans-serif;
+            font-size: 0.7vw;
+            color: #999999;
+            font-weight: 400;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .character-counter.warning {
+            font-weight: 700;
+            color: #0071bc;
+        }
             min-height: 6vw; /* Back to original logic */
         }
 
@@ -1029,7 +1054,7 @@
                 label: 'Company description',
                 type: 'textarea',
                 inputClass: 'description',
-                placeholder: 'Give our members a short description, the elevator pitch, of your company.',
+                placeholder: 'Give our members an elevator pitch of who you are.',
                 maxLength: 300
             }
         };
@@ -1149,13 +1174,21 @@
             label.style.left = (x - padding + 12) + 'px';
             label.style.top = (y - padding - 9) + 'px';
             
-            // Add character counter for description
+            // Add character counter for description - positioned as sibling to border
             if (fieldName === 'description') {
                 const counter = document.createElement('div');
                 counter.className = 'character-counter';
                 counter.id = `charCounter-${fieldName}`;
                 counter.textContent = config.maxLength - (formState[fieldName] || '').length;
-                inputContainer.appendChild(counter);
+                
+                // Position counter on bottom border line (same pattern as label)
+                counter.style.position = 'absolute';
+                counter.style.right = (padding - 12) + 'px'; // 12px from right edge of border
+                counter.style.bottom = (y + (config.type === 'textarea' ? Math.max(height, 120) : height) - 9) + 'px'; // Centered on bottom border
+                counter.style.background = '#ffffff';
+                counter.style.padding = '0 0.4vw';
+                
+                overlay.appendChild(counter); // Sibling to border, not child
                 
                 inputElement.addEventListener('input', () => updateCharCounter(fieldName));
             }

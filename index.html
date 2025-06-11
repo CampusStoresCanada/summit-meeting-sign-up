@@ -391,12 +391,12 @@
             transform: translateY(0);
         }
 
-        /* Input Field Positioning - 50vw Width Only */
+        /* Input Field Positioning - 38vw Width */
         .field-input-container {
             position: absolute;
             top: 0;
             left: 0;
-            width: 50vw; /* The ONLY change - everything else untouched */
+            width: 38vw; /* Match mockup proportions */
         }
 
         .field-input, .field-select, .field-textarea {
@@ -424,10 +424,10 @@
             line-height: 1.2;
         }
 
-        /* Category Select - 50vw Width Only */
+        /* Category Select - 38vw Width */
         .category-dropdown {
             position: relative;
-            width: 50vw; /* The ONLY change - everything else untouched */
+            width: 38vw; /* Match mockup proportions */
         }
 
         .category-select {
@@ -1123,7 +1123,7 @@
             // Position input container to align text exactly with display text
             inputContainer.style.left = x + 'px';
             inputContainer.style.top = y + 'px';
-            inputContainer.style.width = '50vw'; // ONLY width change - rest stays same
+            inputContainer.style.width = '38vw'; // Match mockup proportions
             
             if (config.type === 'textarea') {
                 inputContainer.style.height = Math.max(height, 120) + 'px';

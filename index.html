@@ -1240,7 +1240,17 @@
         }
 
         function updateFieldDisplay(fieldName, value) {
+            if (fieldName === 'category') {
+                // Update the select element instead of display text
+                const selectElement = document.getElementById('categorySelect');
+                if (selectElement) {
+                    selectElement.value = value || '';
+                }
+                return;
+            }
+            
             const display = document.getElementById(`${fieldName}Display`);
+            if (!display) return; // Safety check
             
             if (fieldName === 'website') {
                 // Strip https://, http://, and www. from display
@@ -1250,9 +1260,6 @@
                 }
                 display.textContent = cleanUrl || 'website (example.com)';
                 display.className = cleanUrl ? 'field-display' : 'field-display placeholder';
-            } else if (fieldName === 'category') {
-                display.textContent = value || 'Selected category';
-                display.className = value ? 'field-display' : 'field-display placeholder';
             } else if (fieldName === 'description') {
                 display.textContent = value || 'Give our members an elevator pitch of who you are.';
                 display.className = value ? 'field-display' : 'field-display placeholder';

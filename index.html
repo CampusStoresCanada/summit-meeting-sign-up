@@ -384,10 +384,10 @@
             }
         }
 
-        /* Field label that appears at the top */
+        /* Field label that sits ON the border line, not inside */
         .field-label {
             position: absolute;
-            top: -0.6vw;
+            top: 0;
             left: 0.8vw;
             background: #ffffff;
             color: #0071bc;
@@ -397,17 +397,18 @@
             padding: 0 0.4vw;
             opacity: 0;
             z-index: 12;
+            transform: translateY(-50%);
             animation: labelFadeIn 0.5s ease-out 0.2s forwards;
         }
 
         @keyframes labelFadeIn {
             from {
                 opacity: 0;
-                transform: translateY(0.2vw);
+                transform: translateY(-50%) translateY(0.2vw);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(-50%);
             }
         }
 

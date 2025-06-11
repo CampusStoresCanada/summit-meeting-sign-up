@@ -343,7 +343,7 @@
             pointer-events: all;
         }
 
-        /* Animated Border - Clean SVG Drawing */
+        /* Animated Border - Simple SVG Drawing */
         .field-border {
             position: absolute;
             background: transparent;
@@ -359,11 +359,10 @@
             fill: none;
             stroke: #0071bc;
             stroke-width: 2;
+            overflow: visible;
         }
 
         .field-border svg rect {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
             animation: drawBorder 0.5s cubic-bezier(0.2, 0, 0.2, 1) forwards;
         }
 

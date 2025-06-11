@@ -283,7 +283,7 @@
         }
 
         /* Description - Paragraph text with inline edit button */
-        .form-field:nth-child(4) .field-display {
+        .form-field[data-field="description"] .field-display {
             font-family: 'davis-sans', sans-serif;
             font-weight: 400;
             font-size: 1.0vw;
@@ -296,7 +296,7 @@
             overflow-wrap: break-word;
         }
 
-        .form-field:nth-child(4) .edit-btn {
+        .form-field[data-field="description"] .edit-btn {
             display: flex;
             position: absolute;
             top: 50%; /* Center vertically */
@@ -1184,7 +1184,7 @@
                 // Position counter on bottom border line (same pattern as label on top)
                 const borderHeight = config.type === 'textarea' ? Math.max(height, 120) + padding * 2 : height + padding * 2;
                 counter.style.position = 'absolute';
-                counter.style.right = (x - padding + 12) + 'px'; // 12px from right edge of border
+                counter.style.right = (x - padding + 24) + 'px'; // 24px from right edge to clear corner radius
                 counter.style.top = (y - padding + borderHeight - 9) + 'px'; // Centered on bottom border
                 counter.style.background = '#ffffff';
                 counter.style.padding = '0 0.4vw';

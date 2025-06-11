@@ -348,27 +348,9 @@
             border-radius: 0.5vw;
             padding: 0.8vw 1vw;
             background: #ffffff;
-            opacity: 0;
-            transform: scale(0.98);
-            animation: fieldAppear 0.3s ease-out forwards;
         }
 
-        .animated-field-editor.active .field-border {
-            animation: fieldAppear 0.3s ease-out forwards;
-        }
-
-        @keyframes fieldAppear {
-            0% {
-                opacity: 0;
-                transform: scale(0.98);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* The actual animated border - using SVG for smooth animation */
+        /* The actual animated border - SVG approach for perfect sweep */
         .field-border::before {
             content: '';
             position: absolute;
@@ -377,35 +359,31 @@
             right: -2px;
             bottom: -2px;
             border-radius: 0.5vw;
-            padding: 2px;
-            background: linear-gradient(45deg, #0071bc, #0071bc);
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: destination-out;
-            opacity: 0;
-            animation: borderDraw 0.3s ease-out forwards;
+            background: 
+                linear-gradient(to right, #0071bc 0%, #0071bc 100%) 0 0/0% 2px no-repeat,
+                linear-gradient(to bottom, #0071bc 0%, #0071bc 100%) 100% 0/2px 0% no-repeat,
+                linear-gradient(to left, #0071bc 0%, #0071bc 100%) 100% 100%/0% 2px no-repeat,
+                linear-gradient(to top, #0071bc 0%, #0071bc 100%) 0% 100%/2px 0% no-repeat;
+            animation: borderSweep 0.5s ease-out forwards;
         }
 
-        /* Border draw animation */
-        @keyframes borderDraw {
+        /* Border sweep animation - dual sweep from bottom center */
+        @keyframes borderSweep {
             0% {
-                opacity: 0;
-                clip-path: polygon(0 0, 0 0, 0 0, 0 0);
+                background-size: 0% 2px, 2px 0%, 0% 2px, 2px 0%;
+                background-position: 50% 100%, 100% 100%, 50% 0%, 0% 0%;
             }
-            25% {
-                opacity: 1;
-                clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+            33% {
+                background-size: 50% 2px, 2px 0%, 50% 2px, 2px 0%;
+                background-position: 0% 100%, 100% 100%, 100% 0%, 0% 0%;
             }
-            50% {
-                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-            }
-            75% {
-                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            66% {
+                background-size: 50% 2px, 2px 50%, 50% 2px, 2px 50%;
+                background-position: 0% 100%, 100% 50%, 100% 0%, 0% 50%;
             }
             100% {
-                opacity: 1;
-                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+                background-size: 50% 2px, 2px 50%, 50% 2px, 2px 50%;
+                background-position: 0% 100%, 100% 0%, 100% 0%, 0% 100%;
             }
         }
 
@@ -421,7 +399,7 @@
             font-size: 0.9vw;
             padding: 0 0.4vw;
             opacity: 0;
-            animation: labelFadeIn 0.3s ease-out 0.1s forwards;
+            animation: labelFadeIn 0.5s ease-out 0.2s forwards;
         }
 
         @keyframes labelFadeIn {
@@ -503,7 +481,7 @@
             font-size: 0.9vw;
             padding: 0 0.4vw;
             opacity: 0;
-            animation: labelFadeIn 0.3s ease-out 0.1s forwards;
+            animation: labelFadeIn 0.5s ease-out 0.2s forwards;
             z-index: 11;
         }
 
@@ -545,6 +523,14 @@
         .form-field.editing .field-display-container {
             opacity: 0;
             pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        /* Show display by default */
+        .form-field .field-display-container {
+            opacity: 1;
+            pointer-events: all;
+            transition: opacity 0.2s ease;
         }
 
         /* Button Styles */
@@ -1103,7 +1089,7 @@
             
             editor.classList.add('active');
             
-            // Set the current value
+            // Set the current value and select all text
             if (fieldName === 'category') {
                 input.value = formState[fieldName] || '';
             } else {
@@ -1113,7 +1099,14 @@
             // Focus and select text (slight delay to allow animation)
             setTimeout(() => {
                 input.focus();
-                if (input.type !== 'select-one' && input.tagName !== 'SELECT') {
+                if (input.tagName === 'SELECT') {
+                    // For select, just focus
+                    input.focus();
+                } else if (input.tagName === 'TEXTAREA') {
+                    // For textarea, select all text
+                    input.setSelectionRange(0, input.value.length);
+                } else {
+                    // For regular inputs, select all text
                     input.select();
                 }
                 
@@ -1123,7 +1116,7 @@
                 }
             }, 100);
             
-            console.log('🎬 Editing field:', fieldName);
+            console.log('🎬 Editing field:', fieldName, 'with value:', formState[fieldName]);
         }
 
         /**
@@ -1153,8 +1146,12 @@
             const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
             const editor = document.getElementById(`${fieldName}Editor`);
             
+            // Remove editing class first to show display, then hide editor after transition
             fieldElement.classList.remove('editing');
-            editor.classList.remove('active');
+            
+            setTimeout(() => {
+                editor.classList.remove('active');
+            }, 200); // Match the transition duration
             
             activeField = null;
             
@@ -1500,17 +1497,25 @@
             formState.category = data.organization?.primaryCategory || '';
             formState.description = data.organization?.description || '';
             
-            // Update displays
+            // Update displays immediately (not in edit mode)
             updateFieldDisplay('companyName', formState.companyName);
             updateFieldDisplay('website', formState.website);
             updateFieldDisplay('category', formState.category);
             updateFieldDisplay('description', formState.description);
+            
+            // Also populate the actual input fields so they're ready when edited
+            document.getElementById('companyNameInput').value = formState.companyName;
+            document.getElementById('websiteInput').value = formState.website;
+            document.getElementById('categoryInput').value = formState.category;
+            document.getElementById('descriptionInput').value = formState.description;
             
             // Store data for later use in form steps
             window.formData = {
                 organization: data.organization,
                 boothNumber: data.boothNumber
             };
+            
+            console.log('✅ Form populated with data from database');
         }
 
         // ===========================================

@@ -1128,8 +1128,15 @@
         let vendorData = {};
         let organizationContacts = [];
         let conferenceTeam = [];
-        let categoryDropdownOpen = false;
-
+        let categoryDropdownOpen = false; // Track dropdown state globally
+        let activeField = null;
+        let formState = {
+            companyName: '',
+            website: '',
+            category: '',
+            description: ''
+        };
+        
         const API_BASE = '/api';
 
         // ===========================================

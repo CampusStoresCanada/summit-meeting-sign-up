@@ -1489,7 +1489,9 @@
                             </div>
                         </div>
                     </div>
-                
+                    <button onclick="initializeStep2(); console.log('Force initialized Step 2');" style="background: red; color: white; padding: 10px;">
+                        DEBUG: Force Init Step 2
+                    </button>
                     <!-- Navigation Buttons -->
                     <button class="previous-btn" onclick="previousStep()" id="prevBtn">
                         <span>←</span>
@@ -1635,8 +1637,6 @@
                 document.getElementById('welcomeSection').classList.add('active');
             } else {
                 document.getElementById(`step${stepNumber}Section`).classList.add('active');
-                
-                // ADD THIS: Lazy initialize Step 2 on first visit
                 if (stepNumber === 2 && !initializedSteps.has(2)) {
                     initializeStep2();
                     initializedSteps.add(2);

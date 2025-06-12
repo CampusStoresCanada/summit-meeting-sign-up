@@ -2774,6 +2774,8 @@
                     token: token
                 };
     
+                console.log('🔍 Sending to backend:', JSON.stringify(uploadData, null, 2));
+
                 const response = await fetch(`${API_BASE}/upload-to-s3`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

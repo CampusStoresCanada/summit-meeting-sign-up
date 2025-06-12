@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Import AWS SDK dynamically (Vercel has this built-in!)
+    // Import AWS SDK dynamically 
     const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
     
     const { files, organizationName, token } = req.body;
@@ -25,7 +25,19 @@ export default async function handler(req, res) {
     }
 
     console.log(`📁 Uploading ${files.length} files for ${organizationName}...`);
+    console.log('🔍 Backend received files:', files);
+    console.log('🔍 Files length:', files?.length);
+    console.log('🔍 Organization name:', organizationName);
+    console.log('🔍 Token:', token);
+    
+    if (!files || !Array.isArray(files) || files.length === 0) {
+        console.log('❌ No files or invalid files array');
+        res.status(400).json({ error: 'No files specified' });
+        return;
+    }
 
+    console.log(`📝 Creating presigned URLs for ${files.length} files...`);
+    
     // Initialize S3 client
     const s3Client = new S3Client({
       region: process.env.AWS_REGION,
@@ -45,11 +57,15 @@ export default async function handler(req, res) {
     for (const fileData of files) {
       try {
         console.log(`⬆️ Uploading: ${fileData.name}`);
+        console.log('🔍 Processing file:', fileInfo);
         
         // Determine file path in S3
         const isCatalogueFile = fileInfo.fieldName === 'catalogFile';
         const isHighlightImage = fileInfo.fieldName === 'highlightImage';
         const fileName = fileInfo.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+
+        console.log('🔍 isCatalogueFile:', isCatalogueFile); 
+        console.log('🔍 isHighlightImage:', isHighlightImage);
         
         // Determine folder based on file type
         let subFolder = 'docs/'; // default

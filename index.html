@@ -1627,23 +1627,6 @@
             }
         }
 
-        function showStep(stepNumber) {
-            // Hide all content sections
-            const sections = document.querySelectorAll('.content-section');
-            sections.forEach(section => section.classList.remove('active'));
-        
-            // Show welcome or specific step
-            if (stepNumber === 0) {
-                document.getElementById('welcomeSection').classList.add('active');
-            } else {
-                document.getElementById(`step${stepNumber}Section`).classList.add('active');
-                if (stepNumber === 2 && !initializedSteps.has(2)) {
-                    initializeStep2();
-                    initializedSteps.add(2);
-                    console.log('🚀 Step 2 initialized on first visit!');
-                }
-            }
-        }
         // Field configurations
         const fieldConfigs = {
             companyName: {
@@ -2040,12 +2023,17 @@
             // Hide all content sections
             const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => section.classList.remove('active'));
-
+        
             // Show welcome or specific step
             if (stepNumber === 0) {
                 document.getElementById('welcomeSection').classList.add('active');
             } else {
                 document.getElementById(`step${stepNumber}Section`).classList.add('active');
+                if (stepNumber === 2 && !initializedSteps.has(2)) {
+                    initializeStep2();
+                    initializedSteps.add(2);
+                    console.log('🚀 Step 2 initialized on first visit!');
+                }
             }
         }
 
@@ -2795,6 +2783,12 @@
                 if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
     
                 const result = await response.json();
+                
+                // 🔍 DEBUG: Let's see the actual response structure
+                console.log('🔍 Full S3 response:', result);
+                console.log('🔍 Upload results:', result.uploadResults);
+                console.log('🔍 Other files:', result.uploadResults?.otherFiles);
+                
                 clearInterval(progressInterval);
                 progressFill.style.width = '100%';
                 
@@ -2803,13 +2797,25 @@
                     progressFill.style.width = '0%';
                 }, 1000);
     
-                const imageUrl = result.uploadResults?.otherFiles?.[0]?.url;
+                // Try multiple possible response structures
+                let imageUrl = null;
+                
+                if (result.uploadResults?.otherFiles?.[0]?.url) {
+                    imageUrl = result.uploadResults.otherFiles[0].url;
+                } else if (result.uploadResults?.catalogueUrl) {
+                    imageUrl = result.uploadResults.catalogueUrl;
+                } else if (result.uploadResults?.uploadUrls?.[0]?.publicUrl) {
+                    imageUrl = result.uploadResults.uploadUrls[0].publicUrl;
+                }
+                
+                console.log('🔍 Extracted image URL:', imageUrl);
+                
                 if (imageUrl) {
                     showUploadedImage(imageUrl);
                     highlightFormState.imageUrl = imageUrl;
                     console.log('✅ Image uploaded successfully:', imageUrl);
                 } else {
-                    throw new Error('No image URL returned');
+                    throw new Error('No image URL found in response structure');
                 }
     
             } catch (error) {

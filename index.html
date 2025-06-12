@@ -224,15 +224,15 @@
             margin: 0;
         }
 
-        /* Form Styles - Remove Width Constraints */
+        /* Form Styles */
         .form-container {
-            max-width: none; /* Remove the constraint! */
+            max-width: none;
             width: 100%;
         }
 
         .form-field {
             margin-bottom: 1.5vw;
-            position: relative; /* Add positioning context for absolute positioned children */
+            position: relative;
             width: 100%;
         }
 
@@ -275,9 +275,9 @@
             font-size: 1.0vw;
             color: #666666;
             line-height: 1.5;
-            display: block; /* Changed from inline-block */
+            display: block;
             margin-bottom: 0.5vw;
-            width: 38vw; /* Force width constraint instead of just max-width */
+            width: 38vw;
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
@@ -318,10 +318,6 @@
             font-style: italic;
         }
 
-        /* ===========================================
-           ANIMATED FIELD SYSTEM
-           =========================================== */
-
         /* Field Overlay System */
         .field-overlay {
             position: absolute;
@@ -354,18 +350,15 @@
             bottom: -2px;
             border: 2px solid #0071bc;
             border-radius: 8px;
-            
-            /* Simple single sweep from left to right */
             clip-path: inset(0 100% 0 0);
             animation: drawBorderSweep 0.3s ease-out forwards;
         }
 
         @keyframes drawBorderSweep {
-            from { clip-path: inset(0 100% 0 0); }    /* Hidden */
-            to { clip-path: inset(0 0 0 0); }         /* Fully visible */
+            from { clip-path: inset(0 100% 0 0); }
+            to { clip-path: inset(0 0 0 0); }
         }
 
-        /* Simple Label - No Animation */
         .field-label {
             position: absolute;
             font-family: 'davis-sans', sans-serif;
@@ -377,18 +370,12 @@
             white-space: nowrap;
         }
 
-        .field-label.animate-in {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Input Field Positioning - 38vw Width */
         .field-input-container {
             position: absolute;
             top: 0;
             left: 0;
-            width: 38vw; /* Match mockup proportions */
-            max-width: 38vw; /* Ensure it never exceeds this */
+            width: 38vw;
+            max-width: 38vw;
         }
 
         .field-input, .field-select, .field-textarea {
@@ -400,11 +387,10 @@
             padding: 0;
             margin: 0;
             width: 100%;
-            max-width: 100%; /* Stay within container */
+            max-width: 100%;
             resize: none;
         }
 
-        /* Match font styles to display elements */
         .field-input.company-name {
             font-weight: 700;
             font-size: 1.8vw;
@@ -417,11 +403,11 @@
             line-height: 1.2;
         }
 
-        /* Custom Dropdown - Complete replacement for HTML select */
+        /* Custom Dropdown */
         .custom-dropdown {
             position: relative;
             width: 38vw;
-            margin-left: -18px; /* Align text content with other fields (border 2px + padding 16px) */
+            margin-left: -18px;
         }
 
         .dropdown-display {
@@ -503,39 +489,17 @@
             background-color: #e3f2fd;
         }
 
-        .placeholder-option {
-            color: #999999 !important;
-            font-style: italic;
-            cursor: default !important;
-        }
-
-        .placeholder-option:hover {
-            background-color: transparent !important;
-        }
-
-        .category-dropdown-arrow {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 16px;
-            height: 12px;
-            pointer-events: none;
-        }
-
         .field-textarea.description {
             font-weight: 400;
             font-size: 1.0vw;
             line-height: 1.5;
             min-height: 6vw;
-            max-width: 38vw; /* Ensure textarea doesn't exceed 38vw */
+            max-width: 38vw;
         }
 
-        /* Character Counter for Description */
+        /* Character Counter */
         .character-counter {
             position: absolute;
-            bottom: 0.5vw;
-            right: 0.8vw;
             font-family: 'davis-sans', sans-serif;
             font-size: 0.7vw;
             color: #0071bc;
@@ -544,6 +508,8 @@
             padding: 0.2vw 0.4vw;
             border-radius: 0.2vw;
             transition: all 0.2s ease;
+            white-space: nowrap;
+            z-index: 1;
         }
 
         .character-counter.warning {
@@ -551,7 +517,11 @@
             color: #0071bc;
         }
         
-        /* Headline field - bigger and bolder (matches company name styling) */
+        /* Step 2 Field Styling */
+        .step2-field {
+            margin-bottom: 2.5vw;
+        }
+
         .step2-field[data-field="highlightHeadline"] .field-display {
             font-family: 'davis-sans', sans-serif;
             font-weight: 700;
@@ -567,7 +537,6 @@
             vertical-align: middle;
         }
         
-        /* Description field - paragraph style (matches company description) */
         .step2-field[data-field="highlightDescription"] .field-display {
             font-family: 'davis-sans', sans-serif;
             font-weight: 400;
@@ -589,7 +558,6 @@
             transform: translateY(-50%);
         }
         
-        /* Deal field - normal website-style text */
         .step2-field[data-field="highlightDeal"] .field-display {
             font-family: 'davis-sans', sans-serif;
             font-weight: 400;
@@ -605,15 +573,9 @@
             vertical-align: middle;
         }
         
-        /* Placeholder styling for all Step 2 fields */
         .step2-field .field-display.placeholder {
             color: #999999;
             font-style: italic;
-        }
-        
-        /* Proper spacing between Step 2 fields */
-        .step2-field {
-            margin-bottom: 2.5vw;
         }
 
         /* Button Styles */
@@ -693,7 +655,6 @@
             margin-bottom: 20px;
         }
 
-        /* Content fade-in animation */
         .wizard-content {
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
@@ -748,6 +709,273 @@
             height: 100%;
             background: #0071bc;
             transition: width 0.3s ease;
+        }
+
+        /* Validation Error Styles */
+        .field-border.error-state::before {
+            border-color: #dc3545 !important;
+        }
+        
+        .dropdown-display.error-state {
+            border-color: #dc3545 !important;
+        }
+        
+        @keyframes errorPulse {
+            0% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+            }
+            50% { 
+                transform: scale(1.02);
+                box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.2);
+            }
+            100% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+        
+        .error-message {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 0.8vw;
+            color: #dc3545;
+            font-weight: 500;
+            background: #ffffff;
+            padding: 0.2vw 0.5vw;
+            border-radius: 0.2vw;
+            border: 1px solid #dc3545;
+            white-space: nowrap;
+            z-index: 15;
+            display: none;
+        }
+
+        /* Step 2: Conference Highlight Styles */
+        .highlight-container {
+            display: flex;
+            gap: 40px;
+            max-width: none;
+            width: 100%;
+        }
+        
+        .image-section {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .image-upload-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            border: 2px dashed #cccccc;
+            border-radius: 12px;
+            background: #f8f8f8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .image-upload-container:hover {
+            border-color: #0071bc;
+            background: #f0f8ff;
+        }
+        
+        .image-upload-container.dragover {
+            border-color: #0071bc;
+            background: #e3f2fd;
+            transform: scale(1.02);
+        }
+        
+        .image-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        .image-placeholder svg {
+            width: 120px;
+            height: 90px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+        
+        .image-placeholder-text {
+            font-family: 'davis-sans', sans-serif;
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 8px;
+        }
+        
+        .image-placeholder-hint {
+            font-family: 'davis-sans', sans-serif;
+            font-size: 12px;
+            color: #999999;
+        }
+        
+        .uploaded-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .image-upload-container:hover .image-overlay {
+            display: flex;
+        }
+        
+        .content-section-right {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .upload-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .upload-progress-fill {
+            height: 100%;
+            background: #0071bc;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        /* Crop Modal */
+        .crop-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .crop-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .crop-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .crop-title {
+            font-family: 'davis-sans', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 8px;
+        }
+        
+        .crop-subtitle {
+            font-family: 'davis-sans', sans-serif;
+            font-size: 14px;
+            color: #666666;
+        }
+        
+        .crop-image-container {
+            width: 500px;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        
+        .crop-image {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .crop-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .crop-btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .crop-btn.primary {
+            background: #0071bc;
+            color: white;
+            border: none;
+        }
+        
+        .crop-btn.primary:hover {
+            background: #005a94;
+        }
+        
+        .crop-btn.secondary {
+            background: white;
+            color: #666666;
+            border: 2px solid #cccccc;
+        }
+        
+        .crop-btn.secondary:hover {
+            border-color: #999999;
+            color: #333333;
+        }
+        
+        .image-error-message {
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            right: 0;
+            background: #dc3545;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: center;
+            display: none;
+        }
+        
+        .hidden-file-input {
+            display: none;
         }
 
         /* Responsive breakpoints */
@@ -870,92 +1098,20 @@
                 left: auto;
                 z-index: auto;
             }
-        }
 
-        @media (max-width: 480px) {
-            .welcome-title {
-                font-size: 36px;
+            .highlight-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+        
+            .image-section {
+                width: 100%;
+            }
+        
+            .image-upload-container {
+                height: 300px;
             }
 
-            .welcome-text {
-                font-size: 14px;
-            }
-
-            .booth-number {
-                font-size: 18px;
-            }
-        }
-        /* ===========================================
-           VALIDATION ERROR STYLES
-           =========================================== */
-        
-        /* Error state for field borders */
-        .field-border.error-state::before {
-            border-color: #dc3545 !important; /* Red border */
-        }
-        
-        /* Error state for category dropdown */
-        .dropdown-display.error-state {
-            border-color: #dc3545 !important; /* Red border */
-        }
-        
-        /* Error pulse animation */
-        @keyframes errorPulse {
-            0% { 
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
-            }
-            50% { 
-                transform: scale(1.02);
-                box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.2);
-            }
-            100% { 
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
-            }
-        }
-        
-        /* Error message styling */
-        .error-message {
-            position: absolute;
-            bottom: -25px;
-            left: 0;
-            font-family: 'davis-sans', sans-serif;
-            font-size: 0.8vw;
-            color: #dc3545;
-            font-weight: 500;
-            background: #ffffff;
-            padding: 0.2vw 0.5vw;
-            border-radius: 0.2vw;
-            border: 1px solid #dc3545;
-            white-space: nowrap;f
-            z-index: 15;
-            display: none;
-        }
-        
-        /* Character counter warning state (keep existing) */
-        .character-counter.warning {
-            font-weight: 700;
-            color: #0071bc;
-        }
-        
-        /* Character counter for company name */
-        .character-counter {
-            position: absolute;
-            font-family: 'davis-sans', sans-serif;
-            font-size: 0.7vw;
-            color: #0071bc;
-            font-weight: 400;
-            background: #ffffff;
-            padding: 0.2vw 0.4vw;
-            border-radius: 0.2vw;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            z-index: 1;
-        }
-        
-        /* Mobile responsive error styles */
-        @media (orientation: portrait), (max-width: 768px) {
             .error-message {
                 font-size: 12px;
                 bottom: -20px;
@@ -980,353 +1136,18 @@
                 }
             }
         }
-        /* ===========================================
-           STEP 2: CONFERENCE HIGHLIGHT STYLES
-           =========================================== */
-        
-        .highlight-container {
-            display: flex;
-            gap: 40px;
-            max-width: none;
-            width: 100%;
-        }
-        
-        /* Left side - Image Upload */
-        .image-section {
-            width: 280px;
-            flex-shrink: 0;
-        }
-        
-        .image-upload-container {
-            position: relative;
-            width: 100%;
-            height: 500px; /* 9:16 aspect ratio for 280px width */
-            border: 2px dashed #cccccc;
-            border-radius: 12px;
-            background: #f8f8f8;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-        
-        .image-upload-container:hover {
-            border-color: #0071bc;
-            background: #f0f8ff;
-        }
-        
-        .image-upload-container.dragover {
-            border-color: #0071bc;
-            background: #e3f2fd;
-            transform: scale(1.02);
-        }
-        
-        .image-placeholder {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            pointer-events: none;
-        }
-        
-        .image-placeholder svg {
-            width: 120px;
-            height: 90px;
-            margin-bottom: 16px;
-            opacity: 0.6;
-        }
-        
-        .image-placeholder-text {
-            font-family: 'davis-sans', sans-serif;
-            font-size: 14px;
-            color: #666666;
-            margin-bottom: 8px;
-        }
-        
-        .image-placeholder-hint {
-            font-family: 'davis-sans', sans-serif;
-            font-size: 12px;
-            color: #999999;
-        }
-        
-        .uploaded-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-        
-        .image-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-family: 'davis-sans', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        .image-upload-container:hover .image-overlay {
-            display: flex;
-        }
-        
-        /* Right side - Text Fields */
-        .content-section-right {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .text-field {
-            margin-bottom: 40px;
-            position: relative;
-        }
-        
-        .field-label-step2 {
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 600;
-            font-size: 1.2vw;
-            color: #000000;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .field-display-step2 {
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 400;
-            font-size: 1.0vw;
-            color: #666666;
-            line-height: 1.5;
-            min-height: 1.5em;
-            cursor: pointer;
-            padding: 12px 0;
-        }
-        
-        .field-display-step2.placeholder {
-            color: #999999;
-            font-style: italic;
-        }
-        
-        .field-display-step2.headline {
-            font-size: 1.4vw;
-            font-weight: 600;
-            color: #000000;
-        }
-        
-        /* Progress Bar */
-        .upload-progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 0 0 12px 12px;
-            overflow: hidden;
-            display: none;
-        }
-        
-        .upload-progress-fill {
-            height: 100%;
-            background: #0071bc;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-        
-        /* Crop Modal */
-        .crop-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        
-        .crop-container {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 90vw;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .crop-header {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .crop-title {
-            font-family: 'davis-sans', sans-serif;
-            font-size: 24px;
-            font-weight: 700;
-            color: #000000;
-            margin-bottom: 8px;
-        }
-        
-        .crop-subtitle {
-            font-family: 'davis-sans', sans-serif;
-            font-size: 14px;
-            color: #666666;
-        }
-        
-        .crop-image-container {
-            width: 500px;
-            height: 400px;
-            margin-bottom: 20px;
-        }
-        
-        .crop-image {
-            max-width: 100%;
-            max-height: 100%;
-        }
-        
-        .crop-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        
-        .crop-btn {
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-family: 'davis-sans', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .crop-btn.primary {
-            background: #0071bc;
-            color: white;
-            border: none;
-        }
-        
-        .crop-btn.primary:hover {
-            background: #005a94;
-        }
-        
-        .crop-btn.secondary {
-            background: white;
-            color: #666666;
-            border: 2px solid #cccccc;
-        }
-        
-        .crop-btn.secondary:hover {
-            border-color: #999999;
-            color: #333333;
-        }
-        
-        /* Error Messages */
-        .image-error-message {
-            position: absolute;
-            bottom: -30px;
-            left: 0;
-            right: 0;
-            background: #dc3545;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            text-align: center;
-            display: none;
-        }
-        
-        /* Hidden file input */
-        .hidden-file-input {
-            display: none;
-        }
-        .step2-field {
-            margin-bottom: 2.5vw; /* More space between fields */
-        }
-        
-        /* Headline field - bigger and bolder */
-        .step2-field[data-field="step2Headline"] .field-display {
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 700;
-            font-size: 1.8vw;
-            color: #000000;
-            line-height: 1.2;
-            display: inline-block;
-        }
-        
-        .step2-field[data-field="step2Headline"] .edit-btn {
-            display: inline-flex;
-            margin-left: 0.8vw;
-            vertical-align: middle;
-        }
-        
-        /* Description field - paragraph style */
-        .step2-field[data-field="step2Description"] .field-display {
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 400;
-            font-size: 1.0vw;
-            color: #666666;
-            line-height: 1.5;
-            display: block;
-            margin-bottom: 0.5vw;
-            width: 38vw;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }
-        
-        .step2-field[data-field="step2Description"] .edit-btn {
-            display: flex;
-            position: absolute;
-            top: 50%; 
-            left: 38.8vw;
-            transform: translateY(-50%);
-        }
-        
-        /* Deal field - normal style */
-        .step2-field[data-field="step2Deal"] .field-display {
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 400;
-            font-size: 1.2vw;
-            color: #333333;
-            line-height: 1.2;
-            display: inline-block;
-        }
-        
-        .step2-field[data-field="step2Deal"] .edit-btn {
-            display: inline-flex;
-            margin-left: 0.8vw;
-            vertical-align: middle;
-        }
-        
-        /* Placeholder styling for all Step 2 fields */
-        .step2-field .field-display.placeholder {
-            color: #999999;
-            font-style: italic;
-        }
-        /* Mobile responsive for Step 2 */
-        @media (orientation: portrait), (max-width: 768px) {
-            .highlight-container {
-                flex-direction: column;
-                gap: 20px;
+
+        @media (max-width: 480px) {
+            .welcome-title {
+                font-size: 36px;
             }
-        
-            .image-section {
-                width: 100%;
+
+            .welcome-text {
+                font-size: 14px;
             }
-        
-            .image-upload-container {
-                height: 300px;
+
+            .booth-number {
+                font-size: 18px;
             }
         }
     </style>
@@ -1363,22 +1184,8 @@
                     <div class="booth-section">
                         <div class="booth-number" id="boothNumber">Booth 501</div>
                     </div>
-                </div>  
-                <div class="crop-modal" id="cropModal">
-                    <div class="crop-container">
-                        <div class="crop-header">
-                            <div class="crop-title">Crop your image</div>
-                            <div class="crop-subtitle">Adjust the image to fit a 9:16 aspect ratio (portrait)</div>
-                        </div>
-                        <div class="crop-image-container">
-                            <img class="crop-image" id="cropImage" alt="Image to crop">
-                        </div>
-                        <div class="crop-actions">
-                            <button class="crop-btn secondary" onclick="cancelCrop()">Cancel</button>
-                            <button class="crop-btn primary" onclick="applyCrop()">Apply Crop</button>
-                        </div>
-                    </div>
                 </div>
+
                 <div class="step-navigation">
                     <div class="step-item" data-step="0">
                         <div class="step-number">
@@ -1518,11 +1325,11 @@
                     </div>
 
                     <!-- Navigation Buttons -->
-                    <button class="previous-btn" onclick="previousStep()" id="prevBtn">
+                    <button class="previous-btn" onclick="previousStep()">
                         <span>←</span>
                         Previous step
                     </button>
-                    <button class="next-btn" onclick="nextStep()" id="nextBtn">
+                    <button class="next-btn" onclick="nextStep()">
                         Next step
                         <span>→</span>
                     </button>
@@ -1536,7 +1343,7 @@
                     </div>
                 
                     <div class="highlight-container">
-                        <!-- Left side - Image Upload (keep existing) -->
+                        <!-- Left side - Image Upload -->
                         <div class="image-section">
                             <div class="image-upload-container" id="imageUploadContainer">
                                 <div class="image-placeholder" id="imagePlaceholder">
@@ -1563,9 +1370,9 @@
                             <input type="file" class="hidden-file-input" id="fileInput" accept="image/jpeg,image/png">
                         </div>
                 
-                        <!-- Right side - FIXED TEXT FIELDS -->
+                        <!-- Right side - Text Fields -->
                         <div class="content-section-right">
-                            <!-- Headline Field - NOW MATCHES STEP 1 PATTERN -->
+                            <!-- Headline Field -->
                             <div class="form-field step2-field" data-field="highlightHeadline">
                                 <div class="field-display headline-display" id="highlightHeadlineDisplay">Give your product or service a catchy headline</div>
                                 <button class="edit-btn" onclick="editField('highlightHeadline')" id="editHighlightHeadline">
@@ -1576,7 +1383,7 @@
                                 </button>
                             </div>
                 
-                            <!-- Description Field - NOW MATCHES STEP 1 PATTERN -->
+                            <!-- Description Field -->
                             <div class="form-field step2-field" data-field="highlightDescription">
                                 <div class="field-display" id="highlightDescriptionDisplay">Give a short description of what you are going to do for the members, not every carve out and caveat, but the gist.</div>
                                 <button class="edit-btn" onclick="editField('highlightDescription')" id="editHighlightDescription">
@@ -1587,7 +1394,7 @@
                                 </button>
                             </div>
                 
-                            <!-- Deal Field - NOW MATCHES STEP 1 PATTERN -->
+                            <!-- Deal Field -->
                             <div class="form-field step2-field" data-field="highlightDeal">
                                 <div class="field-display" id="highlightDealDisplay">What's your conference special? Free consultation? Discount? Bonus swag?</div>
                                 <button class="edit-btn" onclick="editField('highlightDeal')" id="editHighlightDeal">
@@ -1624,6 +1431,23 @@
                 </div>
             </div>
         </div>
+
+        <!-- Crop Modal -->
+        <div class="crop-modal" id="cropModal">
+            <div class="crop-container">
+                <div class="crop-header">
+                    <div class="crop-title">Crop your image</div>
+                    <div class="crop-subtitle">Adjust the image to fit a 9:16 aspect ratio (portrait)</div>
+                </div>
+                <div class="crop-image-container">
+                    <img class="crop-image" id="cropImage" alt="Image to crop">
+                </div>
+                <div class="crop-actions">
+                    <button class="crop-btn secondary" onclick="cancelCrop()">Cancel</button>
+                    <button class="crop-btn primary" onclick="applyCrop()">Apply Crop</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1635,7 +1459,7 @@
         let vendorData = {};
         let organizationContacts = [];
         let conferenceTeam = [];
-        let categoryDropdownOpen = false; // Track dropdown state globally
+        let categoryDropdownOpen = false;
         let activeField = null;
         let formState = {
             // Step 1
@@ -1655,7 +1479,6 @@
         // ===========================================
         // CROPPER MANAGEMENT
         // ===========================================
-        
         let cropperInstance = null;
         let currentFile = null;
         let initializedSteps = new Set();
@@ -1663,7 +1486,6 @@
         // ===========================================
         // CUSTOM DROPDOWN FUNCTIONALITY
         // ===========================================
-            
         function initializeDropdown() {
             const dropdown = document.getElementById('categoryDropdown');
             const display = document.getElementById('categoryDisplay');
@@ -1688,8 +1510,6 @@
                     const value = e.target.getAttribute('data-value');
                     selectOption(value);
                     closeDropdown();
-                    
-                    // Clear any error state when user makes a selection
                     clearCategoryError();
                 }
             });
@@ -1704,13 +1524,9 @@
             function openDropdown() {
                 options.style.display = 'block';
                 display.classList.add('open');
-                categoryDropdownOpen = true; // Set flag
-                
-                // Clear error state when opening (user is showing intent to fix)
-                console.log('🔧 Clearing category error on dropdown open');
+                categoryDropdownOpen = true;
                 clearCategoryError();
                 
-                // Highlight selected option
                 const currentValue = formState.category;
                 options.querySelectorAll('.dropdown-option').forEach(option => {
                     option.classList.remove('selected');
@@ -1723,7 +1539,7 @@
             function closeDropdown() {
                 options.style.display = 'none';
                 display.classList.remove('open');
-                categoryDropdownOpen = false; // Clear flag
+                categoryDropdownOpen = false;
             }
             
             function selectOption(value) {
@@ -1760,7 +1576,7 @@
                 maxLength: 300,
                 required: false
             },
-            // Step 2 fields - ADDED WITH PROPER COMMAS
+            // Step 2 fields
             highlightHeadline: {
                 label: 'Headline',
                 type: 'input',
@@ -1786,11 +1602,83 @@
                 required: false
             }
         };
+
+        // ===========================================
+        // FIELD EDITING FUNCTIONS
+        // ===========================================
+        function editField(fieldName) {
+            if (fieldName === 'category') {
+                return;
+            }
+            
+            if (activeField && activeField !== fieldName) {
+                closeField(activeField);
+            }
+
+            activeField = fieldName;
+            const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
+            const displayElement = document.getElementById(`${fieldName}Display`);
+            const editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
+            
+            const displayRect = displayElement.getBoundingClientRect();
+            const fieldRect = fieldElement.getBoundingClientRect();
+            
+            const relativeTop = displayRect.top - fieldRect.top;
+            const relativeLeft = displayRect.left - fieldRect.left;
+            
+            displayElement.style.opacity = '0';
+            editButton.style.opacity = '0';
+            
+            createFieldOverlay(fieldName, relativeLeft, relativeTop, displayRect.width, displayRect.height);
+            
+            console.log('📝 Editing field:', fieldName);
+        }
+
+        function closeField(fieldName) {
+            removeFieldOverlay(fieldName);
+            
+            const displayElement = document.getElementById(`${fieldName}Display`);
+            const editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
+            
+            if (displayElement) displayElement.style.opacity = '1';
+            if (editButton) editButton.style.opacity = '1';
+        }
+
+        function createFieldOverlay(fieldName, x, y, width, height) {
+            const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
+            const config = fieldConfigs[fieldName];
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'field-overlay active';
+            overlay.id = `overlay-${fieldName}`;
+            
+            const border = document.createElement('div');
+            border.className = 'field-border';
+            
+            const label = document.createElement('div');
+            label.className = 'field-label';
+            label.textContent = config.label;
+            
+            const inputContainer = document.createElement('div');
+            inputContainer.className = 'field-input-container';
+            
+            let inputElement;
+            if (config.type === 'textarea') {
+                inputElement = document.createElement('textarea');
+                inputElement.className = `field-textarea ${config.inputClass}`;
+                inputElement.maxLength = config.maxLength || 1000;
+            } else {
+                inputElement = document.createElement('input');
+                inputElement.className = `field-input ${config.inputClass}`;
+                inputElement.type = fieldName === 'website' ? 'url' : 'text';
+                if (config.maxLength) {
+                    inputElement.maxLength = config.maxLength;
+                }
+            }
             
             inputElement.placeholder = config.placeholder;
             inputElement.value = formState[fieldName] || '';
             
-            // Position input container
             inputContainer.style.left = x + 'px';
             inputContainer.style.top = y + 'px';
             inputContainer.style.width = '38vw';
@@ -1801,7 +1689,6 @@
                 inputContainer.style.height = height + 'px';
             }
             
-            // Position border
             const padding = 16;
             const inputWidthVw = window.innerWidth * 0.38;
             const borderWidth = inputWidthVw + (padding * 2);
@@ -1815,11 +1702,9 @@
                 border.style.height = (height + padding * 2) + 'px';
             }
             
-            // Position label
             label.style.left = (x - padding + 12) + 'px';
             label.style.top = (y - padding - 9) + 'px';
             
-            // Add character counter for fields that need it
             if (config.maxLength) {
                 const counter = document.createElement('div');
                 counter.className = 'character-counter';
@@ -1827,7 +1712,6 @@
                 
                 counter.textContent = config.maxLength - (formState[fieldName] || '').length;
                 
-                // Position counter
                 const borderHeight = config.type === 'textarea' ? Math.max(height, 120) + padding * 2 : height + padding * 2;
                 counter.style.position = 'absolute';
                 counter.style.right = (x - padding + 24) + 'px';
@@ -1841,193 +1725,18 @@
                 inputElement.addEventListener('input', () => updateCharCounter(fieldName));
             }
             
-            // Assemble overlay
             inputContainer.appendChild(inputElement);
             overlay.appendChild(border);
             overlay.appendChild(label);
             overlay.appendChild(inputContainer);
             
-            // Add to field
             fieldElement.appendChild(overlay);
             
-            // Focus and setup
-            requestAnimationFrame(() => {
-                inputElement.focus();
-                if (inputElement.select) inputElement.select();
-            });
-        
-        // Update the image upload to use the new form state structure
-        function showUploadedImage(imageUrl) {
-            const placeholder = document.getElementById('imagePlaceholder');
-            const uploadedImage = document.getElementById('uploadedImage');
-            
-            if (placeholder && uploadedImage) {
-                placeholder.style.display = 'none';
-                uploadedImage.src = imageUrl;
-                uploadedImage.style.display = 'block';
-                
-                // Update the form state
-                step2FormState.imageUrl = imageUrl;
-            }
-        }
-
-        function editField(fieldName) {
-            if (fieldName === 'category') {
-                return;
-            }
-            
-            // Close any currently active field first (no animation)
-            if (activeField && activeField !== fieldName) {
-                closeField(activeField);
-            }
-
-            activeField = fieldName;
-            const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
-            const displayElement = document.getElementById(`${fieldName}Display`);
-            const editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
-            
-            // Get display element position and dimensions
-            const displayRect = displayElement.getBoundingClientRect();
-            const fieldRect = fieldElement.getBoundingClientRect();
-            
-            // Calculate relative position within the field container
-            const relativeTop = displayRect.top - fieldRect.top;
-            const relativeLeft = displayRect.left - fieldRect.left;
-            
-            // Hide display and edit button
-            displayElement.style.opacity = '0';
-            editButton.style.opacity = '0';
-            
-            // Create overlay system
-            createFieldOverlay(fieldName, relativeLeft, relativeTop, displayRect.width, displayRect.height);
-            
-            console.log('📝 Editing field:', fieldName);
-        }
-
-        function closeField(fieldName) {
-            // Remove overlay immediately (no animation)
-            removeFieldOverlay(fieldName);
-            
-            // Show display and edit button
-            const displayElement = document.getElementById(`${fieldName}Display`);
-            const editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
-            
-            if (displayElement) displayElement.style.opacity = '1';
-            if (editButton) editButton.style.opacity = '1';
-        }
-
-        function createFieldOverlay(fieldName, x, y, width, height) {
-            const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
-            const config = fieldConfigs[fieldName];
-            
-            // Create overlay container
-            const overlay = document.createElement('div');
-            overlay.className = 'field-overlay active';
-            overlay.id = `overlay-${fieldName}`;
-            
-            // Create border
-            const border = document.createElement('div');
-            border.className = 'field-border';
-            
-            // Create label
-            const label = document.createElement('div');
-            label.className = 'field-label';
-            label.textContent = config.label;
-            
-            // Create input container
-            const inputContainer = document.createElement('div');
-            inputContainer.className = 'field-input-container';
-            
-            // Create input element
-            let inputElement;
-            if (config.type === 'select') {
-                inputElement = document.createElement('select');
-                inputElement.className = `field-select ${config.inputClass}`;
-                config.options.forEach(option => {
-                    const optionEl = document.createElement('option');
-                    optionEl.value = option.value;
-                    optionEl.textContent = option.text;
-                    inputElement.appendChild(optionEl);
-                });
-            } else if (config.type === 'textarea') {
-                inputElement = document.createElement('textarea');
-                inputElement.className = `field-textarea ${config.inputClass}`;
-                inputElement.maxLength = config.maxLength || 1000;
-            } else {
-                inputElement = document.createElement('input');
-                inputElement.className = `field-input ${config.inputClass}`;
-                inputElement.type = fieldName === 'website' ? 'url' : 'text';
-            }
-            
-            inputElement.placeholder = config.placeholder;
-            inputElement.value = formState[fieldName] || '';
-            
-            // Position input container to align text exactly with display text
-            inputContainer.style.left = x + 'px';
-            inputContainer.style.top = y + 'px';
-            inputContainer.style.width = '38vw'; // Match mockup proportions
-            
-            if (config.type === 'textarea') {
-                inputContainer.style.height = Math.max(height, 120) + 'px';
-            } else {
-                inputContainer.style.height = height + 'px';
-            }
-            
-            // Position border around input - FIXED CALCULATION
-            const padding = 16; // 1vw converted to pixels approximately
-            const inputWidthVw = window.innerWidth * 0.38; // 38vw in pixels
-            const borderWidth = inputWidthVw + (padding * 2);
-            border.style.left = (x - padding) + 'px';
-            border.style.top = (y - padding) + 'px';
-            border.style.width = borderWidth + 'px';
-            
-            if (config.type === 'textarea') {
-                border.style.height = (Math.max(height, 120) + padding * 2) + 'px';
-            } else {
-                border.style.height = (height + padding * 2) + 'px';
-            }
-            
-            // Position label on border
-            label.style.left = (x - padding + 12) + 'px';
-            label.style.top = (y - padding - 9) + 'px';
-            
-            // Add character counter for description - positioned as sibling to border
-            if (fieldName === 'description') {
-                const counter = document.createElement('div');
-                counter.className = 'character-counter';
-                counter.id = `charCounter-${fieldName}`;
-                counter.textContent = config.maxLength - (formState[fieldName] || '').length;
-                
-                // Position counter on bottom border line (same pattern as label on top)
-                const borderHeight = config.type === 'textarea' ? Math.max(height, 120) + padding * 2 : height + padding * 2;
-                counter.style.position = 'absolute';
-                counter.style.right = (x - padding + 24) + 'px'; // 24px from right edge to clear corner radius
-                counter.style.top = (y - padding + borderHeight - 9) + 'px'; // Centered on bottom border
-                counter.style.background = '#ffffff';
-                counter.style.padding = '0 0.4vw';
-                counter.style.zIndex = '1'; // Ensure it appears above border
-                
-                overlay.appendChild(counter); // Sibling to border, not child
-                
-                inputElement.addEventListener('input', () => updateCharCounter(fieldName));
-            }
-            
-            // Assemble overlay
-            inputContainer.appendChild(inputElement);
-            overlay.appendChild(border);
-            overlay.appendChild(label);
-            overlay.appendChild(inputContainer);
-            
-            // Add to field
-            fieldElement.appendChild(overlay);
-            
-            // Trigger on next frame - no animations, just show everything
             requestAnimationFrame(() => {
                 inputElement.focus();
                 if (inputElement.select) inputElement.select();
             });
             
-            // Add event listeners
             setupInputEventListeners(inputElement, fieldName);
         }
 
@@ -2039,20 +1748,12 @@
             });
             
             inputElement.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && fieldName !== 'description') {
+                if (e.key === 'Enter' && fieldConfigs[fieldName].type !== 'textarea') {
                     inputElement.blur();
                 } else if (e.key === 'Escape') {
                     cancelEdit(fieldName);
                 }
             });
-            
-            if (fieldName === 'category') {
-                inputElement.addEventListener('change', () => {
-                    if (activeField === fieldName) {
-                        saveField(fieldName);
-                    }
-                });
-            }
         }
 
         function saveField(fieldName) {
@@ -2062,22 +1763,24 @@
             const inputElement = overlay.querySelector('input, select, textarea');
             const newValue = inputElement.value;
             
-            // Don't allow empty category
             if (fieldName === 'category' && !newValue) {
                 inputElement.focus();
                 return;
             }
             
-            // Update form state
+            const errorMessage = validateField(fieldName, newValue);
+            
+            if (errorMessage) {
+                showFieldError(fieldName, errorMessage);
+                return;
+            }
+            
+            clearFieldError(fieldName);
+            
             formState[fieldName] = newValue;
-            
-            // Update display
             updateFieldDisplay(fieldName, newValue);
-            
-            // Remove overlay
             removeFieldOverlay(fieldName);
             
-            // Show display and edit button
             const displayElement = document.getElementById(`${fieldName}Display`);
             const editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
             displayElement.style.opacity = '1';
@@ -2102,7 +1805,6 @@
 
         function updateFieldDisplay(fieldName, value) {
             if (fieldName === 'category') {
-                // Update the custom dropdown display
                 const text = document.getElementById('categoryText');
                 const display = document.getElementById('categoryDisplay');
                 if (text && display) {
@@ -2118,41 +1820,41 @@
             }
             
             const display = document.getElementById(`${fieldName}Display`);
-            if (!display) return; 
+            if (!display) return;
             
-            if (fieldName === 'website') {
-                // Strip https://, http://, and www. from display
-                let cleanUrl = value || '';
-                if (cleanUrl) {
-                    cleanUrl = cleanUrl.replace(/^https?:\/\//, '').replace(/^www\./, '');
+            const config = fieldConfigs[fieldName];
+            
+            if (value) {
+                if (fieldName === 'website') {
+                    let cleanUrl = value.replace(/^https?:\/\//, '').replace(/^www\./, '');
+                    display.textContent = cleanUrl;
+                } else {
+                    display.textContent = value;
                 }
-                display.textContent = cleanUrl || 'website (example.com)';
-                display.className = cleanUrl ? 'field-display' : 'field-display placeholder';
-            } else if (fieldName === 'description') {
-                display.textContent = value || 'Give our members an elevator pitch of who you are.';
-                display.className = value ? 'field-display' : 'field-display placeholder';
+                display.classList.remove('placeholder');
             } else {
-                display.textContent = value || 'Company name';
-                display.className = value ? 'field-display' : 'field-display placeholder';
+                display.textContent = config.placeholder;
+                display.classList.add('placeholder');
             }
         }
 
         function updateCharCounter(fieldName) {
             const counter = document.getElementById(`charCounter-${fieldName}`);
-            const inputElement = document.querySelector(`#overlay-${fieldName} textarea`);
+            const inputElement = document.querySelector(`#overlay-${fieldName} input, #overlay-${fieldName} textarea`);
             if (!counter || !inputElement) return;
             
             const config = fieldConfigs[fieldName];
             const remaining = config.maxLength - inputElement.value.length;
             
             counter.textContent = remaining;
+            
             let warningThreshold;
             if (config.maxLength <= 100) {
-                warningThreshold = 10; // For headline, company name
+                warningThreshold = 10;
             } else if (config.maxLength <= 200) {
-                warningThreshold = 25; // For deal field
+                warningThreshold = 25;
             } else {
-                warningThreshold = 75; // For descriptions
+                warningThreshold = 75;
             }
             counter.className = remaining <= warningThreshold ? 'character-counter warning' : 'character-counter';
         }
@@ -2162,12 +1864,127 @@
         }
 
         // ===========================================
+        // VALIDATION SYSTEM
+        // ===========================================
+        function validateField(fieldName, value) {
+            const validators = {
+                companyName: (val) => {
+                    if (!val || val.trim().length === 0) {
+                        return 'Company name is required';
+                    }
+                    if (val.length > 100) {
+                        return 'Company name cannot exceed 100 characters';
+                    }
+                    return null;
+                },
+                
+                category: (val) => {
+                    if (!val || val.trim() === '') {
+                        return 'Please select a category';
+                    }
+                    return null;
+                },
+                
+                description: () => null,
+                website: () => null,
+                highlightHeadline: () => null,
+                highlightDescription: () => null,
+                highlightDeal: () => null
+            };
+            
+            return validators[fieldName] ? validators[fieldName](value) : null;
+        }
+
+        function validateCategorySelection() {
+            if (categoryDropdownOpen) {
+                console.log('🔧 Skipping category validation - dropdown is open');
+                return true;
+            }
+            
+            const errorMessage = validateField('category', formState.category);
+            
+            if (errorMessage) {
+                showCategoryError();
+                return false;
+            }
+            
+            clearCategoryError();
+            return true;
+        }
+        
+        function showCategoryError() {
+            const dropdown = document.getElementById('categoryDisplay');
+            dropdown.classList.add('error-state');
+            dropdown.style.animation = 'errorPulse 1s ease-in-out infinite';
+        }
+        
+        function clearCategoryError() {
+            const dropdown = document.getElementById('categoryDisplay');
+            dropdown.classList.remove('error-state');
+            dropdown.style.animation = 'none';
+            dropdown.offsetHeight;
+        }
+
+        function showFieldError(fieldName, message) {
+            const overlay = document.getElementById(`overlay-${fieldName}`);
+            if (!overlay) return;
+            
+            const border = overlay.querySelector('.field-border');
+            if (border) {
+                border.classList.add('error-state');
+                border.style.animation = 'errorPulse 1s ease-in-out infinite';
+            }
+            
+            let errorElement = overlay.querySelector('.error-message');
+            if (!errorElement) {
+                errorElement = document.createElement('div');
+                errorElement.className = 'error-message';
+                overlay.appendChild(errorElement);
+            }
+            
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+        
+        function clearFieldError(fieldName) {
+            const overlay = document.getElementById(`overlay-${fieldName}`);
+            if (!overlay) return;
+            
+            const border = overlay.querySelector('.field-border');
+            if (border) {
+                border.classList.remove('error-state');
+                border.style.animation = '';
+            }
+            
+            const errorElement = overlay.querySelector('.error-message');
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+        }
+
+        function validateAllFields() {
+            let allValid = true;
+            
+            const companyNameError = validateField('companyName', formState.companyName);
+            if (companyNameError) {
+                console.log('❌ Company name validation failed:', companyNameError);
+                allValid = false;
+            }
+            
+            if (!validateCategorySelection()) {
+                console.log('❌ Category validation failed');
+                allValid = false;
+            }
+            
+            return allValid;
+        }
+
+        // ===========================================
         // INITIALIZATION
         // ===========================================
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             
-            // Check for OAuth callback success/error
             if (urlParams.get('success') === 'true') {
                 console.log('🎉 OAuth callback success!');
                 showSuccessState();
@@ -2181,7 +1998,6 @@
                 return;
             }
             
-            // Normal page load - get token and load vendor data
             const token = urlParams.get('token');
             if (!token) {
                 showErrorState('Invalid access link. Please check your email for the correct URL.');
@@ -2191,7 +2007,7 @@
             try {
                 console.log('🪄 Loading vendor data for token:', token);
                 await loadVendorData(token);
-                initializeDropdown(); // Initialize the custom dropdown
+                initializeDropdown();
                 showWelcomeScreen();
             } catch (error) {
                 console.error('Error loading vendor data:', error);
@@ -2209,16 +2025,13 @@
         }
 
         function nextStep() {
-            // Save any active field before moving
             if (activeField) {
                 saveField(activeField);
-                // If validation failed, activeField will still be set
-                if (activeField) return; // Don't proceed if validation failed
+                if (activeField) return;
             }
             
-            // Validate all fields before proceeding
             if (!validateAllFields()) {
-                return; // Don't proceed if validation failed
+                return;
             }
             
             if (currentStep < totalSteps) {
@@ -2230,7 +2043,6 @@
         }
 
         function previousStep() {
-            // Save any active field before moving
             if (activeField) {
                 saveField(activeField);
             }
@@ -2244,11 +2056,9 @@
         }
 
         function showStep(stepNumber) {
-            // Hide all content sections
             const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => section.classList.remove('active'));
         
-            // Show welcome or specific step
             if (stepNumber === 0) {
                 document.getElementById('welcomeSection').classList.add('active');
             } else {
@@ -2262,12 +2072,10 @@
         }
 
         function updateStepNavigation() {
-            // Remove active class from all steps
             document.querySelectorAll('.step-item').forEach(item => {
                 item.classList.remove('active');
             });
             
-            // Add active class to current step
             if (currentStep > 0) {
                 const activeStepItem = document.querySelector(`[data-step="${currentStep - 1}"]`);
                 if (activeStepItem) {
@@ -2290,7 +2098,6 @@
             hideLoadingState();
             hideErrorState();
             hideSuccessState();
-            // Fade in content
             document.getElementById('wizardContent').classList.add('loaded');
         }
 
@@ -2385,29 +2192,24 @@
                 
             } catch (error) {
                 console.error('💥 Error loading contacts:', error);
-                // Don't throw - contacts are optional
             }
         }
 
         function populateForm(data) {
             console.log('📝 Populating form with:', data);
             
-            // Update booth info
             document.getElementById('boothNumber').textContent = `Booth ${data.boothNumber}`;
             
-            // Populate form state with organization data
             formState.companyName = data.organization?.name || '';
             formState.website = data.organization?.website || '';
             formState.category = data.organization?.primaryCategory || '';
             formState.description = data.organization?.description || '';
             
-            // Update displays
             updateFieldDisplay('companyName', formState.companyName);
             updateFieldDisplay('website', formState.website);
             updateFieldDisplay('category', formState.category);
             updateFieldDisplay('description', formState.description);
             
-            // Store data for later use in form steps
             window.formData = {
                 organization: data.organization,
                 boothNumber: data.boothNumber
@@ -2415,661 +2217,217 @@
         }
 
         // ===========================================
-        // UTILITY FUNCTIONS
+        // STEP 2 INITIALIZATION
         // ===========================================
-        function handleFileSelect(input, displayElementId) {
-            const file = input.files[0];
-            const displayElement = document.getElementById(displayElementId);
-            
-            if (file) {
-                displayElement.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                displayElement.style.color = '#28a745';
-            } else {
-                displayElement.textContent = '';
-            }
-        }
-        // ===========================================
-        // VALIDATION SYSTEM
-        // ===========================================
-        
-        function validateField(fieldName, value) {
-            const validators = {
-                companyName: (val) => {
-                    if (!val || val.trim().length === 0) {
-                        return 'Company name is required';
-                    }
-                    if (val.length > 100) {
-                        return 'Company name cannot exceed 100 characters';
-                    }
-                    return null; // valid
-                },
-                
-                category: (val) => {
-                    if (!val || val.trim() === '') {
-                        return 'Please select a category';
-                    }
-                    return null;
-                },
-                
-                // Description and website don't need validation (description has char limit, website we don't care)
-                description: () => null,
-                website: () => null
-            };
-            
-            return validators[fieldName] ? validators[fieldName](value) : null;
+        function initializeStep2() {
+            initializeImageUpload();
+            updateFieldDisplay('highlightHeadline', formState.highlightHeadline);
+            updateFieldDisplay('highlightDescription', formState.highlightDescription);
+            updateFieldDisplay('highlightDeal', formState.highlightDeal);
+            console.log('🚀 Step 2 initialized with unified field system!');
         }
         
-        // ===========================================
-        // ENHANCED SAVE FIELD WITH VALIDATION
-        // ===========================================
-        
-        function saveField(fieldName) {
-            const overlay = document.getElementById(`overlay-${fieldName}`);
-            if (!overlay) return;
-            
-            const inputElement = overlay.querySelector('input, select, textarea');
-            const newValue = inputElement.value;
-            
-            // Validate the field
-            const errorMessage = validateField(fieldName, newValue);
-            
-            if (errorMessage) {
-                // Show validation error
-                showFieldError(fieldName, errorMessage);
-                return; // Don't save, keep field open
-            }
-            
-            // Clear any existing errors
-            clearFieldError(fieldName);
-            
-            // Update form state
-            formState[fieldName] = newValue;
-            
-            // Update display
-            updateFieldDisplay(fieldName, newValue);
-            
-            // Remove overlay
-            removeFieldOverlay(fieldName);
-            
-            // Show display and edit button
-            const displayElement = document.getElementById(`${fieldName}Display`);
-            const editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
-            displayElement.style.opacity = '1';
-            editButton.style.opacity = '1';
-            
-            activeField = null;
-            
-            console.log('📝 Updated field:', fieldName, '=', newValue);
+        function initializeImageUpload() {
+            const container = document.getElementById('imageUploadContainer');
+            const fileInput = document.getElementById('fileInput');
+
+            if (!container || !fileInput) return;
+
+            container.addEventListener('click', () => fileInput.click());
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileSelection(e.target.files[0]);
+                }
+            });
+
+            container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                container.classList.add('dragover');
+            });
+
+            container.addEventListener('dragleave', () => {
+                container.classList.remove('dragover');
+            });
+
+            container.addEventListener('drop', (e) => {
+                e.preventDefault();
+                container.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    handleFileSelection(e.dataTransfer.files[0]);
+                }
+            });
         }
         
-        // ===========================================
-        // CATEGORY VALIDATION (Special Case)
-        // ===========================================
-        
-        function validateCategorySelection() {
-            // Don't validate if dropdown is currently open (user is actively fixing it)
-            if (categoryDropdownOpen) {
-                console.log('🔧 Skipping category validation - dropdown is open');
-                return true; // Assume they're going to fix it
+        function handleFileSelection(file) {
+            if (!file.type.match(/^image\/(jpeg|jpg|png)$/i)) {
+                showImageError('Please select a JPEG or PNG image file.');
+                return;
             }
-            
-            const errorMessage = validateField('category', formState.category);
-            
-            if (errorMessage) {
-                showCategoryError();
-                return false;
+
+            const maxSize = 12 * 1024 * 1024; // 12MB
+            if (file.size > maxSize) {
+                showImageError('File size exceeds 12MB limit. Please choose a smaller image or reduce the quality.');
+                return;
             }
-            
-            clearCategoryError();
-            return true;
+
+            console.log('📸 Valid file selected:', file.name);
+            currentFile = file;
+            showCropModal(file);
         }
         
-        function showCategoryError() {
-            const dropdown = document.getElementById('categoryDisplay');
-            dropdown.classList.add('error-state');
-            
-            // Add pulsing animation
-            dropdown.style.animation = 'errorPulse 1s ease-in-out infinite';
-        }
-        
-        function clearCategoryError() {
-            const dropdown = document.getElementById('categoryDisplay');
-            dropdown.classList.remove('error-state');
-            dropdown.style.animation = 'none'; // Force stop animation
-            
-            // Force a reflow to ensure animation stops immediately
-            dropdown.offsetHeight;
-            
-            console.log('🔧 Category error cleared'); // Debug log
-        }
-        
-        // ===========================================
-        // FIELD ERROR DISPLAY
-        // ===========================================
-        
-        function showFieldError(fieldName, message) {
-            const overlay = document.getElementById(`overlay-${fieldName}`);
-            if (!overlay) return;
-            
-            // Add error state to border
-            const border = overlay.querySelector('.field-border');
-            if (border) {
-                border.classList.add('error-state');
-                border.style.animation = 'errorPulse 1s ease-in-out infinite';
-            }
-            
-            // Show error message
-            let errorElement = overlay.querySelector('.error-message');
-            if (!errorElement) {
-                errorElement = document.createElement('div');
-                errorElement.className = 'error-message';
-                overlay.appendChild(errorElement);
-            }
-            
+        function showImageError(message) {
+            const errorElement = document.getElementById('imageError');
+            if (!errorElement) return;
             errorElement.textContent = message;
             errorElement.style.display = 'block';
+            setTimeout(() => errorElement.style.display = 'none', 5000);
         }
         
-        function clearFieldError(fieldName) {
-            const overlay = document.getElementById(`overlay-${fieldName}`);
-            if (!overlay) return;
+        function showCropModal(file) {
+            const modal = document.getElementById('cropModal');
+            const cropImage = document.getElementById('cropImage');
             
-            // Remove error state from border
-            const border = overlay.querySelector('.field-border');
-            if (border) {
-                border.classList.remove('error-state');
-                border.style.animation = '';
-            }
-            
-            // Hide error message
-            const errorElement = overlay.querySelector('.error-message');
-            if (errorElement) {
-                errorElement.style.display = 'none';
-            }
-        }
-        
-        // ===========================================
-        // ENHANCED COMPANY NAME WITH CHARACTER COUNTER
-        // ===========================================
-        
-        function createFieldOverlay(fieldName, x, y, width, height) {
-            const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
-            const config = fieldConfigs[fieldName];
-            
-            // Create overlay container
-            const overlay = document.createElement('div');
-            overlay.className = 'field-overlay active';
-            overlay.id = `overlay-${fieldName}`;
-            
-            // Create border
-            const border = document.createElement('div');
-            border.className = 'field-border';
-            
-            // Create label
-            const label = document.createElement('div');
-            label.className = 'field-label';
-            label.textContent = config.label;
-            
-            // Create input container
-            const inputContainer = document.createElement('div');
-            inputContainer.className = 'field-input-container';
-            
-            // Create input element
-            let inputElement;
-            if (config.type === 'textarea') {
-                inputElement = document.createElement('textarea');
-                inputElement.className = `field-textarea ${config.inputClass}`;
-                inputElement.maxLength = config.maxLength || 1000;
-            } else {
-                inputElement = document.createElement('input');
-                inputElement.className = `field-input ${config.inputClass}`;
-                inputElement.type = fieldName === 'website' ? 'url' : 'text';
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                cropImage.src = e.target.result;
+                modal.style.display = 'flex';
                 
-                // Add maxLength for company name
-                if (fieldName === 'companyName') {
-                    inputElement.maxLength = 100;
-                }
-            }
-            
-            inputElement.placeholder = config.placeholder;
-            inputElement.value = formState[fieldName] || '';
-            
-            // Position input container
-            inputContainer.style.left = x + 'px';
-            inputContainer.style.top = y + 'px';
-            inputContainer.style.width = '38vw';
-            
-            if (config.type === 'textarea') {
-                inputContainer.style.height = Math.max(height, 120) + 'px';
-            } else {
-                inputContainer.style.height = height + 'px';
-            }
-            
-            // Position border
-            const padding = 16;
-            const inputWidthVw = window.innerWidth * 0.38;
-            const borderWidth = inputWidthVw + (padding * 2);
-            border.style.left = (x - padding) + 'px';
-            border.style.top = (y - padding) + 'px';
-            border.style.width = borderWidth + 'px';
-            
-            if (config.type === 'textarea') {
-                border.style.height = (Math.max(height, 120) + padding * 2) + 'px';
-            } else {
-                border.style.height = (height + padding * 2) + 'px';
-            }
-            
-            // Position label
-            label.style.left = (x - padding + 12) + 'px';
-            label.style.top = (y - padding - 9) + 'px';
-            
-            // Add character counter for fields that need it
-            if (fieldName === 'description' || fieldName === 'companyName') {
-                const counter = document.createElement('div');
-                counter.className = 'character-counter';
-                counter.id = `charCounter-${fieldName}`;
+                if (cropperInstance) cropperInstance.destroy();
                 
-                const maxLength = fieldName === 'companyName' ? 100 : 300;
-                counter.textContent = maxLength - (formState[fieldName] || '').length;
-                
-                // Position counter
-                const borderHeight = config.type === 'textarea' ? Math.max(height, 120) + padding * 2 : height + padding * 2;
-                counter.style.position = 'absolute';
-                counter.style.right = (x - padding + 24) + 'px';
-                counter.style.top = (y - padding + borderHeight - 9) + 'px';
-                counter.style.background = '#ffffff';
-                counter.style.padding = '0 0.4vw';
-                counter.style.zIndex = '1';
-                
-                overlay.appendChild(counter);
-                
-                inputElement.addEventListener('input', () => updateCharCounter(fieldName));
-            }
-            
-            // Assemble overlay
-            inputContainer.appendChild(inputElement);
-            overlay.appendChild(border);
-            overlay.appendChild(label);
-            overlay.appendChild(inputContainer);
-            
-            // Add to field
-            fieldElement.appendChild(overlay);
-            
-            // Focus and setup
-            requestAnimationFrame(() => {
-                inputElement.focus();
-                if (inputElement.select) inputElement.select();
-            });
-            
-            // Add event listeners
-            setupInputEventListeners(inputElement, fieldName);
-        }
-        
-        // ===========================================
-        // ENHANCED CHAR COUNTER FOR BOTH FIELDS
-        // ===========================================
-        
-        function updateCharCounter(fieldName) {
-            const counter = document.getElementById(`charCounter-${fieldName}`);
-            const inputElement = document.querySelector(`#overlay-${fieldName} input, #overlay-${fieldName} textarea`);
-            if (!counter || !inputElement) return;
-            
-            const maxLength = fieldName === 'companyName' ? 100 : 300;
-            const remaining = maxLength - inputElement.value.length;
-            
-            counter.textContent = remaining;
-            
-            // Warning threshold: last 10 for company name, last 75 for description
-            const warningThreshold = fieldName === 'companyName' ? 10 : 75;
-            counter.className = remaining <= warningThreshold ? 'character-counter warning' : 'character-counter';
-        }
-        
-        // ===========================================
-        // STEP VALIDATION BEFORE PROGRESSION
-        // ===========================================
-        
-        function nextStep() {
-            // Save any active field before moving
-            if (activeField) {
-                saveField(activeField);
-                // If validation failed, activeField will still be set
-                if (activeField) return; // Don't proceed if validation failed
-            }
-            
-            // Validate all fields before proceeding
-            if (!validateAllFields()) {
-                return; // Don't proceed if validation failed
-            }
-            
-            if (currentStep < totalSteps) {
-                currentStep++;
-                showStep(currentStep);
-                updateStepNavigation();
-                updateMobileProgress();
-            }
-        }
-        
-        function validateAllFields() {
-            let allValid = true;
-            
-            // Check company name
-            const companyNameError = validateField('companyName', formState.companyName);
-            if (companyNameError) {
-                console.log('❌ Company name validation failed:', companyNameError);
-                allValid = false;
-            }
-            
-            // Check category
-            if (!validateCategorySelection()) {
-                console.log('❌ Category validation failed');
-                allValid = false;
-            }
-            
-            return allValid;
-        }
-        function validateField(fieldName, value) {
-            const validators = {
-                companyName: (val) => {
-                    if (!val || val.trim().length === 0) {
-                        return 'Company name is required';
-                    }
-                    if (val.length > 100) {
-                        return 'Company name cannot exceed 100 characters';
-                    }
-                    return null; // valid
-                },
-                
-                category: (val) => {
-                    if (!val || val.trim() === '') {
-                        return 'Please select a category';
-                    }
-                    return null;
-                },
-                
-                // Description and website don't need validation
-                description: () => null,
-                website: () => null
-            };
-            
-            return validators[fieldName] ? validators[fieldName](value) : null;
-        }
-        
-        function validateCategorySelection() {
-            // Don't validate if dropdown is currently open (user is actively fixing it)
-            if (categoryDropdownOpen) {
-                console.log('🔧 Skipping category validation - dropdown is open');
-                return true; // Assume they're going to fix it
-            }
-            
-            const errorMessage = validateField('category', formState.category);
-            
-            if (errorMessage) {
-                showCategoryError();
-                return false;
-            }
-            
-            clearCategoryError();
-            return true;
-        }
-        
-        function showCategoryError() {
-            const dropdown = document.getElementById('categoryDisplay');
-            dropdown.classList.add('error-state');
-            
-            // Add pulsing animation
-            dropdown.style.animation = 'errorPulse 1s ease-in-out infinite';
-        }
-        
-        function clearCategoryError() {
-            const dropdown = document.getElementById('categoryDisplay');
-            dropdown.classList.remove('error-state');
-            dropdown.style.animation = 'none'; // Force stop animation
-            
-            // Force a reflow to ensure animation stops immediately
-            dropdown.offsetHeight;
-            
-            console.log('🔧 Category error cleared'); // Debug log
-        }
-        
-        function validateAllFields() {
-            let allValid = true;
-            
-            // Check company name
-            const companyNameError = validateField('companyName', formState.companyName);
-            if (companyNameError) {
-                console.log('❌ Company name validation failed:', companyNameError);
-                allValid = false;
-            }
-            
-            // Check category
-            if (!validateCategorySelection()) {
-                console.log('❌ Category validation failed');
-                allValid = false;
-            }
-            
-            return allValid;
-        }
-    function initializeStep2() {
-        initializeImageUpload();
-        updateFieldDisplay('highlightHeadline', formState.highlightHeadline);
-        updateFieldDisplay('highlightDescription', formState.highlightDescription);
-        updateFieldDisplay('highlightDeal', formState.highlightDeal);
-    
-        console.log('🚀 Step 2 initialized with unified field system!');
-    }
-    }
-    
-    function initializeImageUpload() {
-        const container = document.getElementById('imageUploadContainer');
-        const fileInput = document.getElementById('fileInput');
-    
-        if (!container || !fileInput) return;
-    
-        container.addEventListener('click', () => fileInput.click());
-    
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFileSelection(e.target.files[0]);
-            }
-        });
-    
-        container.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            container.classList.add('dragover');
-        });
-    
-        container.addEventListener('dragleave', () => {
-            container.classList.remove('dragover');
-        });
-    
-        container.addEventListener('drop', (e) => {
-            e.preventDefault();
-            container.classList.remove('dragover');
-            if (e.dataTransfer.files.length > 0) {
-                handleFileSelection(e.dataTransfer.files[0]);
-            }
-        });
-    }
-    
-    function handleFileSelection(file) {
-        if (!file.type.match(/^image\/(jpeg|jpg|png)$/i)) {
-            showImageError('Please select a JPEG or PNG image file.');
-            return;
-        }
-    
-        const maxSize = 12 * 1024 * 1024; // 12MB
-        if (file.size > maxSize) {
-            showImageError('File size exceeds 12MB limit. Please choose a smaller image or reduce the quality.');
-            return;
-        }
-    
-        console.log('📸 Valid file selected:', file.name);
-        currentFile = file;
-        showCropModal(file);
-    }
-    
-    function showImageError(message) {
-        const errorElement = document.getElementById('imageError');
-        if (!errorElement) return;
-        errorElement.textContent = message;
-        errorElement.style.display = 'block';
-        setTimeout(() => errorElement.style.display = 'none', 5000);
-    }
-    
-    function showCropModal(file) {
-        const modal = document.getElementById('cropModal');
-        const cropImage = document.getElementById('cropImage');
-        
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            cropImage.src = e.target.result;
-            modal.style.display = 'flex';
-            
-            if (cropperInstance) cropperInstance.destroy();
-            
-            cropperInstance = new Cropper(cropImage, {
-                aspectRatio: 9/16,
-                viewMode: 1,
-                autoCropArea: 1,
-                responsive: true,
-                background: false,
-                movable: true,
-                scalable: true,
-                rotatable: false,
-                zoomable: true
-            });
-        };
-        reader.readAsDataURL(file);
-    }
-    
-    function cancelCrop() {
-        const modal = document.getElementById('cropModal');
-        if (modal) modal.style.display = 'none';
-        if (cropperInstance) {
-            cropperInstance.destroy();
-            cropperInstance = null;
-        }
-        currentFile = null;
-        const fileInput = document.getElementById('fileInput');
-        if (fileInput) fileInput.value = '';
-    }
-    
-    function applyCrop() {
-        if (!cropperInstance) return;
-        
-        const canvas = cropperInstance.getCroppedCanvas({
-            width: 540,
-            height: 960,
-            imageSmoothingEnabled: true,
-            imageSmoothingQuality: 'high'
-        });
-        
-        canvas.toBlob((blob) => {
-            if (blob) uploadImageToS3(blob);
-        }, 'image/jpeg', 0.9);
-        
-        cancelCrop();
-    }
-    
-    async function uploadImageToS3(blob) {
-        console.log('📤 Starting S3 upload...');
-        
-        const progressContainer = document.getElementById('uploadProgress');
-        const progressFill = document.getElementById('uploadProgressFill');
-        
-        if (progressContainer && progressFill) {
-            progressContainer.style.display = 'block';
-            
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += Math.random() * 30;
-                if (progress > 90) progress = 90;
-                progressFill.style.width = progress + '%';
-            }, 200);
-    
-            try {
-                const organizationName = formState?.companyName || 'Demo Company';
-                const token = new URLSearchParams(window.location.search).get('token') || 'demo-token';
-                const base64 = await blobToBase64(blob);
-                
-                const uploadData = {
-                    files: [{
-                        name: `highlight-image-${Date.now()}.jpg`,
-                        content: base64.split(',')[1],
-                        type: 'image/jpeg',
-                        fieldName: 'highlightImage'  // This is the key!
-                    }],
-                    organizationName: organizationName,
-                    token: token
-                };
-    
-                console.log('🔍 Sending to backend:', JSON.stringify({
-                    ...uploadData,
-                    files: uploadData.files.map(f => ({...f, content: '[BASE64_DATA]'}))
-                }, null, 2));
-    
-                const response = await fetch(`${API_BASE}/upload-to-s3`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(uploadData)
+                cropperInstance = new Cropper(cropImage, {
+                    aspectRatio: 9/16,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    responsive: true,
+                    background: false,
+                    movable: true,
+                    scalable: true,
+                    rotatable: false,
+                    zoomable: true
                 });
-    
-                if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
-    
-                const result = await response.json();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function cancelCrop() {
+            const modal = document.getElementById('cropModal');
+            if (modal) modal.style.display = 'none';
+            if (cropperInstance) {
+                cropperInstance.destroy();
+                cropperInstance = null;
+            }
+            currentFile = null;
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) fileInput.value = '';
+        }
+        
+        function applyCrop() {
+            if (!cropperInstance) return;
+            
+            const canvas = cropperInstance.getCroppedCanvas({
+                width: 540,
+                height: 960,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+            
+            canvas.toBlob((blob) => {
+                if (blob) uploadImageToS3(blob);
+            }, 'image/jpeg', 0.9);
+            
+            cancelCrop();
+        }
+        
+        async function uploadImageToS3(blob) {
+            console.log('📤 Starting S3 upload...');
+            
+            const progressContainer = document.getElementById('uploadProgress');
+            const progressFill = document.getElementById('uploadProgressFill');
+            
+            if (progressContainer && progressFill) {
+                progressContainer.style.display = 'block';
                 
-                console.log('🔍 Full S3 response:', result);
-                
-                clearInterval(progressInterval);
-                progressFill.style.width = '100%';
-                
-                setTimeout(() => {
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 30;
+                    if (progress > 90) progress = 90;
+                    progressFill.style.width = progress + '%';
+                }, 200);
+
+                try {
+                    const organizationName = formState?.companyName || 'Demo Company';
+                    const token = new URLSearchParams(window.location.search).get('token') || 'demo-token';
+                    const base64 = await blobToBase64(blob);
+                    
+                    const uploadData = {
+                        files: [{
+                            name: `highlight-image-${Date.now()}.jpg`,
+                            content: base64.split(',')[1],
+                            type: 'image/jpeg',
+                            fieldName: 'highlightImage'
+                        }],
+                        organizationName: organizationName,
+                        token: token
+                    };
+
+                    const response = await fetch(`${API_BASE}/upload-to-s3`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(uploadData)
+                    });
+
+                    if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
+
+                    const result = await response.json();
+                    
+                    clearInterval(progressInterval);
+                    progressFill.style.width = '100%';
+                    
+                    setTimeout(() => {
+                        progressContainer.style.display = 'none';
+                        progressFill.style.width = '0%';
+                    }, 1000);
+
+                    const imageUrl = result.uploadResults?.highlightImageUrl;
+                    
+                    if (imageUrl) {
+                        showUploadedImage(imageUrl);
+                        formState.highlightImageUrl = imageUrl;
+                        console.log('✅ Image uploaded successfully:', imageUrl);
+                    } else {
+                        throw new Error('No highlight image URL found in response');
+                    }
+
+                } catch (error) {
+                    console.error('💥 Upload failed:', error);
+                    clearInterval(progressInterval);
                     progressContainer.style.display = 'none';
                     progressFill.style.width = '0%';
-                }, 1000);
-    
-                // Get the highlight image URL (NEW!)
-                const imageUrl = result.uploadResults?.highlightImageUrl;
-                
-                console.log('🔍 Extracted image URL:', imageUrl);
-                
-                if (imageUrl) {
-                    showUploadedImage(imageUrl);
-                    highlightFormState.imageUrl = imageUrl;
-                    console.log('✅ Image uploaded successfully:', imageUrl);
-                } else {
-                    throw new Error('No highlight image URL found in response');
+                    showImageError('Upload failed. Please try again.');
                 }
-    
-            } catch (error) {
-                console.error('💥 Upload failed:', error);
-                clearInterval(progressInterval);
-                progressContainer.style.display = 'none';
-                progressFill.style.width = '0%';
-                showImageError('Upload failed. Please try again.');
             }
         }
-    }
-    
-    function blobToBase64(blob) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    }
-    
-    function showUploadedImage(imageUrl) {
-        const placeholder = document.getElementById('imagePlaceholder');
-        const uploadedImage = document.getElementById('uploadedImage');
         
-        if (placeholder && uploadedImage) {
-            placeholder.style.display = 'none';
-            uploadedImage.src = imageUrl;
-            uploadedImage.style.display = 'block';
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
         }
-    }
+        
+        function showUploadedImage(imageUrl) {
+            const placeholder = document.getElementById('imagePlaceholder');
+            const uploadedImage = document.getElementById('uploadedImage');
+            
+            if (placeholder && uploadedImage) {
+                placeholder.style.display = 'none';
+                uploadedImage.src = imageUrl;
+                uploadedImage.style.display = 'block';
+            }
+        }
     </script>
 </body>
 </html>

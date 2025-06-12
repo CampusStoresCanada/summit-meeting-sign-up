@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete Your Booth Profile - CSC Conference</title>
     <link rel="stylesheet" href="https://use.typekit.net/ilr6ctr.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -913,6 +915,293 @@
                 }
             }
         }
+        /* ===========================================
+           STEP 2: CONFERENCE HIGHLIGHT STYLES
+           =========================================== */
+        
+        .highlight-container {
+            display: flex;
+            gap: 40px;
+            max-width: none;
+            width: 100%;
+        }
+        
+        /* Left side - Image Upload */
+        .image-section {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .image-upload-container {
+            position: relative;
+            width: 100%;
+            height: 500px; /* 9:16 aspect ratio for 280px width */
+            border: 2px dashed #cccccc;
+            border-radius: 12px;
+            background: #f8f8f8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .image-upload-container:hover {
+            border-color: #0071bc;
+            background: #f0f8ff;
+        }
+        
+        .image-upload-container.dragover {
+            border-color: #0071bc;
+            background: #e3f2fd;
+            transform: scale(1.02);
+        }
+        
+        .image-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        .image-placeholder svg {
+            width: 120px;
+            height: 90px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+        
+        .image-placeholder-text {
+            font-family: 'davis-sans', sans-serif;
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 8px;
+        }
+        
+        .image-placeholder-hint {
+            font-family: 'davis-sans', sans-serif;
+            font-size: 12px;
+            color: #999999;
+        }
+        
+        .uploaded-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .image-upload-container:hover .image-overlay {
+            display: flex;
+        }
+        
+        /* Right side - Text Fields */
+        .content-section-right {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .text-field {
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .field-label-step2 {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 1.2vw;
+            color: #000000;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .field-display-step2 {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 400;
+            font-size: 1.0vw;
+            color: #666666;
+            line-height: 1.5;
+            min-height: 1.5em;
+            cursor: pointer;
+            padding: 12px 0;
+        }
+        
+        .field-display-step2.placeholder {
+            color: #999999;
+            font-style: italic;
+        }
+        
+        .field-display-step2.headline {
+            font-size: 1.4vw;
+            font-weight: 600;
+            color: #000000;
+        }
+        
+        /* Progress Bar */
+        .upload-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .upload-progress-fill {
+            height: 100%;
+            background: #0071bc;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        /* Crop Modal */
+        .crop-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .crop-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .crop-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .crop-title {
+            font-family: 'davis-sans', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 8px;
+        }
+        
+        .crop-subtitle {
+            font-family: 'davis-sans', sans-serif;
+            font-size: 14px;
+            color: #666666;
+        }
+        
+        .crop-image-container {
+            width: 500px;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        
+        .crop-image {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .crop-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .crop-btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .crop-btn.primary {
+            background: #0071bc;
+            color: white;
+            border: none;
+        }
+        
+        .crop-btn.primary:hover {
+            background: #005a94;
+        }
+        
+        .crop-btn.secondary {
+            background: white;
+            color: #666666;
+            border: 2px solid #cccccc;
+        }
+        
+        .crop-btn.secondary:hover {
+            border-color: #999999;
+            color: #333333;
+        }
+        
+        /* Error Messages */
+        .image-error-message {
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            right: 0;
+            background: #dc3545;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: center;
+            display: none;
+        }
+        
+        /* Hidden file input */
+        .hidden-file-input {
+            display: none;
+        }
+        
+        /* Mobile responsive for Step 2 */
+        @media (orientation: portrait), (max-width: 768px) {
+            .highlight-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+        
+            .image-section {
+                width: 100%;
+            }
+        
+            .image-upload-container {
+                height: 300px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -947,8 +1236,22 @@
                     <div class="booth-section">
                         <div class="booth-number" id="boothNumber">Booth 501</div>
                     </div>
+                </div>  
+                <div class="crop-modal" id="cropModal">
+                    <div class="crop-container">
+                        <div class="crop-header">
+                            <div class="crop-title">Crop your image</div>
+                            <div class="crop-subtitle">Adjust the image to fit a 9:16 aspect ratio (portrait)</div>
+                        </div>
+                        <div class="crop-image-container">
+                            <img class="crop-image" id="cropImage" alt="Image to crop">
+                        </div>
+                        <div class="crop-actions">
+                            <button class="crop-btn secondary" onclick="cancelCrop()">Cancel</button>
+                            <button class="crop-btn primary" onclick="applyCrop()">Apply Crop</button>
+                        </div>
+                    </div>
                 </div>
-
                 <div class="step-navigation">
                     <div class="step-item" data-step="0">
                         <div class="step-number">
@@ -1098,10 +1401,104 @@
                     </button>
                 </div>
 
-                <!-- Step 2: Conference Highlight -->
+                <!-- Step 3: Conference Highlight -->
                 <div id="step2Section" class="content-section">
-                    <h2>Conference Highlight</h2>
-                    <!-- Content will be added here -->
+                    <div class="step-header">
+                        <h2 class="step-title-main">Conference highlight</h2>
+                        <p class="step-subtitle">Here is your spot to give our members THE reason to book a meeting with you.</p>
+                    </div>
+                
+                    <div class="highlight-container">
+                        <!-- Left side - Image Upload -->
+                        <div class="image-section">
+                            <div class="image-upload-container" id="imageUploadContainer">
+                                <div class="image-placeholder" id="imagePlaceholder">
+                                    <svg viewBox="0 0 252.74 190.53">
+                                        <rect x="12.43" y="22.27" width="217.87" height="145.54" rx="9.27" ry="9.27" transform="translate(-19.43 32.27) rotate(-14.03)" fill="#f2f2f2"/>
+                                        <rect x="26.15" y="35" width="190.41" height="120.09" rx="9.27" ry="9.27" transform="translate(-19.43 32.27) rotate(-14.03)" fill="#ccc"/>
+                                        <path d="M49.31,159.14l-3.42-13.7c-.22-.88-.22-1.8.01-2.68l12.98-50c.85-3.29,4.48-4.99,7.56-3.55l35.1,16.48c2.97,1.4,6.49-.15,7.48-3.28l2.7-8.57c.93-2.95,4.14-4.53,7.04-3.46l86.8,31.86c1.68.62,1.55,3.04-.19,3.48l-149.49,37.37c-2.91.73-5.85-1.04-6.58-3.95Z" fill="#f2f2f2"/>
+                                        <circle cx="160.71" cy="49.15" r="14.61" fill="#f2f2f2"/>
+                                        <rect x="34.87" y="45" width="217.87" height="145.54" rx="9.27" ry="9.27" fill="#f2f2f2"/>
+                                        <rect x="48.6" y="57.72" width="190.41" height="120.09" rx="9.27" ry="9.27" fill="#ccc"/>
+                                        <path d="M58.36,162.48v-14.12c0-.91.23-1.8.66-2.6l24.72-45.36c1.63-2.98,5.56-3.76,8.19-1.61l30.06,24.5c2.54,2.07,6.33,1.43,8.05-1.37l4.7-7.66c1.62-2.64,5.11-3.39,7.67-1.65l76.48,51.96c1.48,1.01.77,3.33-1.02,3.33H63.79c-3,0-5.43-2.43-5.43-5.43Z" fill="#f2f2f2"/>
+                                        <circle cx="193.11" cy="82.78" r="14.61" fill="#f2f2f2"/>
+                                    </svg>
+                                    <div class="image-placeholder-text">Click image to change</div>
+                                    <div class="image-placeholder-hint">JPG or PNG, max 12MB</div>
+                                </div>
+                                <img class="uploaded-image" id="uploadedImage" alt="Uploaded image">
+                                <div class="image-overlay" id="imageOverlay">
+                                    Click to change image
+                                </div>
+                                <div class="upload-progress" id="uploadProgress">
+                                    <div class="upload-progress-fill" id="uploadProgressFill"></div>
+                                </div>
+                                <div class="image-error-message" id="imageError"></div>
+                            </div>
+                            <input type="file" class="hidden-file-input" id="fileInput" accept="image/jpeg,image/png">
+                        </div>
+                
+                        <!-- Right side - Text Fields -->
+                        <div class="content-section-right">
+                            <!-- Headline Field -->
+                            <div class="text-field">
+                                <div class="field-label-step2">
+                                    Headline
+                                    <button class="edit-btn" onclick="editStep2Field('headline')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                            <path d="m14.5 5.5 4 4"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="field-display-step2 headline placeholder" id="headlineDisplay">
+                                    Give your product or service a catchy headline
+                                </div>
+                            </div>
+                
+                            <!-- Description Field -->
+                            <div class="text-field">
+                                <div class="field-label-step2">
+                                    Description
+                                    <button class="edit-btn" onclick="editStep2Field('description')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                            <path d="m14.5 5.5 4 4"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="field-display-step2 placeholder" id="descriptionDisplay">
+                                    Give a short description of what you are going to do for the members, not every carve out and caveat, but the gist.
+                                </div>
+                            </div>
+                
+                            <!-- The Deal Field -->
+                            <div class="text-field">
+                                <div class="field-label-step2">
+                                    The deal
+                                    <button class="edit-btn" onclick="editStep2Field('deal')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                            <path d="m14.5 5.5 4 4"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="field-display-step2 placeholder" id="dealDisplay">
+                                    What's your conference special? Free consultation? Discount? Bonus swag?
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Navigation Buttons -->
+                    <button class="previous-btn" onclick="previousStep()" id="prevBtn">
+                        <span>←</span>
+                        Previous step
+                    </button>
+                    <button class="next-btn" onclick="nextStep()" id="nextBtn">
+                        Next step
+                        <span>→</span>
+                    </button>
                 </div>
 
                 <!-- Step 3: Conference Team -->
@@ -1138,7 +1535,22 @@
         };
         
         const API_BASE = '/api';
-
+        
+        // ===========================================
+        // CROPPER MANAGEMENT
+        // ===========================================
+        let highlightFormState = {
+            headline: '',
+            description: '',
+            deal: '',
+            imageUrl: ''
+        };
+        
+        let cropperInstance = null;
+        let currentFile = null;
+        let activeStep2Field = null;
+        let initializedSteps = new Set();
+        
         // ===========================================
         // CUSTOM DROPDOWN FUNCTIONALITY
         // ===========================================
@@ -1212,7 +1624,27 @@
                 console.log('📝 Selected category:', value);
             }
         }
+        let initializedSteps = new Set();
 
+        function showStep(stepNumber) {
+            // Hide all content sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+        
+            // Show welcome or specific step
+            if (stepNumber === 0) {
+                document.getElementById('welcomeSection').classList.add('active');
+            } else {
+                document.getElementById(`step${stepNumber}Section`).classList.add('active');
+                
+                // ADD THIS: Lazy initialize Step 2 on first visit
+                if (stepNumber === 2 && !initializedSteps.has(2)) {
+                    initializeStep2();
+                    initializedSteps.add(2);
+                    console.log('🚀 Step 2 initialized on first visit!');
+                }
+            }
+        }
         // Field configurations
         const fieldConfigs = {
             companyName: {
@@ -2206,6 +2638,320 @@
             
             return allValid;
         }
+    function initializeStep2() {
+        initializeImageUpload();
+        initializeStep2TextFields();
+    }
+    
+    function initializeImageUpload() {
+        const container = document.getElementById('imageUploadContainer');
+        const fileInput = document.getElementById('fileInput');
+    
+        if (!container || !fileInput) return;
+    
+        container.addEventListener('click', () => fileInput.click());
+    
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelection(e.target.files[0]);
+            }
+        });
+    
+        container.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            container.classList.add('dragover');
+        });
+    
+        container.addEventListener('dragleave', () => {
+            container.classList.remove('dragover');
+        });
+    
+        container.addEventListener('drop', (e) => {
+            e.preventDefault();
+            container.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleFileSelection(e.dataTransfer.files[0]);
+            }
+        });
+    }
+    
+    function handleFileSelection(file) {
+        if (!file.type.match(/^image\/(jpeg|jpg|png)$/i)) {
+            showImageError('Please select a JPEG or PNG image file.');
+            return;
+        }
+    
+        const maxSize = 12 * 1024 * 1024; // 12MB
+        if (file.size > maxSize) {
+            showImageError('File size exceeds 12MB limit. Please choose a smaller image or reduce the quality.');
+            return;
+        }
+    
+        console.log('📸 Valid file selected:', file.name);
+        currentFile = file;
+        showCropModal(file);
+    }
+    
+    function showImageError(message) {
+        const errorElement = document.getElementById('imageError');
+        if (!errorElement) return;
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+        setTimeout(() => errorElement.style.display = 'none', 5000);
+    }
+    
+    function showCropModal(file) {
+        const modal = document.getElementById('cropModal');
+        const cropImage = document.getElementById('cropImage');
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            cropImage.src = e.target.result;
+            modal.style.display = 'flex';
+            
+            if (cropperInstance) cropperInstance.destroy();
+            
+            cropperInstance = new Cropper(cropImage, {
+                aspectRatio: 9/16,
+                viewMode: 1,
+                autoCropArea: 1,
+                responsive: true,
+                background: false,
+                movable: true,
+                scalable: true,
+                rotatable: false,
+                zoomable: true
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    function cancelCrop() {
+        const modal = document.getElementById('cropModal');
+        if (modal) modal.style.display = 'none';
+        if (cropperInstance) {
+            cropperInstance.destroy();
+            cropperInstance = null;
+        }
+        currentFile = null;
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) fileInput.value = '';
+    }
+    
+    function applyCrop() {
+        if (!cropperInstance) return;
+        
+        const canvas = cropperInstance.getCroppedCanvas({
+            width: 540,
+            height: 960,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high'
+        });
+        
+        canvas.toBlob((blob) => {
+            if (blob) uploadImageToS3(blob);
+        }, 'image/jpeg', 0.9);
+        
+        cancelCrop();
+    }
+    
+    async function uploadImageToS3(blob) {
+        console.log('📤 Starting S3 upload...');
+        
+        const progressContainer = document.getElementById('uploadProgress');
+        const progressFill = document.getElementById('uploadProgressFill');
+        
+        if (progressContainer && progressFill) {
+            progressContainer.style.display = 'block';
+            
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 30;
+                if (progress > 90) progress = 90;
+                progressFill.style.width = progress + '%';
+            }, 200);
+    
+            try {
+                const organizationName = formState?.companyName || 'Demo Company';
+                const token = new URLSearchParams(window.location.search).get('token') || 'demo-token';
+                const base64 = await blobToBase64(blob);
+                
+                const uploadData = {
+                    files: [{
+                        name: `highlight-image-${Date.now()}.jpg`,
+                        content: base64.split(',')[1],
+                        type: 'image/jpeg',
+                        fieldName: 'highlightImage'
+                    }],
+                    organizationName: organizationName,
+                    token: token
+                };
+    
+                const response = await fetch(`${API_BASE}/upload-to-s3`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(uploadData)
+                });
+    
+                if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
+    
+                const result = await response.json();
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }, 1000);
+    
+                const imageUrl = result.uploadResults?.otherFiles?.[0]?.url;
+                if (imageUrl) {
+                    showUploadedImage(imageUrl);
+                    highlightFormState.imageUrl = imageUrl;
+                    console.log('✅ Image uploaded successfully:', imageUrl);
+                } else {
+                    throw new Error('No image URL returned');
+                }
+    
+            } catch (error) {
+                console.error('💥 Upload failed:', error);
+                clearInterval(progressInterval);
+                progressContainer.style.display = 'none';
+                progressFill.style.width = '0%';
+                showImageError('Upload failed. Please try again.');
+            }
+        }
+    }
+    
+    function blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    }
+    
+    function showUploadedImage(imageUrl) {
+        const placeholder = document.getElementById('imagePlaceholder');
+        const uploadedImage = document.getElementById('uploadedImage');
+        
+        if (placeholder && uploadedImage) {
+            placeholder.style.display = 'none';
+            uploadedImage.src = imageUrl;
+            uploadedImage.style.display = 'block';
+        }
+    }
+    
+    function initializeStep2TextFields() {
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('field-display-step2')) {
+                const fieldName = getStep2FieldName(e.target);
+                if (fieldName) editStep2Field(fieldName);
+            }
+        });
+    }
+    
+    function getStep2FieldName(displayElement) {
+        if (displayElement.id === 'headlineDisplay') return 'headline';
+        if (displayElement.id === 'descriptionDisplay') return 'description';
+        if (displayElement.id === 'dealDisplay') return 'deal';
+        return null;
+    }
+    
+    function editStep2Field(fieldName) {
+        if (activeStep2Field) saveStep2Field(activeStep2Field);
+    
+        activeStep2Field = fieldName;
+        const displayElement = document.getElementById(`${fieldName}Display`);
+        const fieldElement = displayElement.parentNode;
+        
+        displayElement.style.display = 'none';
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'field-overlay';
+        overlay.id = `step2-overlay-${fieldName}`;
+        
+        let inputElement;
+        if (fieldName === 'description') {
+            inputElement = document.createElement('textarea');
+            inputElement.className = 'field-input field-textarea';
+            inputElement.rows = 4;
+        } else {
+            inputElement = document.createElement('input');
+            inputElement.className = `field-input ${fieldName === 'headline' ? 'headline' : ''}`;
+            inputElement.type = 'text';
+        }
+        
+        inputElement.value = highlightFormState[fieldName] || '';
+        inputElement.placeholder = getStep2PlaceholderText(fieldName);
+        
+        overlay.appendChild(inputElement);
+        fieldElement.appendChild(overlay);
+        
+        inputElement.focus();
+        setupStep2InputListeners(inputElement, fieldName);
+    }
+    
+    function setupStep2InputListeners(inputElement, fieldName) {
+        inputElement.addEventListener('blur', () => {
+            if (activeStep2Field === fieldName) saveStep2Field(fieldName);
+        });
+        
+        inputElement.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && fieldName !== 'description') {
+                inputElement.blur();
+            } else if (e.key === 'Escape') {
+                cancelStep2Edit(fieldName);
+            }
+        });
+    }
+    
+    function saveStep2Field(fieldName) {
+        const overlay = document.getElementById(`step2-overlay-${fieldName}`);
+        if (!overlay) return;
+        
+        const inputElement = overlay.querySelector('input, textarea');
+        const newValue = inputElement.value.trim();
+        
+        highlightFormState[fieldName] = newValue;
+        updateStep2FieldDisplay(fieldName, newValue);
+        
+        overlay.remove();
+        document.getElementById(`${fieldName}Display`).style.display = 'block';
+        activeStep2Field = null;
+        
+        console.log('📝 Updated Step 2 field:', fieldName, '=', newValue);
+    }
+    
+    function cancelStep2Edit(fieldName) {
+        const overlay = document.getElementById(`step2-overlay-${fieldName}`);
+        if (overlay) overlay.remove();
+        document.getElementById(`${fieldName}Display`).style.display = 'block';
+        activeStep2Field = null;
+    }
+    
+    function updateStep2FieldDisplay(fieldName, value) {
+        const display = document.getElementById(`${fieldName}Display`);
+        if (!display) return;
+        
+        if (value) {
+            display.textContent = value;
+            display.classList.remove('placeholder');
+        } else {
+            display.textContent = getStep2PlaceholderText(fieldName);
+            display.classList.add('placeholder');
+        }
+    }
+    
+    function getStep2PlaceholderText(fieldName) {
+        const placeholders = {
+            headline: 'Give your product or service a catchy headline',
+            description: 'Give a short description of what you are going to do for the members, not every carve out and caveat, but the gist.',
+            deal: "What's your conference special? Free consultation? Discount? Bonus swag?"
+        };
+        return placeholders[fieldName] || '';
+    }
     </script>
 </body>
 </html>

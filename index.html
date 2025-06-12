@@ -498,7 +498,7 @@
         }
 
         .dropdown-option {
-            padding: 12px 16px;
+            padding: 8px 16px;
             font-family: 'davis-sans', sans-serif;
             font-weight: 400;
             font-size: 1.2vw;
@@ -996,7 +996,6 @@
                                     </svg>
                                 </div>
                                 <div class="dropdown-options" id="categoryOptions" style="display: none;">
-                                    <div class="dropdown-option placeholder-option">Select your primary category</div>
                                     <div class="dropdown-option" data-value="Accessories">Accessories</div>
                                     <div class="dropdown-option" data-value="Apparel">Apparel</div>
                                     <div class="dropdown-option" data-value="Books">Books</div>
@@ -1092,7 +1091,7 @@
             
             // Click on options
             options.addEventListener('click', (e) => {
-                if (e.target.classList.contains('dropdown-option') && !e.target.classList.contains('placeholder-option')) {
+                if (e.target.classList.contains('dropdown-option')) {
                     const value = e.target.getAttribute('data-value');
                     selectOption(value);
                     closeDropdown();

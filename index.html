@@ -1088,8 +1088,17 @@
 
             activeField = fieldName;
             const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
-            const displayElement = document.getElementById(`${fieldName}Display`);
-            const editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
+            
+            let displayElement, editButton;
+            
+            if (fieldName === 'category') {
+                // Category has different structure
+                displayElement = document.getElementById('categoryDisplaySelect');
+                // No edit button for category
+            } else {
+                displayElement = document.getElementById(`${fieldName}Display`);
+                editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
+            }
             
             // Get display element position and dimensions
             const displayRect = displayElement.getBoundingClientRect();
@@ -1101,7 +1110,9 @@
             
             // Hide display and edit button
             displayElement.style.opacity = '0';
-            editButton.style.opacity = '0';
+            if (editButton) {
+                editButton.style.opacity = '0';
+            }
             
             // Create overlay system
             createFieldOverlay(fieldName, relativeLeft, relativeTop, displayRect.width, displayRect.height);
@@ -1114,8 +1125,16 @@
             removeFieldOverlay(fieldName);
             
             // Show display and edit button
-            const displayElement = document.getElementById(`${fieldName}Display`);
-            const editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
+            let displayElement, editButton;
+            
+            if (fieldName === 'category') {
+                displayElement = document.getElementById('categoryDisplaySelect');
+                // No edit button for category
+            } else {
+                displayElement = document.getElementById(`${fieldName}Display`);
+                editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
+            }
+            
             if (displayElement) displayElement.style.opacity = '1';
             if (editButton) editButton.style.opacity = '1';
         }

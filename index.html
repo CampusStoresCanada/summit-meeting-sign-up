@@ -872,12 +872,12 @@
             color: #0071bc;
         }
         
-        /* Enhanced character counter for company name */
+        /* Character counter for company name */
         .character-counter {
             position: absolute;
             font-family: 'davis-sans', sans-serif;
             font-size: 0.7vw;
-            color: #999999;
+            color: #0071bc;
             font-weight: 400;
             background: #ffffff;
             padding: 0.2vw 0.4vw;
@@ -1767,334 +1767,334 @@
                 displayElement.textContent = '';
             }
         }
+       // ===========================================
+        // VALIDATION SYSTEM
         // ===========================================
-// VALIDATION SYSTEM
-// ===========================================
-
-function validateField(fieldName, value) {
-    const validators = {
-        companyName: (val) => {
-            if (!val || val.trim().length === 0) {
-                return 'Company name is required';
+        
+        function validateField(fieldName, value) {
+            const validators = {
+                companyName: (val) => {
+                    if (!val || val.trim().length === 0) {
+                        return 'Company name is required';
+                    }
+                    if (val.length > 100) {
+                        return 'Company name cannot exceed 100 characters';
+                    }
+                    return null; // valid
+                },
+                
+                category: (val) => {
+                    if (!val || val.trim() === '') {
+                        return 'Please select a category';
+                    }
+                    return null;
+                },
+                
+                // Description and website don't need validation (description has char limit, website we don't care)
+                description: () => null,
+                website: () => null
+            };
+            
+            return validators[fieldName] ? validators[fieldName](value) : null;
+        }
+        
+        // ===========================================
+        // ENHANCED SAVE FIELD WITH VALIDATION
+        // ===========================================
+        
+        function saveField(fieldName) {
+            const overlay = document.getElementById(`overlay-${fieldName}`);
+            if (!overlay) return;
+            
+            const inputElement = overlay.querySelector('input, select, textarea');
+            const newValue = inputElement.value;
+            
+            // Validate the field
+            const errorMessage = validateField(fieldName, newValue);
+            
+            if (errorMessage) {
+                // Show validation error
+                showFieldError(fieldName, errorMessage);
+                return; // Don't save, keep field open
             }
-            if (val.length > 100) {
-                return 'Company name cannot exceed 100 characters';
+            
+            // Clear any existing errors
+            clearFieldError(fieldName);
+            
+            // Update form state
+            formState[fieldName] = newValue;
+            
+            // Update display
+            updateFieldDisplay(fieldName, newValue);
+            
+            // Remove overlay
+            removeFieldOverlay(fieldName);
+            
+            // Show display and edit button
+            const displayElement = document.getElementById(`${fieldName}Display`);
+            const editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
+            displayElement.style.opacity = '1';
+            editButton.style.opacity = '1';
+            
+            activeField = null;
+            
+            console.log('📝 Updated field:', fieldName, '=', newValue);
+        }
+        
+        // ===========================================
+        // CATEGORY VALIDATION (Special Case)
+        // ===========================================
+        
+        function validateCategorySelection() {
+            const errorMessage = validateField('category', formState.category);
+            
+            if (errorMessage) {
+                showCategoryError();
+                return false;
             }
-            return null; // valid
-        },
+            
+            clearCategoryError();
+            return true;
+        }
         
-        category: (val) => {
-            if (!val || val.trim() === '') {
-                return 'Please select a category';
+        function showCategoryError() {
+            const dropdown = document.getElementById('categoryDisplay');
+            dropdown.classList.add('error-state');
+            
+            // Add pulsing animation
+            dropdown.style.animation = 'errorPulse 1s ease-in-out infinite';
+        }
+        
+        function clearCategoryError() {
+            const dropdown = document.getElementById('categoryDisplay');
+            dropdown.classList.remove('error-state');
+            dropdown.style.animation = '';
+        }
+        
+        // ===========================================
+        // FIELD ERROR DISPLAY
+        // ===========================================
+        
+        function showFieldError(fieldName, message) {
+            const overlay = document.getElementById(`overlay-${fieldName}`);
+            if (!overlay) return;
+            
+            // Add error state to border
+            const border = overlay.querySelector('.field-border');
+            if (border) {
+                border.classList.add('error-state');
+                border.style.animation = 'errorPulse 1s ease-in-out infinite';
             }
-            return null;
-        },
-        
-        // Description and website don't need validation (description has char limit, website we don't care)
-        description: () => null,
-        website: () => null
-    };
-    
-    return validators[fieldName] ? validators[fieldName](value) : null;
-}
-
-// ===========================================
-// ENHANCED SAVE FIELD WITH VALIDATION
-// ===========================================
-
-function saveField(fieldName) {
-    const overlay = document.getElementById(`overlay-${fieldName}`);
-    if (!overlay) return;
-    
-    const inputElement = overlay.querySelector('input, select, textarea');
-    const newValue = inputElement.value;
-    
-    // Validate the field
-    const errorMessage = validateField(fieldName, newValue);
-    
-    if (errorMessage) {
-        // Show validation error
-        showFieldError(fieldName, errorMessage);
-        return; // Don't save, keep field open
-    }
-    
-    // Clear any existing errors
-    clearFieldError(fieldName);
-    
-    // Update form state
-    formState[fieldName] = newValue;
-    
-    // Update display
-    updateFieldDisplay(fieldName, newValue);
-    
-    // Remove overlay
-    removeFieldOverlay(fieldName);
-    
-    // Show display and edit button
-    const displayElement = document.getElementById(`${fieldName}Display`);
-    const editButton = document.getElementById(`edit${capitalizeFirst(fieldName)}`);
-    displayElement.style.opacity = '1';
-    editButton.style.opacity = '1';
-    
-    activeField = null;
-    
-    console.log('📝 Updated field:', fieldName, '=', newValue);
-}
-
-// ===========================================
-// CATEGORY VALIDATION (Special Case)
-// ===========================================
-
-function validateCategorySelection() {
-    const errorMessage = validateField('category', formState.category);
-    
-    if (errorMessage) {
-        showCategoryError();
-        return false;
-    }
-    
-    clearCategoryError();
-    return true;
-}
-
-function showCategoryError() {
-    const dropdown = document.getElementById('categoryDisplay');
-    dropdown.classList.add('error-state');
-    
-    // Add pulsing animation
-    dropdown.style.animation = 'errorPulse 1s ease-in-out infinite';
-}
-
-function clearCategoryError() {
-    const dropdown = document.getElementById('categoryDisplay');
-    dropdown.classList.remove('error-state');
-    dropdown.style.animation = '';
-}
-
-// ===========================================
-// FIELD ERROR DISPLAY
-// ===========================================
-
-function showFieldError(fieldName, message) {
-    const overlay = document.getElementById(`overlay-${fieldName}`);
-    if (!overlay) return;
-    
-    // Add error state to border
-    const border = overlay.querySelector('.field-border');
-    if (border) {
-        border.classList.add('error-state');
-        border.style.animation = 'errorPulse 1s ease-in-out infinite';
-    }
-    
-    // Show error message
-    let errorElement = overlay.querySelector('.error-message');
-    if (!errorElement) {
-        errorElement = document.createElement('div');
-        errorElement.className = 'error-message';
-        overlay.appendChild(errorElement);
-    }
-    
-    errorElement.textContent = message;
-    errorElement.style.display = 'block';
-}
-
-function clearFieldError(fieldName) {
-    const overlay = document.getElementById(`overlay-${fieldName}`);
-    if (!overlay) return;
-    
-    // Remove error state from border
-    const border = overlay.querySelector('.field-border');
-    if (border) {
-        border.classList.remove('error-state');
-        border.style.animation = '';
-    }
-    
-    // Hide error message
-    const errorElement = overlay.querySelector('.error-message');
-    if (errorElement) {
-        errorElement.style.display = 'none';
-    }
-}
-
-// ===========================================
-// ENHANCED COMPANY NAME WITH CHARACTER COUNTER
-// ===========================================
-
-function createFieldOverlay(fieldName, x, y, width, height) {
-    const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
-    const config = fieldConfigs[fieldName];
-    
-    // Create overlay container
-    const overlay = document.createElement('div');
-    overlay.className = 'field-overlay active';
-    overlay.id = `overlay-${fieldName}`;
-    
-    // Create border
-    const border = document.createElement('div');
-    border.className = 'field-border';
-    
-    // Create label
-    const label = document.createElement('div');
-    label.className = 'field-label';
-    label.textContent = config.label;
-    
-    // Create input container
-    const inputContainer = document.createElement('div');
-    inputContainer.className = 'field-input-container';
-    
-    // Create input element
-    let inputElement;
-    if (config.type === 'textarea') {
-        inputElement = document.createElement('textarea');
-        inputElement.className = `field-textarea ${config.inputClass}`;
-        inputElement.maxLength = config.maxLength || 1000;
-    } else {
-        inputElement = document.createElement('input');
-        inputElement.className = `field-input ${config.inputClass}`;
-        inputElement.type = fieldName === 'website' ? 'url' : 'text';
-        
-        // Add maxLength for company name
-        if (fieldName === 'companyName') {
-            inputElement.maxLength = 100;
-        }
-    }
-    
-    inputElement.placeholder = config.placeholder;
-    inputElement.value = formState[fieldName] || '';
-    
-    // Position input container
-    inputContainer.style.left = x + 'px';
-    inputContainer.style.top = y + 'px';
-    inputContainer.style.width = '38vw';
-    
-    if (config.type === 'textarea') {
-        inputContainer.style.height = Math.max(height, 120) + 'px';
-    } else {
-        inputContainer.style.height = height + 'px';
-    }
-    
-    // Position border
-    const padding = 16;
-    const inputWidthVw = window.innerWidth * 0.38;
-    const borderWidth = inputWidthVw + (padding * 2);
-    border.style.left = (x - padding) + 'px';
-    border.style.top = (y - padding) + 'px';
-    border.style.width = borderWidth + 'px';
-    
-    if (config.type === 'textarea') {
-        border.style.height = (Math.max(height, 120) + padding * 2) + 'px';
-    } else {
-        border.style.height = (height + padding * 2) + 'px';
-    }
-    
-    // Position label
-    label.style.left = (x - padding + 12) + 'px';
-    label.style.top = (y - padding - 9) + 'px';
-    
-    // Add character counter for fields that need it
-    if (fieldName === 'description' || fieldName === 'companyName') {
-        const counter = document.createElement('div');
-        counter.className = 'character-counter';
-        counter.id = `charCounter-${fieldName}`;
-        
-        const maxLength = fieldName === 'companyName' ? 100 : 300;
-        counter.textContent = maxLength - (formState[fieldName] || '').length;
-        
-        // Position counter
-        const borderHeight = config.type === 'textarea' ? Math.max(height, 120) + padding * 2 : height + padding * 2;
-        counter.style.position = 'absolute';
-        counter.style.right = (x - padding + 24) + 'px';
-        counter.style.top = (y - padding + borderHeight - 9) + 'px';
-        counter.style.background = '#ffffff';
-        counter.style.padding = '0 0.4vw';
-        counter.style.zIndex = '1';
-        
-        overlay.appendChild(counter);
-        
-        inputElement.addEventListener('input', () => updateCharCounter(fieldName));
-    }
-    
-    // Assemble overlay
-    inputContainer.appendChild(inputElement);
-    overlay.appendChild(border);
-    overlay.appendChild(label);
-    overlay.appendChild(inputContainer);
-    
-    // Add to field
-    fieldElement.appendChild(overlay);
-    
-    // Focus and setup
-    requestAnimationFrame(() => {
-        inputElement.focus();
-        if (inputElement.select) inputElement.select();
-    });
-    
-    // Add event listeners
-    setupInputEventListeners(inputElement, fieldName);
-}
-
-// ===========================================
-// ENHANCED CHAR COUNTER FOR BOTH FIELDS
-// ===========================================
-
-function updateCharCounter(fieldName) {
-    const counter = document.getElementById(`charCounter-${fieldName}`);
-    const inputElement = document.querySelector(`#overlay-${fieldName} input, #overlay-${fieldName} textarea`);
-    if (!counter || !inputElement) return;
-    
-    const maxLength = fieldName === 'companyName' ? 100 : 300;
-    const remaining = maxLength - inputElement.value.length;
-    
-    counter.textContent = remaining;
-    
-    // Warning threshold: last 10 for company name, last 75 for description
-    const warningThreshold = fieldName === 'companyName' ? 10 : 75;
-    counter.className = remaining <= warningThreshold ? 'character-counter warning' : 'character-counter';
-    }
-    
-    // ===========================================
-    // STEP VALIDATION BEFORE PROGRESSION
-    // ===========================================
-    
-    function nextStep() {
-        // Save any active field before moving
-        if (activeField) {
-            saveField(activeField);
-            // If validation failed, activeField will still be set
-            if (activeField) return; // Don't proceed if validation failed
+            
+            // Show error message
+            let errorElement = overlay.querySelector('.error-message');
+            if (!errorElement) {
+                errorElement = document.createElement('div');
+                errorElement.className = 'error-message';
+                overlay.appendChild(errorElement);
+            }
+            
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
         }
         
-        // Validate all fields before proceeding
-        if (!validateAllFields()) {
-            return; // Don't proceed if validation failed
+        function clearFieldError(fieldName) {
+            const overlay = document.getElementById(`overlay-${fieldName}`);
+            if (!overlay) return;
+            
+            // Remove error state from border
+            const border = overlay.querySelector('.field-border');
+            if (border) {
+                border.classList.remove('error-state');
+                border.style.animation = '';
+            }
+            
+            // Hide error message
+            const errorElement = overlay.querySelector('.error-message');
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
         }
         
-        if (currentStep < totalSteps) {
-            currentStep++;
-            showStep(currentStep);
-            updateStepNavigation();
-            updateMobileProgress();
-        }
-    }
-    
-    function validateAllFields() {
-        let allValid = true;
+        // ===========================================
+        // ENHANCED COMPANY NAME WITH CHARACTER COUNTER
+        // ===========================================
         
-        // Check company name
-        const companyNameError = validateField('companyName', formState.companyName);
-        if (companyNameError) {
-            console.log('❌ Company name validation failed:', companyNameError);
-            allValid = false;
+        function createFieldOverlay(fieldName, x, y, width, height) {
+            const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
+            const config = fieldConfigs[fieldName];
+            
+            // Create overlay container
+            const overlay = document.createElement('div');
+            overlay.className = 'field-overlay active';
+            overlay.id = `overlay-${fieldName}`;
+            
+            // Create border
+            const border = document.createElement('div');
+            border.className = 'field-border';
+            
+            // Create label
+            const label = document.createElement('div');
+            label.className = 'field-label';
+            label.textContent = config.label;
+            
+            // Create input container
+            const inputContainer = document.createElement('div');
+            inputContainer.className = 'field-input-container';
+            
+            // Create input element
+            let inputElement;
+            if (config.type === 'textarea') {
+                inputElement = document.createElement('textarea');
+                inputElement.className = `field-textarea ${config.inputClass}`;
+                inputElement.maxLength = config.maxLength || 1000;
+            } else {
+                inputElement = document.createElement('input');
+                inputElement.className = `field-input ${config.inputClass}`;
+                inputElement.type = fieldName === 'website' ? 'url' : 'text';
+                
+                // Add maxLength for company name
+                if (fieldName === 'companyName') {
+                    inputElement.maxLength = 100;
+                }
+            }
+            
+            inputElement.placeholder = config.placeholder;
+            inputElement.value = formState[fieldName] || '';
+            
+            // Position input container
+            inputContainer.style.left = x + 'px';
+            inputContainer.style.top = y + 'px';
+            inputContainer.style.width = '38vw';
+            
+            if (config.type === 'textarea') {
+                inputContainer.style.height = Math.max(height, 120) + 'px';
+            } else {
+                inputContainer.style.height = height + 'px';
+            }
+            
+            // Position border
+            const padding = 16;
+            const inputWidthVw = window.innerWidth * 0.38;
+            const borderWidth = inputWidthVw + (padding * 2);
+            border.style.left = (x - padding) + 'px';
+            border.style.top = (y - padding) + 'px';
+            border.style.width = borderWidth + 'px';
+            
+            if (config.type === 'textarea') {
+                border.style.height = (Math.max(height, 120) + padding * 2) + 'px';
+            } else {
+                border.style.height = (height + padding * 2) + 'px';
+            }
+            
+            // Position label
+            label.style.left = (x - padding + 12) + 'px';
+            label.style.top = (y - padding - 9) + 'px';
+            
+            // Add character counter for fields that need it
+            if (fieldName === 'description' || fieldName === 'companyName') {
+                const counter = document.createElement('div');
+                counter.className = 'character-counter';
+                counter.id = `charCounter-${fieldName}`;
+                
+                const maxLength = fieldName === 'companyName' ? 100 : 300;
+                counter.textContent = maxLength - (formState[fieldName] || '').length;
+                
+                // Position counter
+                const borderHeight = config.type === 'textarea' ? Math.max(height, 120) + padding * 2 : height + padding * 2;
+                counter.style.position = 'absolute';
+                counter.style.right = (x - padding + 24) + 'px';
+                counter.style.top = (y - padding + borderHeight - 9) + 'px';
+                counter.style.background = '#ffffff';
+                counter.style.padding = '0 0.4vw';
+                counter.style.zIndex = '1';
+                
+                overlay.appendChild(counter);
+                
+                inputElement.addEventListener('input', () => updateCharCounter(fieldName));
+            }
+            
+            // Assemble overlay
+            inputContainer.appendChild(inputElement);
+            overlay.appendChild(border);
+            overlay.appendChild(label);
+            overlay.appendChild(inputContainer);
+            
+            // Add to field
+            fieldElement.appendChild(overlay);
+            
+            // Focus and setup
+            requestAnimationFrame(() => {
+                inputElement.focus();
+                if (inputElement.select) inputElement.select();
+            });
+            
+            // Add event listeners
+            setupInputEventListeners(inputElement, fieldName);
         }
         
-        // Check category
-        if (!validateCategorySelection()) {
-            console.log('❌ Category validation failed');
-            allValid = false;
+        // ===========================================
+        // ENHANCED CHAR COUNTER FOR BOTH FIELDS
+        // ===========================================
+        
+        function updateCharCounter(fieldName) {
+            const counter = document.getElementById(`charCounter-${fieldName}`);
+            const inputElement = document.querySelector(`#overlay-${fieldName} input, #overlay-${fieldName} textarea`);
+            if (!counter || !inputElement) return;
+            
+            const maxLength = fieldName === 'companyName' ? 100 : 300;
+            const remaining = maxLength - inputElement.value.length;
+            
+            counter.textContent = remaining;
+            
+            // Warning threshold: last 10 for company name, last 75 for description
+            const warningThreshold = fieldName === 'companyName' ? 10 : 75;
+            counter.className = remaining <= warningThreshold ? 'character-counter warning' : 'character-counter';
         }
         
-        return allValid;
-    }
+        // ===========================================
+        // STEP VALIDATION BEFORE PROGRESSION
+        // ===========================================
+        
+        function nextStep() {
+            // Save any active field before moving
+            if (activeField) {
+                saveField(activeField);
+                // If validation failed, activeField will still be set
+                if (activeField) return; // Don't proceed if validation failed
+            }
+            
+            // Validate all fields before proceeding
+            if (!validateAllFields()) {
+                return; // Don't proceed if validation failed
+            }
+            
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+                updateStepNavigation();
+                updateMobileProgress();
+            }
+        }
+        
+        function validateAllFields() {
+            let allValid = true;
+            
+            // Check company name
+            const companyNameError = validateField('companyName', formState.companyName);
+            if (companyNameError) {
+                console.log('❌ Company name validation failed:', companyNameError);
+                allValid = false;
+            }
+            
+            // Check category
+            if (!validateCategorySelection()) {
+                console.log('❌ Category validation failed');
+                allValid = false;
+            }
+            
+            return allValid;
+        }
     </script>
 </body>
 </html>

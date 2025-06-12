@@ -2768,14 +2768,17 @@
                         name: `highlight-image-${Date.now()}.jpg`,
                         content: base64.split(',')[1],
                         type: 'image/jpeg',
-                        fieldName: 'highlightImage'
+                        fieldName: 'highlightImage'  // This is the key!
                     }],
                     organizationName: organizationName,
                     token: token
                 };
     
-                console.log('🔍 Sending to backend:', JSON.stringify(uploadData, null, 2));
-
+                console.log('🔍 Sending to backend:', JSON.stringify({
+                    ...uploadData,
+                    files: uploadData.files.map(f => ({...f, content: '[BASE64_DATA]'}))
+                }, null, 2));
+    
                 const response = await fetch(`${API_BASE}/upload-to-s3`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -2786,10 +2789,7 @@
     
                 const result = await response.json();
                 
-                // 🔍 DEBUG: Let's see the actual response structure
                 console.log('🔍 Full S3 response:', result);
-                console.log('🔍 Upload results:', result.uploadResults);
-                console.log('🔍 Other files:', result.uploadResults?.otherFiles);
                 
                 clearInterval(progressInterval);
                 progressFill.style.width = '100%';
@@ -2799,16 +2799,8 @@
                     progressFill.style.width = '0%';
                 }, 1000);
     
-                // Try multiple possible response structures
-                let imageUrl = null;
-                
-                if (result.uploadResults?.highlightImageUrl) {
-                    imageUrl = result.uploadResults.highlightImageUrl; // NEW: Check for highlight image first
-                } else if (result.uploadResults?.otherFiles?.[0]?.url) {
-                    imageUrl = result.uploadResults.otherFiles[0].url;
-                } else if (result.uploadResults?.catalogueUrl) {
-                    imageUrl = result.uploadResults.catalogueUrl;
-                }
+                // Get the highlight image URL (NEW!)
+                const imageUrl = result.uploadResults?.highlightImageUrl;
                 
                 console.log('🔍 Extracted image URL:', imageUrl);
                 
@@ -2817,7 +2809,7 @@
                     highlightFormState.imageUrl = imageUrl;
                     console.log('✅ Image uploaded successfully:', imageUrl);
                 } else {
-                    throw new Error('No image URL found in response structure');
+                    throw new Error('No highlight image URL found in response');
                 }
     
             } catch (error) {

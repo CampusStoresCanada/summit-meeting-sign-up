@@ -391,6 +391,7 @@
             resize: none;
         }
 
+        /* WYSIWYG Input Styling - Step 1 */
         .field-input.company-name {
             font-weight: 700;
             font-size: 1.8vw;
@@ -401,6 +402,36 @@
             font-weight: 400;
             font-size: 1.0vw;
             line-height: 1.2;
+        }
+
+        .field-textarea.description {
+            font-weight: 400;
+            font-size: 1.0vw;
+            line-height: 1.5;
+            min-height: 6vw;
+        }
+
+        /* WYSIWYG Input Styling - Step 2 */
+        .field-input.headline {
+            font-weight: 700;
+            font-size: 1.8vw;
+            line-height: 1.2;
+            color: #000000;
+        }
+
+        .field-input.deal {
+            font-weight: 700;
+            font-size: 1.8vw;
+            line-height: 1.2;
+            color: #000000;
+        }
+
+        .field-textarea.highlight-description {
+            font-weight: 400;
+            font-size: 1.0vw;
+            line-height: 1.5;
+            color: #666666;
+            min-height: 6vw;
         }
 
         /* Custom Dropdown */
@@ -522,6 +553,7 @@
             margin-bottom: 2.5vw;
         }
 
+        /* Headline - Large Bold (like company name) */
         .step2-field[data-field="highlightHeadline"] .field-display {
             font-family: 'davis-sans', sans-serif;
             font-weight: 700;
@@ -537,6 +569,7 @@
             vertical-align: middle;
         }
         
+        /* Description - Paragraph style with 22vw width */
         .step2-field[data-field="highlightDescription"] .field-display {
             font-family: 'davis-sans', sans-serif;
             font-weight: 400;
@@ -545,7 +578,7 @@
             line-height: 1.5;
             display: block;
             margin-bottom: 0.5vw;
-            width: 38vw;
+            width: 22vw; /* Reduced from 38vw */
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
@@ -554,15 +587,16 @@
             display: flex;
             position: absolute;
             top: 50%; 
-            left: 38.8vw;
+            left: 22.8vw; /* Adjusted for new width */
             transform: translateY(-50%);
         }
         
+        /* Deal - Large Bold (like headline) */
         .step2-field[data-field="highlightDeal"] .field-display {
             font-family: 'davis-sans', sans-serif;
-            font-weight: 400;
-            font-size: 1.0vw;
-            color: #666666;
+            font-weight: 700;
+            font-size: 1.8vw;
+            color: #000000;
             line-height: 1.2;
             display: inline-block;
         }
@@ -1552,21 +1586,23 @@
 
         // Field configurations
         const fieldConfigs = {
-            // Step 1 fields
+            // Step 1 fields (38vw width)
             companyName: {
                 label: 'Company name',
                 type: 'input',
                 inputClass: 'company-name',
                 placeholder: 'Enter company name',
                 maxLength: 100,
-                required: true
+                required: true,
+                width: '38vw'
             },
             website: {
                 label: 'Website',
                 type: 'input',
                 inputClass: 'website',
                 placeholder: 'example.com',
-                required: false
+                required: false,
+                width: '38vw'
             },
             description: {
                 label: 'Company description',
@@ -1574,16 +1610,18 @@
                 inputClass: 'description',
                 placeholder: 'Give our members an elevator pitch of who you are.',
                 maxLength: 300,
-                required: false
+                required: false,
+                width: '38vw'
             },
-            // Step 2 fields
+            // Step 2 fields (22vw width)
             highlightHeadline: {
                 label: 'Headline',
                 type: 'input',
                 inputClass: 'headline',
                 placeholder: 'Give your product or service a catchy headline',
                 maxLength: 100,
-                required: false
+                required: false,
+                width: '22vw'
             },
             highlightDescription: {
                 label: 'Description',
@@ -1591,7 +1629,8 @@
                 inputClass: 'highlight-description',
                 placeholder: 'Give a short description of what you are going to do for the members, not every carve out and caveat, but the gist.',
                 maxLength: 300,
-                required: false
+                required: false,
+                width: '22vw'
             },
             highlightDeal: {
                 label: 'Conference special',
@@ -1599,7 +1638,8 @@
                 inputClass: 'deal',
                 placeholder: "What's your conference special? Free consultation? Discount? Bonus swag?",
                 maxLength: 200,
-                required: false
+                required: false,
+                width: '22vw'
             }
         };
 
@@ -1679,9 +1719,11 @@
             inputElement.placeholder = config.placeholder;
             inputElement.value = formState[fieldName] || '';
             
+            // Use the width from config (22vw for Step 2, 38vw for Step 1)
+            const fieldWidth = config.width || '38vw';
             inputContainer.style.left = x + 'px';
             inputContainer.style.top = y + 'px';
-            inputContainer.style.width = '38vw';
+            inputContainer.style.width = fieldWidth;
             
             if (config.type === 'textarea') {
                 inputContainer.style.height = Math.max(height, 120) + 'px';
@@ -1690,8 +1732,11 @@
             }
             
             const padding = 16;
-            const inputWidthVw = window.innerWidth * 0.38;
+            // Calculate border width based on the field's specific width
+            const fieldWidthPercent = parseFloat(fieldWidth) / 100; // Convert 22vw to 0.22
+            const inputWidthVw = window.innerWidth * fieldWidthPercent;
             const borderWidth = inputWidthVw + (padding * 2);
+            
             border.style.left = (x - padding) + 'px';
             border.style.top = (y - padding) + 'px';
             border.style.width = borderWidth + 'px';

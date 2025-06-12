@@ -2800,12 +2800,12 @@
                 // Try multiple possible response structures
                 let imageUrl = null;
                 
-                if (result.uploadResults?.otherFiles?.[0]?.url) {
+                if (result.uploadResults?.highlightImageUrl) {
+                    imageUrl = result.uploadResults.highlightImageUrl; // NEW: Check for highlight image first
+                } else if (result.uploadResults?.otherFiles?.[0]?.url) {
                     imageUrl = result.uploadResults.otherFiles[0].url;
                 } else if (result.uploadResults?.catalogueUrl) {
                     imageUrl = result.uploadResults.catalogueUrl;
-                } else if (result.uploadResults?.uploadUrls?.[0]?.publicUrl) {
-                    imageUrl = result.uploadResults.uploadUrls[0].publicUrl;
                 }
                 
                 console.log('🔍 Extracted image URL:', imageUrl);

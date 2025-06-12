@@ -1767,7 +1767,7 @@
                 displayElement.textContent = '';
             }
         }
-       // ===========================================
+        // ===========================================
         // VALIDATION SYSTEM
         // ===========================================
         
@@ -1846,6 +1846,12 @@
         // ===========================================
         
         function validateCategorySelection() {
+            // Don't validate if dropdown is currently open (user is actively fixing it)
+            if (categoryDropdownOpen) {
+                console.log('🔧 Skipping category validation - dropdown is open');
+                return true; // Assume they're going to fix it
+            }
+            
             const errorMessage = validateField('category', formState.category);
             
             if (errorMessage) {

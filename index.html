@@ -431,38 +431,73 @@
             line-height: 1.2;
         }
 
-        /* Category Select - 38vw Width */
-        .category-dropdown {
-            position: relative;
-            width: 38vw; /* Match mockup proportions */
-        }
-
-        .category-select {
-            width: 100%;
+        /* Category Display Select - Three States */
+        .category-display-select {
+            width: 38vw;
             padding: 12px 40px 12px 16px;
             border: 2px solid #cccccc;
             border-radius: 8px;
             font-family: 'davis-sans', sans-serif;
             font-weight: 400;
-            font-size: 1.2vw; /* Same as category display */
-            line-height: 1.2; /* Same as category display */
+            font-size: 1.2vw;
+            line-height: 1.2;
             color: #333333;
             background: #ffffff;
             cursor: pointer;
-            outline: none;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             transition: border-color 0.2s ease;
         }
 
-        .category-select:hover {
-            border-color: #999999;
+        .category-display-select:hover {
+            border-color: #0071bc;
         }
 
-        .category-select option:first-child {
+        .category-display-select.placeholder {
             color: #999999;
             font-style: italic;
+        }
+
+        /* Category Dropdown List */
+        .category-dropdown-list {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 38vw;
+            background: #ffffff;
+            border: 2px solid #0071bc;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .category-option {
+            padding: 12px 16px;
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 400;
+            font-size: 1.2vw;
+            line-height: 1.2;
+            color: #0071bc;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .category-option:first-child {
+            color: #999999;
+            font-style: italic;
+            cursor: default;
+        }
+
+        .category-option:not(:first-child):hover {
+            background-color: #e3f2fd;
+        }
+
+        .category-option.selected {
+            background-color: #e3f2fd;
         }
 
         .category-dropdown-arrow {
@@ -927,22 +962,8 @@
 
                         <!-- Category Field -->
                         <div class="form-field" data-field="category">
-                            <div class="category-dropdown">
-                                <select class="category-select" id="categorySelect">
-                                    <option value="">Select your primary category</option>
-                                    <option value="Accessories">Accessories</option>
-                                    <option value="Apparel">Apparel</option>
-                                    <option value="Books">Books</option>
-                                    <option value="Campus Living">Campus Living</option>
-                                    <option value="Food & Beverages">Food & Beverages</option>
-                                    <option value="Gifts & Promotional Products">Gifts & Promotional Products</option>
-                                    <option value="Graduation & Regalia">Graduation & Regalia</option>
-                                    <option value="Health & Beauty">Health & Beauty</option>
-                                    <option value="School Office & Lab Supplies">School Office & Lab Supplies</option>
-                                    <option value="Store Operations">Store Operations</option>
-                                    <option value="Technology & Electronics">Technology & Electronics</option>
-                                    <option value="Other">Other</option>
-                                </select>
+                            <div class="category-display-select" id="categoryDisplaySelect" onclick="editField('category')">
+                                <span id="categoryDisplayText">Select your primary category</span>
                                 <svg class="category-dropdown-arrow" viewBox="0 0 19.87 12.22">
                                     <path d="M19.68.11c-.21-.17-.52-.15-.7.07l-9.03,10.77-.02-.02-.02.02L.88.18C.7-.04.39-.06.18.11-.04.29-.06.61.11.82l9.42,11.22c.1.12.24.18.38.18h.04c.14,0,.28-.06.38-.18L19.75.82c.17-.21.15-.53-.07-.71Z" fill="#999999"/>
                                 </svg>
@@ -1285,10 +1306,17 @@
 
         function updateFieldDisplay(fieldName, value) {
             if (fieldName === 'category') {
-                // Update the select element instead of display text
-                const selectElement = document.getElementById('categorySelect');
-                if (selectElement) {
-                    selectElement.value = value || '';
+                // Update the category display
+                const displayElement = document.getElementById('categoryDisplayText');
+                const containerElement = document.getElementById('categoryDisplaySelect');
+                if (displayElement && containerElement) {
+                    if (value) {
+                        displayElement.textContent = value;
+                        containerElement.classList.remove('placeholder');
+                    } else {
+                        displayElement.textContent = 'Select your primary category';
+                        containerElement.classList.add('placeholder');
+                    }
                 }
                 return;
             }

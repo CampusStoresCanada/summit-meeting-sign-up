@@ -1638,10 +1638,12 @@
         let categoryDropdownOpen = false; // Track dropdown state globally
         let activeField = null;
         let formState = {
+            // Step 1
             companyName: '',
             website: '',
             category: '',
-            description: ''
+            description: '',
+            // Step 2
             highlightHeadline: '',
             highlightDescription: '',
             highlightDeal: '',
@@ -1656,7 +1658,6 @@
         
         let cropperInstance = null;
         let currentFile = null;
-        let activeStep2Field = null;
         let initializedSteps = new Set();
         
         // ===========================================
@@ -1735,13 +1736,14 @@
 
         // Field configurations
         const fieldConfigs = {
+            // Step 1 fields
             companyName: {
                 label: 'Company name',
                 type: 'input',
                 inputClass: 'company-name',
                 placeholder: 'Enter company name',
-                maxLength: 100, // Added max length
-                required: true   // Added required flag
+                maxLength: 100,
+                required: true
             },
             website: {
                 label: 'Website',
@@ -1758,14 +1760,14 @@
                 maxLength: 300,
                 required: false
             },
+            // Step 2 fields - ADDED WITH PROPER COMMAS
             highlightHeadline: {
                 label: 'Headline',
                 type: 'input',
                 inputClass: 'headline',
                 placeholder: 'Give your product or service a catchy headline',
                 maxLength: 100,
-                required: false,
-                step: 2
+                required: false
             },
             highlightDescription: {
                 label: 'Description',
@@ -1773,8 +1775,7 @@
                 inputClass: 'highlight-description',
                 placeholder: 'Give a short description of what you are going to do for the members, not every carve out and caveat, but the gist.',
                 maxLength: 300,
-                required: false,
-                step: 2
+                required: false
             },
             highlightDeal: {
                 label: 'Conference special',
@@ -1782,23 +1783,12 @@
                 inputClass: 'deal',
                 placeholder: "What's your conference special? Free consultation? Discount? Bonus swag?",
                 maxLength: 200,
-                required: false,
-                step: 2
-            }   
-        };
-        
-
-        
-        // Updated Step 2 form state to match field names
-        let step2FormState = {
-            step2Headline: '',
-            step2Description: '',
-            step2Deal: '',
-            imageUrl: ''
+                required: false
+            }
         };
             
             inputElement.placeholder = config.placeholder;
-            inputElement.value = step2FormState[fieldName] || '';
+            inputElement.value = formState[fieldName] || '';
             
             // Position input container
             inputContainer.style.left = x + 'px';
@@ -1835,7 +1825,7 @@
                 counter.className = 'character-counter';
                 counter.id = `charCounter-${fieldName}`;
                 
-                counter.textContent = config.maxLength - (step2FormState[fieldName] || '').length;
+                counter.textContent = config.maxLength - (formState[fieldName] || '').length;
                 
                 // Position counter
                 const borderHeight = config.type === 'textarea' ? Math.max(height, 120) + padding * 2 : height + padding * 2;
@@ -1848,7 +1838,7 @@
                 
                 overlay.appendChild(counter);
                 
-                inputElement.addEventListener('input', () => updateStep2CharCounter(fieldName));
+                inputElement.addEventListener('input', () => updateCharCounter(fieldName));
             }
             
             // Assemble overlay
@@ -2862,6 +2852,12 @@
         }
     function initializeStep2() {
         initializeImageUpload();
+        updateFieldDisplay('highlightHeadline', formState.highlightHeadline);
+        updateFieldDisplay('highlightDescription', formState.highlightDescription);
+        updateFieldDisplay('highlightDeal', formState.highlightDeal);
+    
+        console.log('🚀 Step 2 initialized with unified field system!');
+    }
     }
     
     function initializeImageUpload() {
@@ -3074,13 +3070,6 @@
             uploadedImage.src = imageUrl;
             uploadedImage.style.display = 'block';
         }
-    }
-    
-    function getStep2FieldName(displayElement) {
-        if (displayElement.id === 'headlineDisplay') return 'headline';
-        if (displayElement.id === 'descriptionDisplay') return 'description';
-        if (displayElement.id === 'dealDisplay') return 'deal';
-        return null;
     }
     </script>
 </body>

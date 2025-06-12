@@ -431,9 +431,14 @@
             line-height: 1.2;
         }
 
-        /* Category Display Select - Three States */
-        .category-display-select {
+        /* Custom Dropdown - Complete replacement for HTML select */
+        .custom-dropdown {
+            position: relative;
             width: 38vw;
+        }
+
+        .dropdown-display {
+            width: 100%;
             padding: 12px 40px 12px 16px;
             border: 2px solid #cccccc;
             border-radius: 8px;
@@ -444,38 +449,55 @@
             color: #333333;
             background: #ffffff;
             cursor: pointer;
-            position: relative;
             display: flex;
             align-items: center;
             justify-content: space-between;
             transition: border-color 0.2s ease;
         }
 
-        .category-display-select:hover {
+        .dropdown-display:hover {
             border-color: #0071bc;
         }
 
-        .category-display-select.placeholder {
+        .dropdown-display.open {
+            border-color: #0071bc;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .dropdown-display.placeholder {
             color: #999999;
             font-style: italic;
         }
 
-        /* Category Dropdown List */
-        .category-dropdown-list {
+        .dropdown-arrow {
+            width: 16px;
+            height: 12px;
+            pointer-events: none;
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown-display.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-options {
             position: absolute;
-            top: 0;
+            top: 100%;
             left: 0;
-            width: 38vw;
+            right: 0;
             background: #ffffff;
             border: 2px solid #0071bc;
-            border-radius: 8px;
+            border-top: none;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             z-index: 100;
             max-height: 300px;
             overflow-y: auto;
         }
 
-        .category-option {
+        .dropdown-option {
             padding: 12px 16px;
             font-family: 'davis-sans', sans-serif;
             font-weight: 400;
@@ -486,18 +508,22 @@
             transition: background-color 0.2s ease;
         }
 
-        .category-option:first-child {
-            color: #999999;
+        .dropdown-option:hover {
+            background-color: #e3f2fd;
+        }
+
+        .dropdown-option.selected {
+            background-color: #e3f2fd;
+        }
+
+        .placeholder-option {
+            color: #999999 !important;
             font-style: italic;
-            cursor: default;
+            cursor: default !important;
         }
 
-        .category-option:not(:first-child):hover {
-            background-color: #e3f2fd;
-        }
-
-        .category-option.selected {
-            background-color: #e3f2fd;
+        .placeholder-option:hover {
+            background-color: transparent !important;
         }
 
         .category-dropdown-arrow {
@@ -962,11 +988,28 @@
 
                         <!-- Category Field -->
                         <div class="form-field" data-field="category">
-                            <div class="category-display-select" id="categoryDisplaySelect" onclick="editField('category')">
-                                <span id="categoryDisplayText">Select your primary category</span>
-                                <svg class="category-dropdown-arrow" viewBox="0 0 19.87 12.22">
-                                    <path d="M19.68.11c-.21-.17-.52-.15-.7.07l-9.03,10.77-.02-.02-.02.02L.88.18C.7-.04.39-.06.18.11-.04.29-.06.61.11.82l9.42,11.22c.1.12.24.18.38.18h.04c.14,0,.28-.06.38-.18L19.75.82c.17-.21.15-.53-.07-.71Z" fill="#999999"/>
-                                </svg>
+                            <div class="custom-dropdown" id="categoryDropdown">
+                                <div class="dropdown-display" id="categoryDisplay">
+                                    <span id="categoryText">Select your primary category</span>
+                                    <svg class="dropdown-arrow" viewBox="0 0 19.87 12.22">
+                                        <path d="M19.68.11c-.21-.17-.52-.15-.7.07l-9.03,10.77-.02-.02-.02.02L.88.18C.7-.04.39-.06.18.11-.04.29-.06.61.11.82l9.42,11.22c.1.12.24.18.38.18h.04c.14,0,.28-.06.38-.18L19.75.82c.17-.21.15-.53-.07-.71Z" fill="#999999"/>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-options" id="categoryOptions" style="display: none;">
+                                    <div class="dropdown-option placeholder-option">Select your primary category</div>
+                                    <div class="dropdown-option" data-value="Accessories">Accessories</div>
+                                    <div class="dropdown-option" data-value="Apparel">Apparel</div>
+                                    <div class="dropdown-option" data-value="Books">Books</div>
+                                    <div class="dropdown-option" data-value="Campus Living">Campus Living</div>
+                                    <div class="dropdown-option" data-value="Food & Beverages">Food & Beverages</div>
+                                    <div class="dropdown-option" data-value="Gifts & Promotional Products">Gifts & Promotional Products</div>
+                                    <div class="dropdown-option" data-value="Graduation & Regalia">Graduation & Regalia</div>
+                                    <div class="dropdown-option" data-value="Health & Beauty">Health & Beauty</div>
+                                    <div class="dropdown-option" data-value="School Office & Lab Supplies">School Office & Lab Supplies</div>
+                                    <div class="dropdown-option" data-value="Store Operations">Store Operations</div>
+                                    <div class="dropdown-option" data-value="Technology & Electronics">Technology & Electronics</div>
+                                    <div class="dropdown-option" data-value="Other">Other</div>
+                                </div>
                             </div>
                         </div>
 
@@ -1027,8 +1070,68 @@
         const API_BASE = '/api';
 
         // ===========================================
-        // ANIMATED FIELD SYSTEM
+        // CUSTOM DROPDOWN FUNCTIONALITY
         // ===========================================
+        function initializeDropdown() {
+            const dropdown = document.getElementById('categoryDropdown');
+            const display = document.getElementById('categoryDisplay');
+            const options = document.getElementById('categoryOptions');
+            const text = document.getElementById('categoryText');
+            
+            // Click on display to toggle dropdown
+            display.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = options.style.display === 'block';
+                
+                if (isOpen) {
+                    closeDropdown();
+                } else {
+                    openDropdown();
+                }
+            });
+            
+            // Click on options
+            options.addEventListener('click', (e) => {
+                if (e.target.classList.contains('dropdown-option') && !e.target.classList.contains('placeholder-option')) {
+                    const value = e.target.getAttribute('data-value');
+                    selectOption(value);
+                    closeDropdown();
+                }
+            });
+            
+            // Click outside to close
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+            
+            function openDropdown() {
+                options.style.display = 'block';
+                display.classList.add('open');
+                
+                // Highlight selected option
+                const currentValue = formState.category;
+                options.querySelectorAll('.dropdown-option').forEach(option => {
+                    option.classList.remove('selected');
+                    if (option.getAttribute('data-value') === currentValue) {
+                        option.classList.add('selected');
+                    }
+                });
+            }
+            
+            function closeDropdown() {
+                options.style.display = 'none';
+                display.classList.remove('open');
+            }
+            
+            function selectOption(value) {
+                formState.category = value;
+                text.textContent = value;
+                display.classList.remove('placeholder');
+                console.log('📝 Selected category:', value);
+            }
+        }
         let activeField = null;
         let formState = {
             companyName: '',
@@ -1325,16 +1428,16 @@
 
         function updateFieldDisplay(fieldName, value) {
             if (fieldName === 'category') {
-                // Update the category display
-                const displayElement = document.getElementById('categoryDisplayText');
-                const containerElement = document.getElementById('categoryDisplaySelect');
-                if (displayElement && containerElement) {
+                // Update the custom dropdown display
+                const text = document.getElementById('categoryText');
+                const display = document.getElementById('categoryDisplay');
+                if (text && display) {
                     if (value) {
-                        displayElement.textContent = value;
-                        containerElement.classList.remove('placeholder');
+                        text.textContent = value;
+                        display.classList.remove('placeholder');
                     } else {
-                        displayElement.textContent = 'Select your primary category';
-                        containerElement.classList.add('placeholder');
+                        text.textContent = 'Select your primary category';
+                        display.classList.add('placeholder');
                     }
                 }
                 return;
@@ -1406,6 +1509,7 @@
             try {
                 console.log('🪄 Loading vendor data for token:', token);
                 await loadVendorData(token);
+                initializeDropdown(); // Initialize the custom dropdown
                 showWelcomeScreen();
             } catch (error) {
                 console.error('Error loading vendor data:', error);

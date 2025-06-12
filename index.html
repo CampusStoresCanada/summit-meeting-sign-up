@@ -281,10 +281,11 @@
         }
 
         .form-field[data-field="description"] .edit-btn {
-            display: inline-flex;
-            margin-left: 0.8vw;
-            vertical-align: top;
-            position: relative; /* Remove absolute positioning */
+            display: flex;
+            position: absolute;
+            top: 50%; 
+            right: -30px; /* This is the culprit */
+            transform: translateY(-50%);
         }
 
         .edit-btn {

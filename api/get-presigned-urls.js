@@ -20,7 +20,11 @@ export default async function handler(req, res) {
     
     const { fileList, organizationName, token } = req.body;
     
+    console.log('🔍 Backend received fileList:', fileList);
+    console.log('🔍 Organization:', organizationName);
+    
     if (!fileList || !Array.isArray(fileList) || fileList.length === 0) {
+      console.log('❌ No files or invalid fileList array');
       res.status(400).json({ error: 'No files specified' });
       return;
     }
@@ -42,16 +46,33 @@ export default async function handler(req, res) {
     // Generate presigned URL for each file
     for (const fileInfo of fileList) {
       try {
-        const isCatalogueFile = fileInfo.fieldName === 'catalogFile';
-        const fileName = fileInfo.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const s3Key = `${folderPath}${isCatalogueFile ? 'catalogue/' : 'docs/'}${fileName}`;
+        console.log('🔍 Processing file:', fileInfo);
         
-        // Create presigned URL for upload (no ACL needed!)
+        const isCatalogueFile = fileInfo.fieldName === 'catalogFile';
+        const isHighlightImage = fileInfo.fieldName === 'highlightImage';
+        
+        console.log('🔍 isCatalogueFile:', isCatalogueFile);
+        console.log('🔍 isHighlightImage:', isHighlightImage);
+        
+        const fileName = fileInfo.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        
+        // Determine folder based on file type
+        let subFolder = 'docs/'; // default
+        if (isCatalogueFile) {
+          subFolder = 'catalogue/';
+        } else if (isHighlightImage) {
+          subFolder = 'highlights/';
+        }
+        
+        const s3Key = `${folderPath}${subFolder}${fileName}`;
+        
+        console.log('🔍 S3 key will be:', s3Key);
+        
+        // Create presigned URL for upload
         const command = new PutObjectCommand({
           Bucket: process.env.AWS_S3_BUCKET,
           Key: s3Key,
-          ContentType: fileInfo.type
-          // Removed ACL - bucket policy will handle public access
+          ContentType: fileInfo.type || 'application/octet-stream'
         });
         
         const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // 1 hour
@@ -62,10 +83,11 @@ export default async function handler(req, res) {
           presignedUrl: presignedUrl,
           publicUrl: `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`,
           s3Key: s3Key,
-          isCatalogue: isCatalogueFile
+          isCatalogue: isCatalogueFile,
+          isHighlight: isHighlightImage
         });
         
-        console.log(`📄 Created presigned URL for: ${fileInfo.name}`);
+        console.log(`📄 Created presigned URL for: ${fileInfo.name} -> ${subFolder}`);
         
       } catch (fileError) {
         console.error(`💥 Error creating URL for ${fileInfo.name}:`, fileError);

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -484,11 +483,11 @@
             max-width: 38vw; /* Ensure textarea doesn't exceed 38vw */
         }
 
-        /* Character Counter  */
+        /* Character Counter - consolidated definition */
         .character-counter {
             font-family: 'davis-sans', sans-serif;
             font-size: 0.7vw;
-            color: #0071bc;
+            color: #999999;
             font-weight: 400;
             transition: all 0.2s ease;
             white-space: nowrap;
@@ -498,7 +497,27 @@
             font-weight: 700;
             color: #0071bc;
         }
-            min-height: 6vw;
+            min-height: 6vw; /* Back to original logic */
+        }
+
+        /* Character Counter for Description */
+        .character-counter {
+            position: absolute;
+            bottom: 0.5vw;
+            right: 0.8vw;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 0.7vw;
+            color: #999999;
+            font-weight: 400;
+            background: #ffffff;
+            padding: 0.2vw 0.4vw;
+            border-radius: 0.2vw;
+            transition: all 0.2s ease;
+        }
+
+        .character-counter.warning {
+            font-weight: 700;
+            color: #0071bc;
         }
 
         /* Button Styles */

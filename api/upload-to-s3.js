@@ -47,9 +47,19 @@ export default async function handler(req, res) {
         console.log(`⬆️ Uploading: ${fileData.name}`);
         
         // Determine file path in S3
-        const isCatalogueFile = fileData.fieldName === 'catalogFile';
-        const fileName = fileData.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const s3Key = `${uploadResults.folderPath}${isCatalogueFile ? 'catalogue/' : 'docs/'}${fileName}`;
+        const isCatalogueFile = fileInfo.fieldName === 'catalogFile';
+        const isHighlightImage = fileInfo.fieldName === 'highlightImage';
+        const fileName = fileInfo.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        
+        // Determine folder based on file type
+        let subFolder = 'docs/'; // default
+        if (isCatalogueFile) {
+            subFolder = 'catalogue/';
+        } else if (isHighlightImage) {
+            subFolder = 'highlights/'; // new folder for conference highlight images
+        }
+        
+        const s3Key = `${folderPath}${subFolder}${fileName}`;
         
         // Convert base64 to buffer
         const fileBuffer = Buffer.from(fileData.content, 'base64');
@@ -71,14 +81,17 @@ export default async function handler(req, res) {
         if (isCatalogueFile) {
           uploadResults.catalogueUrl = fileUrl;
           console.log(`📄 Catalogue uploaded: ${fileUrl}`);
-        } else {
+      } else if (isHighlightImage) {
+          uploadResults.highlightImageUrl = fileUrl; // New field for highlight images
+          console.log(`🖼️ Highlight image uploaded: ${fileInfo.name}`);
+      } else {
           uploadResults.otherFiles.push({
-            name: fileData.name,
-            url: fileUrl,
-            key: s3Key
+              name: fileInfo.name,
+              url: fileUrl,
+              key: s3Key
           });
-          console.log(`📎 Document uploaded: ${fileData.name}`);
-        }
+          console.log(`📎 Document uploaded: ${fileInfo.name}`);
+      }
         
       } catch (fileError) {
         console.error(`💥 Error uploading ${fileData.name}:`, fileError);

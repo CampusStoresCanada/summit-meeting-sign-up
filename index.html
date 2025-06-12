@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -483,11 +484,11 @@
             max-width: 38vw; /* Ensure textarea doesn't exceed 38vw */
         }
 
-        /* Character Counter - consolidated definition */
+        /* Character Counter  */
         .character-counter {
             font-family: 'davis-sans', sans-serif;
             font-size: 0.7vw;
-            color: #999999;
+            color: #0071bc;
             font-weight: 400;
             transition: all 0.2s ease;
             white-space: nowrap;
@@ -497,27 +498,7 @@
             font-weight: 700;
             color: #0071bc;
         }
-            min-height: 6vw; /* Back to original logic */
-        }
-
-        /* Character Counter for Description */
-        .character-counter {
-            position: absolute;
-            bottom: 0.5vw;
-            right: 0.8vw;
-            font-family: 'davis-sans', sans-serif;
-            font-size: 0.7vw;
-            color: #999999;
-            font-weight: 400;
-            background: #ffffff;
-            padding: 0.2vw 0.4vw;
-            border-radius: 0.2vw;
-            transition: all 0.2s ease;
-        }
-
-        .character-counter.warning {
-            font-weight: 700;
-            color: #0071bc;
+            min-height: 6vw;
         }
 
         /* Button Styles */
@@ -927,26 +908,13 @@
 
                         <!-- Category Field -->
                         <div class="form-field" data-field="category">
-                            <div class="category-dropdown">
-                                <select class="category-select" id="categorySelect">
-                                    <option value="">Select your primary category</option>
-                                    <option value="Accessories">Accessories</option>
-                                    <option value="Apparel">Apparel</option>
-                                    <option value="Books">Books</option>
-                                    <option value="Campus Living">Campus Living</option>
-                                    <option value="Food & Beverages">Food & Beverages</option>
-                                    <option value="Gifts & Promotional Products">Gifts & Promotional Products</option>
-                                    <option value="Graduation & Regalia">Graduation & Regalia</option>
-                                    <option value="Health & Beauty">Health & Beauty</option>
-                                    <option value="School Office & Lab Supplies">School Office & Lab Supplies</option>
-                                    <option value="Store Operations">Store Operations</option>
-                                    <option value="Technology & Electronics">Technology & Electronics</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                                <svg class="category-dropdown-arrow" viewBox="0 0 19.87 12.22">
-                                    <path d="M19.68.11c-.21-.17-.52-.15-.7.07l-9.03,10.77-.02-.02-.02.02L.88.18C.7-.04.39-.06.18.11-.04.29-.06.61.11.82l9.42,11.22c.1.12.24.18.38.18h.04c.14,0,.28-.06.38-.18L19.75.82c.17-.21.15-.53-.07-.71Z" fill="#999999"/>
+                            <div class="field-display" id="categoryDisplay">Select your primary category</div>
+                            <button class="edit-btn" onclick="editField('category')" id="editCategory">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                    <path d="m14.5 5.5 4 4"/>
                                 </svg>
-                            </div>
+                            </button>
                         </div>
 
                         <!-- Company Description Field -->

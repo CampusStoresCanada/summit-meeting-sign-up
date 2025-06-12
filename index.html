@@ -266,22 +266,6 @@
             vertical-align: middle;
         }
 
-        /* Category - Normal text */
-        .form-field:nth-child(3) .field-display {
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 400;
-            font-size: 1.2vw;
-            color: #333333;
-            line-height: 1.2;
-            display: inline-block;
-        }
-
-        .form-field:nth-child(3) .edit-btn {
-            display: inline-flex;
-            margin-left: 0.8vw;
-            vertical-align: middle;
-        }
-
         /* Description - Paragraph text with inline edit button */
         .form-field[data-field="description"] .field-display {
             font-family: 'davis-sans', sans-serif;
@@ -297,11 +281,10 @@
         }
 
         .form-field[data-field="description"] .edit-btn {
-            display: flex;
-            position: absolute;
-            top: 50%; /* Center vertically */
-            right: -30px; /* Offset to the right of the text */
-            transform: translateY(-50%); /* True vertical centering */
+            display: inline-flex;
+            margin-left: 0.8vw;
+            vertical-align: top;
+            position: relative; /* Remove absolute positioning */
         }
 
         .edit-btn {
@@ -545,23 +528,6 @@
             max-width: 38vw; /* Ensure textarea doesn't exceed 38vw */
         }
 
-        /* Character Counter - consolidated definition */
-        .character-counter {
-            font-family: 'davis-sans', sans-serif;
-            font-size: 0.7vw;
-            color: #999999;
-            font-weight: 400;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .character-counter.warning {
-            font-weight: 700;
-            color: #0071bc;
-        }
-            min-height: 6vw; /* Back to original logic */
-        }
-
         /* Character Counter for Description */
         .character-counter {
             position: absolute;
@@ -569,7 +535,7 @@
             right: 0.8vw;
             font-family: 'davis-sans', sans-serif;
             font-size: 0.7vw;
-            color: #999999;
+            color: #0071bc;
             font-weight: 400;
             background: #ffffff;
             padding: 0.2vw 0.4vw;

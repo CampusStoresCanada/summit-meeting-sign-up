@@ -14,30 +14,23 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Import AWS SDK dynamically 
+    // Import AWS SDK dynamically
     const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
     
     const { files, organizationName, token } = req.body;
     
+    console.log('🔍 Backend received files:', files);
+    console.log('🔍 Files length:', files?.length);
+    console.log('🔍 Organization name:', organizationName);
+    
     if (!files || !Array.isArray(files) || files.length === 0) {
+      console.log('❌ No files or invalid files array');
       res.status(400).json({ error: 'No files provided' });
       return;
     }
 
     console.log(`📁 Uploading ${files.length} files for ${organizationName}...`);
-    console.log('🔍 Backend received files:', files);
-    console.log('🔍 Files length:', files?.length);
-    console.log('🔍 Organization name:', organizationName);
-    console.log('🔍 Token:', token);
-    
-    if (!files || !Array.isArray(files) || files.length === 0) {
-        console.log('❌ No files or invalid files array');
-        res.status(400).json({ error: 'No files specified' });
-        return;
-    }
 
-    console.log(`📝 Creating presigned URLs for ${files.length} files...`);
-    
     // Initialize S3 client
     const s3Client = new S3Client({
       region: process.env.AWS_REGION,
@@ -49,6 +42,7 @@ export default async function handler(req, res) {
 
     const uploadResults = {
       catalogueUrl: null,
+      highlightImageUrl: null, // NEW: Add this field
       otherFiles: [],
       folderPath: `vendors/${organizationName.replace(/[^a-zA-Z0-9 ]/g, '-').replace(/\s+/g, '-')}/`
     };
@@ -57,25 +51,28 @@ export default async function handler(req, res) {
     for (const fileData of files) {
       try {
         console.log(`⬆️ Uploading: ${fileData.name}`);
-        console.log('🔍 Processing file:', fileInfo);
+        console.log(`🔍 Field name: ${fileData.fieldName}`);
         
         // Determine file path in S3
-        const isCatalogueFile = fileInfo.fieldName === 'catalogFile';
-        const isHighlightImage = fileInfo.fieldName === 'highlightImage';
-        const fileName = fileInfo.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-
-        console.log('🔍 isCatalogueFile:', isCatalogueFile); 
+        const isCatalogueFile = fileData.fieldName === 'catalogFile';
+        const isHighlightImage = fileData.fieldName === 'highlightImage';
+        
+        console.log('🔍 isCatalogueFile:', isCatalogueFile);
         console.log('🔍 isHighlightImage:', isHighlightImage);
+        
+        const fileName = fileData.name.replace(/[^a-zA-Z0-9.-]/g, '_');
         
         // Determine folder based on file type
         let subFolder = 'docs/'; // default
         if (isCatalogueFile) {
-            subFolder = 'catalogue/';
+          subFolder = 'catalogue/';
         } else if (isHighlightImage) {
-            subFolder = 'highlights/'; // new folder for conference highlight images
+          subFolder = 'highlights/';
         }
         
-        const s3Key = `${folderPath}${subFolder}${fileName}`;
+        const s3Key = `${uploadResults.folderPath}${subFolder}${fileName}`;
+        
+        console.log('🔍 Uploading to S3 key:', s3Key);
         
         // Convert base64 to buffer
         const fileBuffer = Buffer.from(fileData.content, 'base64');
@@ -85,8 +82,7 @@ export default async function handler(req, res) {
           Bucket: process.env.AWS_S3_BUCKET,
           Key: s3Key,
           Body: fileBuffer,
-          ContentType: fileData.type,
-          ACL: 'public-read' // Make files publicly accessible
+          ContentType: fileData.type || 'application/octet-stream'
         });
         
         await s3Client.send(command);
@@ -94,32 +90,37 @@ export default async function handler(req, res) {
         // Create public URL
         const fileUrl = `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
         
+        // Store URL in appropriate field
         if (isCatalogueFile) {
           uploadResults.catalogueUrl = fileUrl;
           console.log(`📄 Catalogue uploaded: ${fileUrl}`);
-      } else if (isHighlightImage) {
-          uploadResults.highlightImageUrl = fileUrl; // New field for highlight images
-          console.log(`🖼️ Highlight image uploaded: ${fileInfo.name}`);
-      } else {
+        } else if (isHighlightImage) {
+          uploadResults.highlightImageUrl = fileUrl; // NEW: Store highlight image URL
+          console.log(`🖼️ Highlight image uploaded: ${fileUrl}`);
+        } else {
           uploadResults.otherFiles.push({
-              name: fileInfo.name,
-              url: fileUrl,
-              key: s3Key
+            name: fileData.name,
+            url: fileUrl,
+            key: s3Key
           });
-          console.log(`📎 Document uploaded: ${fileInfo.name}`);
-      }
+          console.log(`📎 Document uploaded: ${fileData.name}`);
+        }
         
       } catch (fileError) {
         console.error(`💥 Error uploading ${fileData.name}:`, fileError);
       }
     }
 
+    const totalUploaded = (uploadResults.catalogueUrl ? 1 : 0) + 
+                         (uploadResults.highlightImageUrl ? 1 : 0) + 
+                         uploadResults.otherFiles.length;
+
     console.log('🎉 Upload complete!', uploadResults);
 
     res.status(200).json({
       success: true,
       uploadResults: uploadResults,
-      message: `Successfully uploaded ${uploadResults.otherFiles.length + (uploadResults.catalogueUrl ? 1 : 0)} files`
+      message: `Successfully uploaded ${totalUploaded} files`
     });
 
   } catch (error) {

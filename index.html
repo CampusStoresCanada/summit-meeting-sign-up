@@ -1868,7 +1868,12 @@
         function clearCategoryError() {
             const dropdown = document.getElementById('categoryDisplay');
             dropdown.classList.remove('error-state');
-            dropdown.style.animation = '';
+            dropdown.style.animation = 'none'; // Force stop animation
+            
+            // Force a reflow to ensure animation stops immediately
+            dropdown.offsetHeight;
+            
+            console.log('🔧 Category error cleared'); // Debug log
         }
         
         // ===========================================

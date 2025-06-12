@@ -1128,12 +1128,14 @@
         let vendorData = {};
         let organizationContacts = [];
         let conferenceTeam = [];
+        let categoryDropdownOpen = false;
 
         const API_BASE = '/api';
 
         // ===========================================
         // CUSTOM DROPDOWN FUNCTIONALITY
         // ===========================================
+            
         function initializeDropdown() {
             const dropdown = document.getElementById('categoryDropdown');
             const display = document.getElementById('categoryDisplay');
@@ -1158,6 +1160,9 @@
                     const value = e.target.getAttribute('data-value');
                     selectOption(value);
                     closeDropdown();
+                    
+                    // Clear any error state when user makes a selection
+                    clearCategoryError();
                 }
             });
             
@@ -1171,6 +1176,11 @@
             function openDropdown() {
                 options.style.display = 'block';
                 display.classList.add('open');
+                categoryDropdownOpen = true; // Set flag
+                
+                // Clear error state when opening (user is showing intent to fix)
+                console.log('🔧 Clearing category error on dropdown open');
+                clearCategoryError();
                 
                 // Highlight selected option
                 const currentValue = formState.category;
@@ -1185,6 +1195,7 @@
             function closeDropdown() {
                 options.style.display = 'none';
                 display.classList.remove('open');
+                categoryDropdownOpen = false; // Clear flag
             }
             
             function selectOption(value) {
@@ -1194,13 +1205,6 @@
                 console.log('📝 Selected category:', value);
             }
         }
-        let activeField = null;
-        let formState = {
-            companyName: '',
-            website: '',
-            category: '',
-            description: ''
-        };
 
         // Field configurations
         const fieldConfigs = {
@@ -1563,6 +1567,13 @@
             // Save any active field before moving
             if (activeField) {
                 saveField(activeField);
+                // If validation failed, activeField will still be set
+                if (activeField) return; // Don't proceed if validation failed
+            }
+            
+            // Validate all fields before proceeding
+            if (!validateAllFields()) {
+                return; // Don't proceed if validation failed
             }
             
             if (currentStep < totalSteps) {
@@ -2086,6 +2097,88 @@
                 updateStepNavigation();
                 updateMobileProgress();
             }
+        }
+        
+        function validateAllFields() {
+            let allValid = true;
+            
+            // Check company name
+            const companyNameError = validateField('companyName', formState.companyName);
+            if (companyNameError) {
+                console.log('❌ Company name validation failed:', companyNameError);
+                allValid = false;
+            }
+            
+            // Check category
+            if (!validateCategorySelection()) {
+                console.log('❌ Category validation failed');
+                allValid = false;
+            }
+            
+            return allValid;
+        }
+        function validateField(fieldName, value) {
+            const validators = {
+                companyName: (val) => {
+                    if (!val || val.trim().length === 0) {
+                        return 'Company name is required';
+                    }
+                    if (val.length > 100) {
+                        return 'Company name cannot exceed 100 characters';
+                    }
+                    return null; // valid
+                },
+                
+                category: (val) => {
+                    if (!val || val.trim() === '') {
+                        return 'Please select a category';
+                    }
+                    return null;
+                },
+                
+                // Description and website don't need validation
+                description: () => null,
+                website: () => null
+            };
+            
+            return validators[fieldName] ? validators[fieldName](value) : null;
+        }
+        
+        function validateCategorySelection() {
+            // Don't validate if dropdown is currently open (user is actively fixing it)
+            if (categoryDropdownOpen) {
+                console.log('🔧 Skipping category validation - dropdown is open');
+                return true; // Assume they're going to fix it
+            }
+            
+            const errorMessage = validateField('category', formState.category);
+            
+            if (errorMessage) {
+                showCategoryError();
+                return false;
+            }
+            
+            clearCategoryError();
+            return true;
+        }
+        
+        function showCategoryError() {
+            const dropdown = document.getElementById('categoryDisplay');
+            dropdown.classList.add('error-state');
+            
+            // Add pulsing animation
+            dropdown.style.animation = 'errorPulse 1s ease-in-out infinite';
+        }
+        
+        function clearCategoryError() {
+            const dropdown = document.getElementById('categoryDisplay');
+            dropdown.classList.remove('error-state');
+            dropdown.style.animation = 'none'; // Force stop animation
+            
+            // Force a reflow to ensure animation stops immediately
+            dropdown.offsetHeight;
+            
+            console.log('🔧 Category error cleared'); // Debug log
         }
         
         function validateAllFields() {

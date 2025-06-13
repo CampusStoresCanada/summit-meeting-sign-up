@@ -3179,6 +3179,10 @@
             console.log(`✏️ Edit contact clicked: ${contactId} (index: ${index})`);
             // TODO: Open edit contact modal
         }
+        function initializeContactModal() {
+            setupModalFieldHandlers();
+            console.log('📝 Contact modal initialized');
+        }
         // ===========================================
         // CONTACT MODAL MANAGEMENT
         // ===========================================
@@ -3189,60 +3193,27 @@
             currentContactIndex: null,
             formData: {}
         };
-        
-        function createContactModal() {
-            // Create modal HTML structure
-            const modalHTML = `
-                <div class="contact-modal" id="contactModal">
-                    <div class="modal-container">
-                        <div class="modal-header">
-                            <h3 class="modal-title" id="modalTitle">Edit Contact</h3>
-                        </div>
-                        <form class="modal-form" id="modalForm">
-                            <div class="modal-field">
-                                <div class="modal-field-border unfocused" id="nameBorder">
-                                    <div class="modal-field-label unfocused" id="nameLabel">Name</div>
-                                    <input type="text" class="modal-field-input" id="nameInput" placeholder="Enter full name">
-                                </div>
-                            </div>
-                            
-                            <div class="modal-field">
-                                <div class="modal-field-border unfocused" id="titleBorder">
-                                    <div class="modal-field-label unfocused" id="titleLabel">Job title</div>
-                                    <input type="text" class="modal-field-input" id="titleInput" placeholder="Enter job title">
-                                </div>
-                            </div>
-                            
-                            <div class="modal-field">
-                                <div class="modal-field-border unfocused" id="emailBorder">
-                                    <div class="modal-field-label unfocused" id="emailLabel">Email</div>
-                                    <input type="email" class="modal-field-input" id="emailInput" placeholder="Enter email address">
-                                </div>
-                            </div>
-                            
-                            <div class="modal-field">
-                                <div class="modal-field-border unfocused" id="phoneBorder">
-                                    <div class="modal-field-label unfocused" id="phoneLabel">Phone</div>
-                                    <input type="tel" class="modal-field-input" id="phoneInput" placeholder="Enter phone number">
-                                </div>
-                            </div>
-                        </form>
-                        
-                        <div class="modal-actions">
-                            <button type="button" class="modal-btn secondary" onclick="cancelContactModal()">Cancel</button>
-                            <button type="button" class="modal-btn primary" onclick="saveContactModal()">Save</button>
-                        </div>
-                    </div>
-                </div>
-            `;
+
+        function updateModalLabels(prefix) {
+            const labels = {
+                name: 'Name',
+                title: 'Job title',
+                email: 'Email',
+                phone: 'Phone'
+            };
             
-            // Add modal to the page
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            
-            // Setup field focus/blur handlers
-            setupModalFieldHandlers();
-            
-            console.log('📝 Contact modal created');
+            Object.keys(labels).forEach(fieldName => {
+                const label = document.getElementById(`${fieldName}Label`);
+                if (label) {
+                    if (prefix === 'Current' && fieldName !== 'name') {
+                        // For edit mode, show current values in labels
+                        const currentValue = modalState.currentContact[fieldName === 'title' ? 'roleTitle' : fieldName === 'email' ? 'workEmail' : fieldName === 'phone' ? 'workPhone' : fieldName];
+                        label.textContent = currentValue ? `Current: ${currentValue}` : `Current: ${labels[fieldName]}`;
+                    } else {
+                        label.textContent = `${prefix}: ${labels[fieldName]}`;
+                    }
+                }
+            });
         }
         
         function setupModalFieldHandlers() {
@@ -3357,11 +3328,6 @@
         }
         
         function showContactModal() {
-            // Create modal if it doesn't exist
-            if (!document.getElementById('contactModal')) {
-                createContactModal();
-            }
-            
             const modal = document.getElementById('contactModal');
             const body = document.body;
             

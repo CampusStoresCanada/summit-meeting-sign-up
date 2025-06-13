@@ -1366,14 +1366,18 @@
         }
         
         .radio-circle.selected::after {
-            content: '';
-            width: 0.6vw;
-            height: 0.6vw;
-            background: #0071bc;
-            border-radius: 50%;
+            content: '✓';
+            color: #ffffff;
+            font-size: 0.8vw;
+            font-weight: 700;
             position: absolute;
         }
         
+        .radio-circle.selected {
+            background: #28a745;
+            border-color: #28a745;
+        }
+                
         .primary-contact-info {
             flex: 1;
             min-width: 0;

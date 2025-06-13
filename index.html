@@ -1032,31 +1032,31 @@
             height: 35vh;
             background: #ffffff;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         
-        .team-list {
-            height: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 1vw;
-            /* Hide default scrollbar */
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        
-        .team-list::-webkit-scrollbar {
-            display: none;
-        }
-        
-        /* Attending header */
+        /* Attending header - fixed outside scroll area */
         .attending-header {
             font-family: 'davis-sans', sans-serif;
             font-weight: 400;
             font-size: 0.8vw;
             color: #666666;
             font-style: italic;
-            margin-bottom: 0.8vw;
-            margin-left: 0.7vw;
+            padding: 0.8vw 1vw 0.4vw 0.7vw;
+            flex-shrink: 0;
+            background: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .team-list {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0.4vw 1vw 1vw 1vw;
+            /* Hide default scrollbar */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         
         .contact-item {
@@ -1117,7 +1117,7 @@
             flex: 1;
             min-width: 0;
             display: grid;
-            grid-template-columns: max-content 1fr;
+            grid-template-columns: max-content max-content;
             grid-template-rows: auto auto;
             column-gap: 1.5vw;
             row-gap: 0.2vw;
@@ -1177,10 +1177,8 @@
             align-items: center;
             justify-content: center;
             transition: color 0.2s ease;
-            position: absolute;
-            right: 0.8vw;
-            top: 50%;
-            transform: translateY(-50%);
+            margin-left: 0.8vw;
+            align-self: center;
         }
         
         .contact-edit:hover {
@@ -2794,15 +2792,20 @@
         
         function populateContactList() {
             const teamList = document.getElementById('teamList');
-            if (!teamList || !organizationContacts) return;
+            const teamListWrapper = document.querySelector('.team-list-wrapper');
+            if (!teamList || !teamListWrapper || !organizationContacts) return;
             
+            // Clear existing content
             teamList.innerHTML = '';
             
-            // Add the "Attending?" header
-            const headerDiv = document.createElement('div');
-            headerDiv.className = 'attending-header';
-            headerDiv.textContent = 'Attending?';
-            teamList.appendChild(headerDiv);
+            // Add header outside the scrolling area (if not already there)
+            let existingHeader = teamListWrapper.querySelector('.attending-header');
+            if (!existingHeader) {
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'attending-header';
+                headerDiv.textContent = 'Attending?';
+                teamListWrapper.insertBefore(headerDiv, teamList);
+            }
             
             organizationContacts.forEach((contact, index) => {
                 const contactElement = createContactElement(contact, index);

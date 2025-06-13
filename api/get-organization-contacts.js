@@ -21,17 +21,15 @@ export default async function handler(req, res) {
     return;
   }
   
-  // Use environment variables (should work now!)
+  // Use environment variables
   const notionToken = process.env.NOTION_TOKEN;
   const organizationsDbId = process.env.NOTION_ORGANIZATIONS_DB_ID;
   const contactsDbId = process.env.NOTION_CONTACTS_DB_ID;
+  const tagSystemDbId = process.env.NOTION_TAG_SYSTEM_DB_ID || '1f9a69bf0cfd8034b919f51b7c4f2c67';
   
   // Safety check
   if (!notionToken || !organizationsDbId || !contactsDbId) {
     console.error('❌ Missing environment variables!');
-    console.error('- NOTION_TOKEN:', !!notionToken);
-    console.error('- NOTION_ORGANIZATIONS_DB_ID:', !!organizationsDbId);
-    console.error('- NOTION_CONTACTS_DB_ID:', !!contactsDbId);
     res.status(500).json({ error: 'Missing configuration' });
     return;
   }
@@ -70,12 +68,47 @@ export default async function handler(req, res) {
     
     const org = orgData.results[0];
     const organizationName = org.properties.Organization?.title?.[0]?.text?.content || '';
-    const organizationId = org.id; // This is the key! Use the relation ID
+    const organizationId = org.id;
     
     console.log('🏢 Found organization:', organizationName);
     console.log('🔍 Organization ID for relation:', organizationId);
     
-    // Step 2: Get contacts where Organization relation = this org ID
+    // Step 2: Get the "Primary Contact" tag ID from Tag System
+    console.log('🏷️ Looking up Primary Contact tag...');
+    let primaryContactTagId = null;
+    
+    try {
+      const tagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionToken}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28'
+        },
+        body: JSON.stringify({
+          filter: {
+            property: 'Name',
+            title: { equals: 'Primary Contact' }
+          }
+        })
+      });
+      
+      if (tagResponse.ok) {
+        const tagData = await tagResponse.json();
+        if (tagData.results.length > 0) {
+          primaryContactTagId = tagData.results[0].id;
+          console.log('✅ Found Primary Contact tag ID:', primaryContactTagId);
+        } else {
+          console.log('⚠️ No "Primary Contact" tag found in Tag System database');
+        }
+      } else {
+        console.error('❌ Failed to query Tag System database:', tagResponse.status);
+      }
+    } catch (error) {
+      console.error('💥 Error finding Primary Contact tag:', error);
+    }
+    
+    // Step 3: Get contacts where Organization relation = this org ID
     console.log('👥 Fetching contacts for organization...');
     
     const contactsResponse = await fetch(`https://api.notion.com/v1/databases/${contactsDbId}/query`, {
@@ -100,46 +133,21 @@ export default async function handler(req, res) {
     }
     
     const contactsData = await contactsResponse.json();
-    
     console.log(`📋 Found ${contactsData.results.length} contacts for ${organizationName}`);
-
-    const tagSystemDbId = process.env.NOTION_TAG_SYSTEM_DB_ID || '1f9a69bf0cfd8034b919f51b7c4f2c67';
-
-    // First, get the "Primary Contact" tag ID
-    let primaryContactTagId = null;
-    try {
-      const tagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${notionToken}`,
-          'Content-Type': 'application/json',
-          'Notion-Version': '2022-06-28'
-        },
-        body: JSON.stringify({
-          filter: {
-            property: 'Name',
-            title: { equals: 'Primary Contact' }
-          }
-        })
-      });
-      
-      const tagData = await tagResponse.json();
-      if (tagData.results.length > 0) {
-        primaryContactTagId = tagData.results[0].id;
-        console.log('🏷️ Found Primary Contact tag ID:', primaryContactTagId);
-      }
-    } catch (error) {
-      console.error('💥 Error finding Primary Contact tag:', error);
-    }
     
-    // Then modify your contacts mapping:
+    // Step 4: Format the contacts data and check for Primary Contact tag
     const contacts = contactsData.results.map(contact => {
       const props = contact.properties;
       
       // Check if this contact has the Primary Contact tag
       let isPrimaryContact = false;
       if (primaryContactTagId && props['Personal Tag']?.relation) {
+        // Check if any of the related tags match our Primary Contact tag ID
         isPrimaryContact = props['Personal Tag'].relation.some(tag => tag.id === primaryContactTagId);
+        
+        if (isPrimaryContact) {
+          console.log(`👑 Found primary contact: ${props.Name?.title?.[0]?.text?.content}`);
+        }
       }
       
       return {
@@ -153,7 +161,7 @@ export default async function handler(req, res) {
         tags: props.Tags?.multi_select?.map(tag => tag.name) || [],
         notes: props.Notes?.rich_text?.[0]?.text?.content || '',
         isAttending: false,
-        isPrimaryContact: isPrimaryContact  // Now this is actually checking the database!
+        isPrimaryContact: isPrimaryContact
       };
     });
     
@@ -163,6 +171,10 @@ export default async function handler(req, res) {
       (contact.workEmail || contact.workPhone)
     );
     
+    // Count primary contacts for debugging
+    const primaryContactsCount = validContacts.filter(c => c.isPrimaryContact).length;
+    console.log(`👑 Found ${primaryContactsCount} primary contacts`);
+    
     console.log(`✅ Returning ${validContacts.length} valid contacts`);
     
     res.status(200).json({
@@ -170,7 +182,8 @@ export default async function handler(req, res) {
       organizationName: organizationName,
       contacts: validContacts,
       totalFound: contactsData.results.length,
-      validContacts: validContacts.length
+      validContacts: validContacts.length,
+      primaryContactsFound: primaryContactsCount
     });
     
   } catch (error) {

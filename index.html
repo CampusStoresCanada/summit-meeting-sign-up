@@ -2787,10 +2787,16 @@
                     initializedSteps.add(3);
                     console.log('🚀 Step 3 initialized on first visit!');
                 }
-                if (stepNumber === 4 && !initializedSteps.has(4)) {
-                    initializeStep4();
-                    initializedSteps.add(4);
-                    console.log('🚀 Step 4 initialized on first visit!');
+                if (stepNumber === 4) {
+                    if (!initializedSteps.has(4)) {
+                        initializeStep4();
+                        initializedSteps.add(4);
+                        console.log('🚀 Step 4 initialized on first visit!');
+                    } else {
+                        // Repopulate the list in case attending status changed
+                        populatePrimaryContactList();
+                        console.log('🔄 Step 4 refreshed with updated attending list');
+                    }
                 }
             } 
                 
@@ -3652,14 +3658,9 @@
             if (!primaryContactList || !organizationContacts) return;
             
             primaryContactList.innerHTML = '';
-            
-            // Only show contacts that are attending (from Step 3)
-            const attendingContacts = organizationContacts.filter(contact => 
-                teamState.attendingContacts.has(contact.id)
-            );
-            
-            // If no one is marked as attending, show all contacts
-            const contactsToShow = attendingContacts.length > 0 ? attendingContacts : organizationContacts;
+
+            // Always show ALL contacts - primary contact doesn't need to be attending
+            const contactsToShow = organizationContacts;
             
             contactsToShow.forEach((contact, index) => {
                 const contactElement = createPrimaryContactElement(contact, index);
@@ -3667,9 +3668,6 @@
             });
             
             console.log(`👤 Populated ${contactsToShow.length} contacts for primary selection`);
-            if (attendingContacts.length === 0) {
-                console.log('ℹ️ No contacts marked as attending, showing all contacts');
-            }
         }
         
         function createPrimaryContactElement(contact, index) {

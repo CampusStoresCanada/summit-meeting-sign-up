@@ -1020,7 +1020,7 @@
         }
         /* Step 3: Conference Team Styles */
         .team-container {
-            max-width: none;
+            max-width: 44vw;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -1030,8 +1030,6 @@
         .team-list-wrapper {
             position: relative;
             height: 35vh;
-            border: 2px solid #cccccc;
-            border-radius: 8px;
             background: #ffffff;
             overflow: hidden;
         }
@@ -1050,14 +1048,26 @@
             display: none;
         }
         
+        /* Attending header */
+        .attending-header {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 400;
+            font-size: 0.8vw;
+            color: #666666;
+            font-style: italic;
+            margin-bottom: 0.8vw;
+            margin-left: 0.7vw;
+        }
+        
         .contact-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 1.2vw;
             padding: 0.8vw 0;
             border-bottom: 1px solid #f0f0f0;
             cursor: pointer;
             transition: background-color 0.2s ease;
+            position: relative;
         }
         
         .contact-item:last-child {
@@ -1076,6 +1086,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            margin-top: 0.1vw;
         }
         
         .checkbox-circle {
@@ -1105,6 +1116,11 @@
         .contact-info {
             flex: 1;
             min-width: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            column-gap: 1vw;
+            row-gap: 0.2vw;
         }
         
         .contact-name {
@@ -1113,7 +1129,8 @@
             font-size: 1.1vw;
             color: #000000;
             line-height: 1.2;
-            margin-bottom: 0.2vw;
+            grid-column: 1;
+            grid-row: 1;
         }
         
         .contact-title {
@@ -1121,16 +1138,30 @@
             font-weight: 500;
             font-size: 0.9vw;
             color: #666666;
+            font-style: italic;
             line-height: 1.2;
-            margin-bottom: 0.1vw;
+            grid-column: 2;
+            grid-row: 1;
         }
         
-        .contact-details {
+        .contact-email {
             font-family: 'davis-sans', sans-serif;
             font-weight: 400;
             font-size: 0.8vw;
             color: #888888;
             line-height: 1.2;
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        .contact-phone {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 400;
+            font-size: 0.8vw;
+            color: #888888;
+            line-height: 1.2;
+            grid-column: 2;
+            grid-row: 2;
         }
         
         .contact-edit {
@@ -1146,6 +1177,10 @@
             align-items: center;
             justify-content: center;
             transition: color 0.2s ease;
+            position: absolute;
+            right: 0.8vw;
+            top: 50%;
+            transform: translateY(-50%);
         }
         
         .contact-edit:hover {
@@ -1157,18 +1192,14 @@
             height: 1vw;
         }
         
-        /* Custom Scrollbar */
+        /* Custom Scrollbar - Force visible for testing */
         .custom-scrollbar {
             position: absolute;
             right: 6px;
             top: 1vw;
             bottom: 1vw;
             width: 8px;
-            display: none;
-        }
-        
-        .custom-scrollbar.visible {
-            display: block;
+            display: block; /* Force visible for now */
         }
         
         .scrollbar-track {
@@ -2767,12 +2798,24 @@
             
             teamList.innerHTML = '';
             
+            // Add the "Attending?" header
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'attending-header';
+            headerDiv.textContent = 'Attending?';
+            teamList.appendChild(headerDiv);
+            
             organizationContacts.forEach((contact, index) => {
                 const contactElement = createContactElement(contact, index);
                 teamList.appendChild(contactElement);
             });
             
-            updateScrollbar();
+            // Force scrollbar update after content is added
+            setTimeout(() => {
+                if (window.updateScrollbar) {
+                    window.updateScrollbar();
+                }
+            }, 100);
+            
             console.log(`👥 Populated ${organizationContacts.length} contacts`);
         }
         
@@ -2795,9 +2838,8 @@
                 <div class="contact-info">
                     <div class="contact-name">${contact.name}</div>
                     <div class="contact-title">${contact.roleTitle || ''}</div>
-                    <div class="contact-details">
-                        ${contact.workEmail || ''}${contact.workEmail && formattedPhone ? '       ' : ''}${formattedPhone}
-                    </div>
+                    <div class="contact-email">${contact.workEmail || ''}</div>
+                    <div class="contact-phone">${formattedPhone}</div>
                 </div>
                 <button class="contact-edit" onclick="editContact('${contact.id}', ${index})">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2843,16 +2885,26 @@
             
             if (!teamList || !scrollbar || !scrollbarThumb) return;
             
-            function updateScrollbar() {
+            function updateScrollbarVisibility() {
                 const scrollHeight = teamList.scrollHeight;
                 const clientHeight = teamList.clientHeight;
                 
                 if (scrollHeight <= clientHeight) {
-                    scrollbar.classList.remove('visible');
+                    scrollbar.style.display = 'none';
+                    return false;
+                } else {
+                    scrollbar.style.display = 'block';
+                    return true;
+                }
+            }
+            
+            function updateScrollbar() {
+                const scrollHeight = teamList.scrollHeight;
+                const clientHeight = teamList.clientHeight;
+                
+                if (!updateScrollbarVisibility()) {
                     return;
                 }
-                
-                scrollbar.classList.add('visible');
                 
                 // Calculate thumb height as proportion of visible area
                 const thumbHeight = (clientHeight / scrollHeight) * clientHeight;
@@ -2862,7 +2914,7 @@
                 const scrollTop = teamList.scrollTop;
                 const maxScroll = scrollHeight - clientHeight;
                 const thumbMaxTop = clientHeight - thumbHeight;
-                const thumbTop = (scrollTop / maxScroll) * thumbMaxTop;
+                const thumbTop = maxScroll > 0 ? (scrollTop / maxScroll) * thumbMaxTop : 0;
                 
                 scrollbarThumb.style.top = thumbTop + 'px';
             }
@@ -2894,8 +2946,10 @@
                 const thumbHeight = parseFloat(scrollbarThumb.style.height);
                 const thumbMaxTop = clientHeight - thumbHeight;
                 
-                const scrollDelta = (deltaY / thumbMaxTop) * maxScroll;
-                teamList.scrollTop = startScrollTop + scrollDelta;
+                if (thumbMaxTop > 0) {
+                    const scrollDelta = (deltaY / thumbMaxTop) * maxScroll;
+                    teamList.scrollTop = startScrollTop + scrollDelta;
+                }
             }
             
             function handleDragEnd() {

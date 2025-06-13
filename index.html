@@ -3922,21 +3922,8 @@
         }
         
         function selectPrimaryContact(contactId) {
-            // Clear previous selection
-            if (primaryContactState.selectedContactId) {
-                const previousItem = document.querySelector(`[data-contact-id="${primaryContactState.selectedContactId}"]`);
-                const previousRadio = previousItem?.querySelector('.radio-circle');
-                if (previousItem) previousItem.classList.remove('selected');
-                if (previousRadio) previousRadio.classList.remove('selected');
-            }
-            
-            // Set new selection
+            // Update the state
             primaryContactState.selectedContactId = contactId;
-            
-            const currentItem = document.querySelector(`[data-contact-id="${contactId}"]`);
-            const currentRadio = currentItem?.querySelector('.radio-circle');
-            if (currentItem) currentItem.classList.add('selected');
-            if (currentRadio) currentRadio.classList.add('selected');
             
             // Find contact name for logging
             const contact = organizationContacts.find(c => c.id === contactId);
@@ -3944,6 +3931,9 @@
             const contactName = contactData?.name || contact?.name || 'Unknown';
             
             console.log(`👑 Selected primary contact: ${contactName} (${contactId})`);
+            
+            // Refresh the entire list to show the updated selection
+            populatePrimaryContactList();
         }
         
         function initializeStep4() {

@@ -1440,6 +1440,169 @@
                 font-size: 18px;
             }
         }
+        /* Contact Modal Styles */
+        .contact-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .contact-modal.active {
+            display: flex;
+        }
+        
+        .modal-container {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 2vw;
+            max-width: 28vw;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            margin-bottom: 1.5vw;
+        }
+        
+        .modal-title {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.5vw;
+            color: #000000;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2vw;
+        }
+        
+        .modal-field {
+            position: relative;
+        }
+        
+        .modal-field-border {
+            position: relative;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: transparent;
+        }
+        
+        .modal-field-border.focused::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 2px solid #0071bc;
+            border-radius: 8px;
+            clip-path: inset(0 100% 0 0);
+            animation: drawBorderSweep 0.3s ease-out forwards;
+        }
+        
+        .modal-field-border.unfocused {
+            border: 2px solid #cccccc;
+        }
+        
+        .modal-field-label {
+            position: absolute;
+            top: -9px;
+            left: 12px;
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.9vw;
+            background: #ffffff;
+            padding: 0 0.4vw;
+            white-space: nowrap;
+            z-index: 1;
+        }
+        
+        .modal-field-label.focused {
+            color: #0071bc;
+        }
+        
+        .modal-field-label.unfocused {
+            color: #666666;
+        }
+        
+        .modal-field-input {
+            width: 100%;
+            padding: 0.8vw 1vw;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 400;
+            font-size: 1vw;
+            color: #000000;
+            line-height: 1.2;
+        }
+        
+        .modal-field-input::placeholder {
+            color: #999999;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 0.8vw;
+            margin-top: 1.5vw;
+            justify-content: flex-end;
+        }
+        
+        .modal-btn {
+            padding: 0.8vw 1.5vw;
+            border-radius: 6px;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 0.9vw;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        
+        .modal-btn.primary {
+            background: #0071bc;
+            color: #ffffff;
+        }
+        
+        .modal-btn.primary:hover {
+            background: #005a94;
+        }
+        
+        .modal-btn.secondary {
+            background: #ffffff;
+            color: #666666;
+            border: 2px solid #cccccc;
+        }
+        
+        .modal-btn.secondary:hover {
+            border-color: #999999;
+            color: #333333;
+        }
+        
+        /* Hide add contact section when modal is open */
+        .modal-open .add-contact-section {
+            display: none;
+        }
+        
+        /* Blur background content when modal is open */
+        .modal-open .team-container {
+            filter: blur(2px);
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -2981,6 +3144,313 @@
         function editContact(contactId, index) {
             console.log(`✏️ Edit contact clicked: ${contactId} (index: ${index})`);
             // TODO: Open edit contact modal
+        }
+        // ===========================================
+        // CONTACT MODAL MANAGEMENT
+        // ===========================================
+        let modalState = {
+            isOpen: false,
+            mode: 'edit', // 'edit' or 'new'
+            currentContact: null,
+            currentContactIndex: null,
+            formData: {}
+        };
+        
+        function createContactModal() {
+            // Create modal HTML structure
+            const modalHTML = `
+                <div class="contact-modal" id="contactModal">
+                    <div class="modal-container">
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="modalTitle">Edit Contact</h3>
+                        </div>
+                        <form class="modal-form" id="modalForm">
+                            <div class="modal-field">
+                                <div class="modal-field-border unfocused" id="nameBorder">
+                                    <div class="modal-field-label unfocused" id="nameLabel">Name</div>
+                                    <input type="text" class="modal-field-input" id="nameInput" placeholder="Enter full name">
+                                </div>
+                            </div>
+                            
+                            <div class="modal-field">
+                                <div class="modal-field-border unfocused" id="titleBorder">
+                                    <div class="modal-field-label unfocused" id="titleLabel">Job title</div>
+                                    <input type="text" class="modal-field-input" id="titleInput" placeholder="Enter job title">
+                                </div>
+                            </div>
+                            
+                            <div class="modal-field">
+                                <div class="modal-field-border unfocused" id="emailBorder">
+                                    <div class="modal-field-label unfocused" id="emailLabel">Email</div>
+                                    <input type="email" class="modal-field-input" id="emailInput" placeholder="Enter email address">
+                                </div>
+                            </div>
+                            
+                            <div class="modal-field">
+                                <div class="modal-field-border unfocused" id="phoneBorder">
+                                    <div class="modal-field-label unfocused" id="phoneLabel">Phone</div>
+                                    <input type="tel" class="modal-field-input" id="phoneInput" placeholder="Enter phone number">
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <div class="modal-actions">
+                            <button type="button" class="modal-btn secondary" onclick="cancelContactModal()">Cancel</button>
+                            <button type="button" class="modal-btn primary" onclick="saveContactModal()">Save</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add modal to the page
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Setup field focus/blur handlers
+            setupModalFieldHandlers();
+            
+            console.log('📝 Contact modal created');
+        }
+        
+        function setupModalFieldHandlers() {
+            const fields = ['name', 'title', 'email', 'phone'];
+            
+            fields.forEach(fieldName => {
+                const input = document.getElementById(`${fieldName}Input`);
+                const border = document.getElementById(`${fieldName}Border`);
+                const label = document.getElementById(`${fieldName}Label`);
+                
+                if (input && border && label) {
+                    input.addEventListener('focus', () => {
+                        border.classList.remove('unfocused');
+                        border.classList.add('focused');
+                        label.classList.remove('unfocused');
+                        label.classList.add('focused');
+                    });
+                    
+                    input.addEventListener('blur', () => {
+                        border.classList.remove('focused');
+                        border.classList.add('unfocused');
+                        label.classList.remove('focused');
+                        label.classList.add('unfocused');
+                    });
+                    
+                    // Store form data as user types
+                    input.addEventListener('input', () => {
+                        modalState.formData[fieldName] = input.value;
+                    });
+                }
+            });
+        }
+        
+        function openEditContactModal(contactId, contactIndex) {
+            // Find the contact data
+            const contact = organizationContacts.find(c => c.id === contactId);
+            if (!contact) {
+                console.error('❌ Contact not found:', contactId);
+                return;
+            }
+            
+            modalState.mode = 'edit';
+            modalState.currentContact = contact;
+            modalState.currentContactIndex = contactIndex;
+            modalState.formData = {
+                name: contact.name || '',
+                title: contact.roleTitle || '',
+                email: contact.workEmail || '',
+                phone: contact.workPhone || ''
+            };
+            
+            // Update modal content
+            document.getElementById('modalTitle').textContent = 'Current: ' + contact.name;
+            updateModalLabels('Current');
+            populateModalForm();
+            showContactModal();
+            
+            console.log('✏️ Opened edit modal for:', contact.name);
+        }
+        
+        function openNewContactModal() {
+            modalState.mode = 'new';
+            modalState.currentContact = null;
+            modalState.currentContactIndex = null;
+            modalState.formData = {
+                name: '',
+                title: '',
+                email: '',
+                phone: ''
+            };
+            
+            // Update modal content
+            document.getElementById('modalTitle').textContent = 'New contact: Name';
+            updateModalLabels('New contact');
+            populateModalForm();
+            showContactModal();
+            
+            console.log('➕ Opened new contact modal');
+        }
+        
+        function updateModalLabels(prefix) {
+            const labels = {
+                name: prefix === 'New contact' ? 'Name' : contact.name || 'Name',
+                title: 'Job title',
+                email: 'Email',
+                phone: 'Phone'
+            };
+            
+            Object.keys(labels).forEach(fieldName => {
+                const label = document.getElementById(`${fieldName}Label`);
+                if (label) {
+                    if (prefix === 'Current' && fieldName !== 'name') {
+                        // For edit mode, show current values in labels
+                        const currentValue = modalState.currentContact[fieldName === 'title' ? 'roleTitle' : fieldName === 'email' ? 'workEmail' : fieldName === 'phone' ? 'workPhone' : fieldName];
+                        label.textContent = currentValue ? `Current: ${currentValue}` : `Current: ${labels[fieldName]}`;
+                    } else {
+                        label.textContent = `${prefix}: ${labels[fieldName]}`;
+                    }
+                }
+            });
+        }
+        
+        function populateModalForm() {
+            const fields = ['name', 'title', 'email', 'phone'];
+            
+            fields.forEach(fieldName => {
+                const input = document.getElementById(`${fieldName}Input`);
+                if (input) {
+                    input.value = modalState.formData[fieldName] || '';
+                }
+            });
+        }
+        
+        function showContactModal() {
+            // Create modal if it doesn't exist
+            if (!document.getElementById('contactModal')) {
+                createContactModal();
+            }
+            
+            const modal = document.getElementById('contactModal');
+            const body = document.body;
+            
+            modal.classList.add('active');
+            body.classList.add('modal-open');
+            modalState.isOpen = true;
+            
+            // Focus first input
+            setTimeout(() => {
+                const firstInput = document.getElementById('nameInput');
+                if (firstInput) firstInput.focus();
+            }, 100);
+        }
+        
+        function hideContactModal() {
+            const modal = document.getElementById('contactModal');
+            const body = document.body;
+            
+            if (modal) modal.classList.remove('active');
+            body.classList.remove('modal-open');
+            modalState.isOpen = false;
+            
+            // Clear form data
+            modalState.formData = {};
+        }
+        
+        function cancelContactModal() {
+            hideContactModal();
+            console.log('❌ Contact modal cancelled');
+        }
+        
+        function saveContactModal() {
+            // Validate required fields
+            if (!modalState.formData.name || modalState.formData.name.trim() === '') {
+                alert('Please enter a name');
+                document.getElementById('nameInput').focus();
+                return;
+            }
+            
+            if (modalState.mode === 'edit') {
+                saveEditedContact();
+            } else {
+                saveNewContact();
+            }
+            
+            hideContactModal();
+        }
+        
+        function saveEditedContact() {
+            const contactId = modalState.currentContact.id;
+            const updatedData = { ...modalState.formData };
+            
+            // Store the edit in teamState
+            teamState.editedContacts[contactId] = updatedData;
+            
+            // Update the contact display
+            updateContactDisplay(contactId, updatedData);
+            
+            console.log('✅ Contact edited:', contactId, updatedData);
+        }
+        
+        function saveNewContact() {
+            const newContact = {
+                id: 'new_' + Date.now(), // Temporary ID
+                name: modalState.formData.name,
+                roleTitle: modalState.formData.title,
+                workEmail: modalState.formData.email,
+                workPhone: modalState.formData.phone,
+                isNew: true
+            };
+            
+            // Add to teamState
+            teamState.newContacts.push(newContact);
+            
+            // Add to the contact list display
+            addNewContactToList(newContact);
+            
+            console.log('✅ New contact created:', newContact);
+        }
+        
+        function updateContactDisplay(contactId, updatedData) {
+            const contactElement = document.querySelector(`[data-contact-id="${contactId}"]`);
+            if (!contactElement) return;
+            
+            // Update the display with new data
+            const nameElement = contactElement.querySelector('.contact-name');
+            const titleElement = contactElement.querySelector('.contact-title');
+            const emailElement = contactElement.querySelector('.contact-email');
+            const phoneElement = contactElement.querySelector('.contact-phone');
+            
+            if (nameElement) nameElement.textContent = updatedData.name;
+            if (titleElement) titleElement.textContent = updatedData.title;
+            if (emailElement) emailElement.textContent = updatedData.email;
+            if (phoneElement) phoneElement.textContent = formatPhoneForDisplay(updatedData.phone);
+        }
+        
+        function addNewContactToList(newContact) {
+            const teamList = document.getElementById('teamList');
+            if (!teamList) return;
+            
+            const contactElement = createContactElement(newContact, -1);
+            teamList.appendChild(contactElement);
+            
+            // Update scrollbar
+            setTimeout(() => {
+                if (window.updateScrollbar) {
+                    window.updateScrollbar();
+                }
+            }, 100);
+        }
+        
+        // Update the existing edit and add contact functions
+        function editContact(contactId, index) {
+            openEditContactModal(contactId, index);
+        }
+        
+        function setupAddContactHandler() {
+            const addContactSection = document.querySelector('.add-contact-section');
+            if (addContactSection) {
+                addContactSection.addEventListener('click', () => {
+                    openNewContactModal();
+                });
+            }
         }
     </script>
 </body>

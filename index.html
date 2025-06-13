@@ -3867,26 +3867,23 @@
         
         function initializeStep4() {
             populatePrimaryContactList();
+            
+            // Auto-select primary contact if one exists
+            const primaryContact = organizationContacts.find(contact => contact.isPrimaryContact);
+            if (primaryContact) {
+                primaryContactState.selectedContactId = primaryContact.id;
+                console.log(`🎯 Auto-selected primary contact: ${primaryContact.name}`);
+                
+                // Re-populate to show the selection
+                setTimeout(() => {
+                    populatePrimaryContactList();
+                }, 100);
+            }
+            
             console.log('🚀 Step 4 (Primary Contact) initialized!');
         }
         
-        function populatePrimaryContactList() {
-            const primaryContactList = document.getElementById('primaryContactList');
-            if (!primaryContactList || !organizationContacts) return;
-            
-            primaryContactList.innerHTML = '';
-
-            // Always show ALL contacts - primary contact doesn't need to be attending
-            const contactsToShow = organizationContacts;
-            
-            contactsToShow.forEach((contact, index) => {
-                const contactElement = createPrimaryContactElement(contact, index);
-                primaryContactList.appendChild(contactElement);
-            });
-            
-            console.log(`👤 Populated ${contactsToShow.length} contacts for primary selection`);
-        }
-        
+        // Update to the createPrimaryContactElement function
         function createPrimaryContactElement(contact, index) {
             const contactDiv = document.createElement('div');
             contactDiv.className = 'primary-contact-item';
@@ -3905,12 +3902,15 @@
             const phone = contactData.workPhone || contact.workPhone || '';
             const formattedPhone = phone ? formatPhoneForDisplay(phone) : '';
             
+            // Add a visual indicator for existing primary contacts
+            const primaryIndicator = contact.isPrimaryContact ? ' 👑' : '';
+            
             contactDiv.innerHTML = `
                 <div class="primary-contact-radio" onclick="selectPrimaryContact('${contact.id}')">
                     <div class="radio-circle ${isSelected ? 'selected' : ''}"></div>
                 </div>
                 <div class="primary-contact-info">
-                    <div class="primary-contact-name">${contactData.name || contact.name}</div>
+                    <div class="primary-contact-name">${contactData.name || contact.name}${primaryIndicator}</div>
                     <div class="primary-contact-title">${contactData.title || contactData.roleTitle || contact.roleTitle || ''}</div>
                     <div class="primary-contact-email">${contactData.email || contactData.workEmail || contact.workEmail || ''}</div>
                     <div class="primary-contact-phone">${formattedPhone}</div>
@@ -3923,14 +3923,30 @@
             return contactDiv;
         }
         
+        // Updated selectPrimaryContact function with better logging
         function selectPrimaryContact(contactId) {
-            // 1. Update the state
+            // Clear previous selection
+            if (primaryContactState.selectedContactId) {
+                const previousItem = document.querySelector(`[data-contact-id="${primaryContactState.selectedContactId}"]`);
+                const previousRadio = previousItem?.querySelector('.radio-circle');
+                if (previousItem) previousItem.classList.remove('selected');
+                if (previousRadio) previousRadio.classList.remove('selected');
+            }
+            
+            // Set new selection
             primaryContactState.selectedContactId = contactId;
             
-            // 2. Refresh the display
-            populatePrimaryContactList();
+            const currentItem = document.querySelector(`[data-contact-id="${contactId}"]`);
+            const currentRadio = currentItem?.querySelector('.radio-circle');
+            if (currentItem) currentItem.classList.add('selected');
+            if (currentRadio) currentRadio.classList.add('selected');
             
-            console.log(`👑 Selected primary contact: ${contactId}`);
+            // Find contact name for logging
+            const contact = organizationContacts.find(c => c.id === contactId);
+            const contactData = teamState.editedContacts[contactId] || contact;
+            const contactName = contactData?.name || contact?.name || 'Unknown';
+            
+            console.log(`👑 Selected primary contact: ${contactName} (${contactId})`);
         }
         // ===========================================
         // STEP 5: PRODUCT CATALOGUE UPLOAD

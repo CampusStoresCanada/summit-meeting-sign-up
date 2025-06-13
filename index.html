@@ -1752,6 +1752,177 @@
             filter: blur(2px);
             pointer-events: none;
         }
+        /* Step 5: Product Catalogue Styles */
+        .catalogue-container {
+            max-width: 44vw;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vw;
+        }
+        
+        .catalogue-instruction {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 400;
+            font-size: 1.0vw;
+            color: #666666;
+            font-style: italic;
+            margin-bottom: 0.5vw;
+        }
+        
+        .catalogue-upload-container {
+            position: relative;
+            width: 100%;
+            height: 40vh;
+            border: 2px dashed #cccccc;
+            border-radius: 12px;
+            background: #f8f8f8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .catalogue-upload-container:hover {
+            border-color: #0071bc;
+            background: #f0f8ff;
+        }
+        
+        .catalogue-upload-container.dragover {
+            border-color: #0071bc;
+            background: #e3f2fd;
+            transform: scale(1.02);
+        }
+        
+        .catalogue-upload-container.uploaded {
+            border: 2px solid #28a745;
+            background: #f8fff9;
+        }
+        
+        .catalogue-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        .pdf-icon {
+            width: 120px;
+            height: 140px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+            fill: #cccccc;
+        }
+        
+        .catalogue-upload-container:hover .pdf-icon {
+            fill: #0071bc;
+            opacity: 0.8;
+        }
+        
+        .catalogue-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 113, 188, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 1.2vw;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .catalogue-upload-container:hover .catalogue-overlay {
+            display: flex;
+        }
+        
+        .catalogue-upload-container.uploaded:hover .catalogue-overlay {
+            display: flex;
+        }
+        
+        .catalogue-upload-container.uploaded .catalogue-overlay {
+            background: rgba(40, 167, 69, 0.9);
+        }
+        
+        .catalogue-upload-container.uploaded:hover .catalogue-overlay {
+            background: rgba(40, 167, 69, 0.9);
+        }
+        
+        .upload-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .upload-progress-fill {
+            height: 100%;
+            background: #0071bc;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .catalogue-success {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            pointer-events: none;
+            color: #28a745;
+        }
+        
+        .success-icon {
+            font-size: 4vw;
+            font-weight: 700;
+            margin-bottom: 1vw;
+            color: #28a745;
+        }
+        
+        .success-text {
+            font-family: 'davis-sans', sans-serif;
+            font-size: 1.2vw;
+            font-weight: 600;
+            color: #28a745;
+            margin-bottom: 0.5vw;
+        }
+        
+        .success-filename {
+            font-family: 'davis-sans', sans-serif;
+            font-size: 0.9vw;
+            font-weight: 400;
+            color: #666666;
+            word-break: break-all;
+            max-width: 80%;
+        }
+        
+        .catalogue-error-message {
+            position: absolute;
+            bottom: -40px;
+            left: 0;
+            right: 0;
+            background: #dc3545;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 0.9vw;
+            text-align: center;
+            display: none;
+            font-family: 'davis-sans', sans-serif;
+        }
     </style>
 </head>
 <body>
@@ -2135,6 +2306,49 @@
                         <span>→</span>
                     </button>
                 </div>
+                <!-- Step 5: Product Catalogue -->
+                <div id="step5Section" class="content-section">
+                    <div class="step-header">
+                        <h2 class="step-title-main">Product catalogue</h2>
+                        <p class="step-subtitle">Please upload a product catalogue, or other representation of your organization. This is a great spot to show of the depth of your company.</p>
+                    </div>
+                
+                    <div class="catalogue-container">
+                        <div class="catalogue-instruction">
+                            <em>Upload ONE 25MB file. PDF's preferred.</em>
+                        </div>
+                        
+                        <div class="catalogue-upload-container" id="catalogueUploadContainer">
+                            <div class="catalogue-placeholder" id="cataloguePlaceholder">
+                                <svg viewBox="0 0 168.51 197.32" class="pdf-icon">
+                                    <path d="M66.2,114.19h-3.44v27.54h3.44c11.69,0,14.81-6.36,14.81-13.64s-3.12-13.9-14.81-13.9ZM66.2,114.19h-3.44v27.54h3.44c11.69,0,14.81-6.36,14.81-13.64s-3.12-13.9-14.81-13.9ZM165.47,38.54L130.07,3.06c-1.95-1.96-4.61-3.06-7.37-3.06H30.27c-5.75,0-10.42,4.67-10.42,10.42v79.78h-9.54c-5.69,0-10.31,4.62-10.31,10.31v54.89c0,5.69,4.62,10.31,10.31,10.31h9.54v21.18c0,5.75,4.67,10.42,10.42,10.42h127.81c5.75,0,10.42-4.67,10.42-10.42V45.9c0-2.76-1.1-5.4-3.04-7.36ZM24.25,133.81v16.89h-9.74v-45.46h13.77c12.34,0,17.54,5.33,17.54,14.35s-4.94,14.22-17.54,14.22h-4.03ZM159.6,185.64c0,1.36-1.1,2.47-2.47,2.47H31.17c-1.36,0-2.47-1.1-2.47-2.47v-19.92h97.35c5.7,0,10.31-4.62,10.31-10.31v-54.89c0-5.69-4.61-10.31-10.31-10.31H28.7V11.52c0-1.36,1.1-2.46,2.47-2.46h90.04v28c0,5.65,4.58,10.24,10.24,10.24h28.15v138.35ZM52.76,150.69v-45.46h15.72c15.33,0,22.99,9.87,22.99,22.86s-7.66,22.6-22.99,22.6h-15.72ZM124.91,123.15v8.96h-15.72v18.58h-10v-45.46h27.02v8.96h-17.02v8.96h15.72ZM66.2,114.19h-3.44v27.54h3.44c11.69,0,14.81-6.36,14.81-13.64s-3.12-13.9-14.81-13.9ZM28.93,113.67h-4.68v11.43h4.68c4.94,0,6.62-2.2,6.62-5.71s-1.69-5.71-6.62-5.71Z" fill="#fff"/>
+                                </svg>
+                            </div>
+                            <div class="catalogue-overlay" id="catalogueOverlay">Click to select file</div>
+                            <div class="upload-progress" id="catalogueUploadProgress">
+                                <div class="upload-progress-fill" id="catalogueUploadProgressFill"></div>
+                            </div>
+                            <div class="catalogue-success" id="catalogueSuccess" style="display: none;">
+                                <div class="success-icon">✓</div>
+                                <div class="success-text">Catalogue uploaded successfully!</div>
+                                <div class="success-filename" id="successFilename"></div>
+                            </div>
+                            <div class="catalogue-error-message" id="catalogueError"></div>
+                        </div>
+                        
+                        <input type="file" class="hidden-file-input" id="catalogueFileInput" accept=".pdf">
+                    </div>
+                
+                    <!-- Navigation Buttons -->
+                    <button class="previous-btn" onclick="previousStep()">
+                        <span>←</span>
+                        Previous step
+                    </button>
+                    <button class="next-btn" onclick="finishWizard()">
+                        Finish
+                        <span>→</span>
+                    </button>
+                </div>      
         <!-- Crop Modal -->
         <div class="crop-modal" id="cropModal">
             <div class="crop-container">
@@ -2152,7 +2366,6 @@
             </div>
         </div>
     </div>
-
     <script>
         // ===========================================
         // WIZARD STATE MANAGEMENT
@@ -2797,6 +3010,10 @@
                         populatePrimaryContactList();
                         console.log('🔄 Step 4 refreshed with updated attending list');
                     }
+                }
+                if (stepNumber === 5 && !initializedSteps.has(5)) {
+                    initializeStep5();
+                    initializedSteps.add(5);
                 }
             } 
                 
@@ -3729,6 +3946,184 @@
             const contactName = contactData?.name || contact?.name || 'Unknown';
             
             console.log(`👑 Selected primary contact: ${contactName} (${contactId})`);
+        }
+        // ===========================================
+        // STEP 5: PRODUCT CATALOGUE UPLOAD
+        // ===========================================
+        let catalogueState = {
+            uploadedFile: null,
+            uploadedUrl: null
+        };
+        
+        function initializeStep5() {
+            initializeCatalogueUpload();
+            console.log('🚀 Step 5 (Product Catalogue) initialized!');
+        }
+        
+        function initializeCatalogueUpload() {
+            const container = document.getElementById('catalogueUploadContainer');
+            const fileInput = document.getElementById('catalogueFileInput');
+        
+            if (!container || !fileInput) return;
+        
+            // Click to select file
+            container.addEventListener('click', () => fileInput.click());
+        
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleCatalogueFileSelection(e.target.files[0]);
+                }
+            });
+        
+            // Drag and drop
+            container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                container.classList.add('dragover');
+            });
+        
+            container.addEventListener('dragleave', () => {
+                container.classList.remove('dragover');
+            });
+        
+            container.addEventListener('drop', (e) => {
+                e.preventDefault();
+                container.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    handleCatalogueFileSelection(e.dataTransfer.files[0]);
+                }
+            });
+        }
+        
+        function handleCatalogueFileSelection(file) {
+            console.log('📄 File selected:', file.name, file.type, file.size);
+            
+            // Validate file type (only PDFs)
+            if (file.type !== 'application/pdf') {
+                showCatalogueError('Please select a PDF file only.');
+                return;
+            }
+        
+            // Validate file size (25MB max)
+            const maxSize = 25 * 1024 * 1024; // 25MB
+            if (file.size > maxSize) {
+                showCatalogueError('File size exceeds 25MB limit. Please choose a smaller PDF file.');
+                return;
+            }
+        
+            console.log('✅ Valid PDF file selected:', file.name);
+            catalogueState.uploadedFile = file;
+            uploadCatalogueToS3(file);
+        }
+        
+        async function uploadCatalogueToS3(file) {
+            console.log('📤 Starting catalogue upload to S3...');
+            
+            const progressContainer = document.getElementById('catalogueUploadProgress');
+            const progressFill = document.getElementById('catalogueUploadProgressFill');
+            const container = document.getElementById('catalogueUploadContainer');
+            const placeholder = document.getElementById('cataloguePlaceholder');
+            const successSection = document.getElementById('catalogueSuccess');
+            
+            // Show progress
+            progressContainer.style.display = 'block';
+            
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress > 90) progress = 90;
+                progressFill.style.width = progress + '%';
+            }, 300);
+        
+            try {
+                const organizationName = formState?.companyName || 'Demo Company';
+                const token = new URLSearchParams(window.location.search).get('token') || 'demo-token';
+                const base64 = await fileToBase64(file);
+                
+                const uploadData = {
+                    files: [{
+                        name: file.name,
+                        content: base64.split(',')[1],
+                        type: file.type,
+                        fieldName: 'catalogFile'
+                    }],
+                    organizationName: organizationName,
+                    token: token
+                };
+        
+                const response = await fetch(`${API_BASE}/upload-to-s3`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(uploadData)
+                });
+        
+                if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
+        
+                const result = await response.json();
+                
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    progressFill.style.width = '0%';
+                    
+                    // Show success state
+                    placeholder.style.display = 'none';
+                    successSection.style.display = 'flex';
+                    container.classList.add('uploaded');
+                    
+                    // Update success text
+                    document.getElementById('successFilename').textContent = file.name;
+                    
+                }, 1000);
+        
+                // Store the uploaded file URL
+                const catalogueUrl = result.uploadResults?.catalogueUrl;
+                if (catalogueUrl) {
+                    catalogueState.uploadedUrl = catalogueUrl;
+                    console.log('✅ Catalogue uploaded successfully:', catalogueUrl);
+                } else {
+                    throw new Error('No catalogue URL found in response');
+                }
+        
+            } catch (error) {
+                console.error('💥 Catalogue upload failed:', error);
+                clearInterval(progressInterval);
+                progressContainer.style.display = 'none';
+                progressFill.style.width = '0%';
+                showCatalogueError('Upload failed. Please try again.');
+            }
+        }
+        
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function showCatalogueError(message) {
+            const errorElement = document.getElementById('catalogueError');
+            if (!errorElement) return;
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            setTimeout(() => errorElement.style.display = 'none', 5000);
+        }
+        
+        function finishWizard() {
+            console.log('🎉 Wizard complete!');
+            console.log('📋 Final state:');
+            console.log('- Form data:', formState);
+            console.log('- Team state:', teamState);
+            console.log('- Primary contact:', primaryContactState);
+            console.log('- Catalogue:', catalogueState);
+            
+            // TODO: Send all data to the backend API
+            // For now, just show success
+            showSuccessState();
         }
     </script>
 </body>

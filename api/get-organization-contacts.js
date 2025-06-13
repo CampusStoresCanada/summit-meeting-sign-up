@@ -157,25 +157,6 @@ export default async function handler(req, res) {
       };
     });
     
-    // Step 3: Format the contacts data
-    const contacts = contactsData.results.map(contact => {
-      const props = contact.properties;
-      return {
-        id: contact.id,
-        name: props.Name?.title?.[0]?.text?.content || 'Unknown Name',
-        firstName: props['First Name']?.rich_text?.[0]?.text?.content || '',
-        workEmail: props['Work Email']?.email || '',
-        workPhone: props['Work Phone Number']?.phone_number || '',
-        roleTitle: props['Role/Title']?.rich_text?.[0]?.text?.content || '',
-        contactType: props['Contact Type']?.select?.name || '',
-        tags: props.Tags?.multi_select?.map(tag => tag.name) || [],
-        notes: props.Notes?.rich_text?.[0]?.text?.content || '',
-        // Add fields we might need for conference tracking
-        isAttending: false, // We'll track this separately
-        isPrimaryContact: false // We'll track this separately
-      };
-    });
-    
     // Filter out contacts without basic info
     const validContacts = contacts.filter(contact => 
       contact.name && contact.name !== 'Unknown Name' && 

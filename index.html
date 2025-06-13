@@ -1018,7 +1018,234 @@
                 width: 60%;
             }
         }
-
+        /* Step 3: Conference Team Styles */
+        .team-container {
+            max-width: none;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2vw;
+        }
+        
+        .team-list-wrapper {
+            position: relative;
+            height: 35vh;
+            border: 2px solid #cccccc;
+            border-radius: 8px;
+            background: #ffffff;
+            overflow: hidden;
+        }
+        
+        .team-list {
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1vw;
+            /* Hide default scrollbar */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .team-list::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1.2vw;
+            padding: 0.8vw 0;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+        
+        .contact-item:hover {
+            background-color: #f8f8f8;
+        }
+        
+        .contact-checkbox {
+            width: 1.5vw;
+            height: 1.5vw;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .checkbox-circle {
+            width: 1.2vw;
+            height: 1.2vw;
+            border: 2px solid #cccccc;
+            border-radius: 50%;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .checkbox-circle.checked {
+            background: #28a745;
+            border-color: #28a745;
+        }
+        
+        .checkbox-circle.checked::after {
+            content: '✓';
+            color: #ffffff;
+            font-size: 0.8vw;
+            font-weight: 700;
+        }
+        
+        .contact-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .contact-name {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 1.1vw;
+            color: #000000;
+            line-height: 1.2;
+            margin-bottom: 0.2vw;
+        }
+        
+        .contact-title {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 500;
+            font-size: 0.9vw;
+            color: #666666;
+            line-height: 1.2;
+            margin-bottom: 0.1vw;
+        }
+        
+        .contact-details {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 400;
+            font-size: 0.8vw;
+            color: #888888;
+            line-height: 1.2;
+        }
+        
+        .contact-edit {
+            width: 1.2vw;
+            height: 1.2vw;
+            flex-shrink: 0;
+            background: none;
+            border: none;
+            color: #999999;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+        }
+        
+        .contact-edit:hover {
+            color: #666666;
+        }
+        
+        .contact-edit svg {
+            width: 1vw;
+            height: 1vw;
+        }
+        
+        /* Custom Scrollbar */
+        .custom-scrollbar {
+            position: absolute;
+            right: 6px;
+            top: 1vw;
+            bottom: 1vw;
+            width: 8px;
+            display: none;
+        }
+        
+        .custom-scrollbar.visible {
+            display: block;
+        }
+        
+        .scrollbar-track {
+            width: 100%;
+            height: 100%;
+            background: #f0f0f0;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .scrollbar-thumb {
+            width: 100%;
+            background: #cccccc;
+            border-radius: 4px;
+            position: absolute;
+            top: 0;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .scrollbar-thumb:hover {
+            background: #999999;
+        }
+        
+        /* Fade and Shadow Effects */
+        .team-list-fade {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 20px;
+            height: 3vw;
+            background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.8) 70%, #ffffff 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .team-list-shadow {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 20px;
+            height: 1px;
+            background: #cccccc;
+            pointer-events: none;
+            z-index: 3;
+        }
+        
+        /* Add Contact Section */
+        .add-contact-section {
+            border: 2px dashed #cccccc;
+            border-radius: 8px;
+            padding: 1vw;
+            background: #f8f8f8;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .add-contact-section:hover {
+            border-color: #0071bc;
+            background: #f0f8ff;
+        }
+        
+        .add-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1.2vw;
+        }
+        
+        .add-contact-item .contact-name {
+            font-weight: 600;
+            color: #0071bc;
+        }
+        
+        .add-contact-item .contact-details {
+            color: #666666;
+            font-size: 0.9vw;
+        }
         /* MOBILE/TABLET: Complete Layout Change */
         @media (orientation: portrait), (max-width: 768px) {
             body {
@@ -1454,8 +1681,47 @@
 
                 <!-- Step 3: Conference Team -->
                 <div id="step3Section" class="content-section">
-                    <h2>Conference Team</h2>
-                    <!-- Content will be added here -->
+                    <div class="step-header">
+                        <h2 class="step-title-main">Conference team</h2>
+                        <p class="step-subtitle">Select who from your team will be attending the conference. Add any additional contacts</p>
+                    </div>
+
+                    <div class="team-container">
+                        <div class="team-list-wrapper">
+                            <div class="team-list" id="teamList">
+                                <!-- Contacts will be dynamically added here -->
+                            </div>
+                            <div class="team-list-fade"></div>
+                            <div class="team-list-shadow"></div>
+                            <div class="custom-scrollbar" id="teamScrollbar">
+                                <div class="scrollbar-track">
+                                    <div class="scrollbar-thumb" id="scrollbarThumb"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="add-contact-section">
+                            <div class="add-contact-item" id="addContactItem">
+                                <div class="contact-checkbox">
+                                    <div class="checkbox-circle"></div>
+                                </div>
+                                <div class="contact-info">
+                                    <div class="contact-name">A new contact</div>
+                                    <div class="contact-details">You can add all the contacts our members should know, attending or not.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <button class="previous-btn" onclick="previousStep()">
+                        <span>←</span>
+                        Previous step
+                    </button>
+                    <button class="next-btn" onclick="nextStep()">
+                        Next step
+                        <span>→</span>
+                    </button>
                 </div>
 
                 <!-- Step 4: Product Catalogue -->
@@ -2112,8 +2378,14 @@
                     initializeStep2();
                     initializedSteps.add(2);
                     console.log('🚀 Step 2 initialized on first visit!');
+                } 
+                if (stepNumber === 3 && !initializedSteps.has(3)) {
+                    initializeStep3();
+                    initializedSteps.add(3);
+                    console.log('🚀 Step 3 initialized on first visit!');
                 }
-            }
+            } 
+                
         }
 
         function updateStepNavigation() {
@@ -2472,6 +2744,186 @@
                 uploadedImage.src = imageUrl;
                 uploadedImage.style.display = 'block';
             }
+        }
+        // ===========================================
+        // STEP 3: CONFERENCE TEAM MANAGEMENT
+        // ===========================================
+        let teamState = {
+            attendingContacts: new Set(),
+            editedContacts: {},
+            newContacts: []
+        };
+        
+        function initializeStep3() {
+            populateContactList();
+            setupScrollbar();
+            setupAddContactHandler();
+            console.log('🚀 Step 3 (Conference Team) initialized!');
+        }
+        
+        function populateContactList() {
+            const teamList = document.getElementById('teamList');
+            if (!teamList || !organizationContacts) return;
+            
+            teamList.innerHTML = '';
+            
+            organizationContacts.forEach((contact, index) => {
+                const contactElement = createContactElement(contact, index);
+                teamList.appendChild(contactElement);
+            });
+            
+            updateScrollbar();
+            console.log(`👥 Populated ${organizationContacts.length} contacts`);
+        }
+        
+        function createContactElement(contact, index) {
+            const contactDiv = document.createElement('div');
+            contactDiv.className = 'contact-item';
+            contactDiv.dataset.contactId = contact.id;
+            contactDiv.dataset.index = index;
+            
+            const isAttending = teamState.attendingContacts.has(contact.id);
+            
+            // Format phone number for display
+            const phone = contact.workPhone || '';
+            const formattedPhone = phone ? formatPhoneForDisplay(phone) : '';
+            
+            contactDiv.innerHTML = `
+                <div class="contact-checkbox" onclick="toggleAttendance('${contact.id}')">
+                    <div class="checkbox-circle ${isAttending ? 'checked' : ''}"></div>
+                </div>
+                <div class="contact-info">
+                    <div class="contact-name">${contact.name}</div>
+                    <div class="contact-title">${contact.roleTitle || ''}</div>
+                    <div class="contact-details">
+                        ${contact.workEmail || ''}${contact.workEmail && formattedPhone ? '       ' : ''}${formattedPhone}
+                    </div>
+                </div>
+                <button class="contact-edit" onclick="editContact('${contact.id}', ${index})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                        <path d="m14.5 5.5 4 4"/>
+                    </svg>
+                </button>
+            `;
+            
+            return contactDiv;
+        }
+        
+        function formatPhoneForDisplay(phone) {
+            // Remove all non-digit characters
+            const digits = phone.replace(/\D/g, '');
+            
+            // Format as (XXX) XXX-XXXX if 10 digits, otherwise return as-is
+            if (digits.length === 10) {
+                return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+            }
+            return phone;
+        }
+        
+        function toggleAttendance(contactId) {
+            const checkbox = document.querySelector(`[data-contact-id="${contactId}"] .checkbox-circle`);
+            if (!checkbox) return;
+            
+            if (teamState.attendingContacts.has(contactId)) {
+                teamState.attendingContacts.delete(contactId);
+                checkbox.classList.remove('checked');
+                console.log(`👤 Marked ${contactId} as NOT attending`);
+            } else {
+                teamState.attendingContacts.add(contactId);
+                checkbox.classList.add('checked');
+                console.log(`✅ Marked ${contactId} as attending`);
+            }
+        }
+        
+        function setupScrollbar() {
+            const teamList = document.getElementById('teamList');
+            const scrollbar = document.getElementById('teamScrollbar');
+            const scrollbarThumb = document.getElementById('scrollbarThumb');
+            
+            if (!teamList || !scrollbar || !scrollbarThumb) return;
+            
+            function updateScrollbar() {
+                const scrollHeight = teamList.scrollHeight;
+                const clientHeight = teamList.clientHeight;
+                
+                if (scrollHeight <= clientHeight) {
+                    scrollbar.classList.remove('visible');
+                    return;
+                }
+                
+                scrollbar.classList.add('visible');
+                
+                // Calculate thumb height as proportion of visible area
+                const thumbHeight = (clientHeight / scrollHeight) * clientHeight;
+                scrollbarThumb.style.height = thumbHeight + 'px';
+                
+                // Calculate thumb position
+                const scrollTop = teamList.scrollTop;
+                const maxScroll = scrollHeight - clientHeight;
+                const thumbMaxTop = clientHeight - thumbHeight;
+                const thumbTop = (scrollTop / maxScroll) * thumbMaxTop;
+                
+                scrollbarThumb.style.top = thumbTop + 'px';
+            }
+            
+            // Update scrollbar on scroll
+            teamList.addEventListener('scroll', updateScrollbar);
+            
+            // Handle scrollbar thumb dragging
+            let isDragging = false;
+            let startY = 0;
+            let startScrollTop = 0;
+            
+            scrollbarThumb.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startY = e.clientY;
+                startScrollTop = teamList.scrollTop;
+                document.addEventListener('mousemove', handleDrag);
+                document.addEventListener('mouseup', handleDragEnd);
+                e.preventDefault();
+            });
+            
+            function handleDrag(e) {
+                if (!isDragging) return;
+                
+                const deltaY = e.clientY - startY;
+                const scrollHeight = teamList.scrollHeight;
+                const clientHeight = teamList.clientHeight;
+                const maxScroll = scrollHeight - clientHeight;
+                const thumbHeight = parseFloat(scrollbarThumb.style.height);
+                const thumbMaxTop = clientHeight - thumbHeight;
+                
+                const scrollDelta = (deltaY / thumbMaxTop) * maxScroll;
+                teamList.scrollTop = startScrollTop + scrollDelta;
+            }
+            
+            function handleDragEnd() {
+                isDragging = false;
+                document.removeEventListener('mousemove', handleDrag);
+                document.removeEventListener('mouseup', handleDragEnd);
+            }
+            
+            // Initial update
+            setTimeout(updateScrollbar, 100);
+            
+            // Store reference for external calls
+            window.updateScrollbar = updateScrollbar;
+        }
+        
+        function setupAddContactHandler() {
+            const addContactSection = document.querySelector('.add-contact-section');
+            if (addContactSection) {
+                addContactSection.addEventListener('click', () => {
+                    console.log('➕ Add new contact clicked');
+                    // TODO: Open new contact modal
+                });
+            }
+        }
+        
+        function editContact(contactId, index) {
+            console.log(`✏️ Edit contact clicked: ${contactId} (index: ${index})`);
+            // TODO: Open edit contact modal
         }
     </script>
 </body>

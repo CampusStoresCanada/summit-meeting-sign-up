@@ -102,6 +102,60 @@ export default async function handler(req, res) {
     const contactsData = await contactsResponse.json();
     
     console.log(`📋 Found ${contactsData.results.length} contacts for ${organizationName}`);
+
+    const tagSystemDbId = process.env.NOTION_TAG_SYSTEM_DB_ID || '1f9a69bf0cfd8034b919f51b7c4f2c67';
+
+    // First, get the "Primary Contact" tag ID
+    let primaryContactTagId = null;
+    try {
+      const tagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionToken}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28'
+        },
+        body: JSON.stringify({
+          filter: {
+            property: 'Name',
+            title: { equals: 'Primary Contact' }
+          }
+        })
+      });
+      
+      const tagData = await tagResponse.json();
+      if (tagData.results.length > 0) {
+        primaryContactTagId = tagData.results[0].id;
+        console.log('🏷️ Found Primary Contact tag ID:', primaryContactTagId);
+      }
+    } catch (error) {
+      console.error('💥 Error finding Primary Contact tag:', error);
+    }
+    
+    // Then modify your contacts mapping:
+    const contacts = contactsData.results.map(contact => {
+      const props = contact.properties;
+      
+      // Check if this contact has the Primary Contact tag
+      let isPrimaryContact = false;
+      if (primaryContactTagId && props['Personal Tag']?.relation) {
+        isPrimaryContact = props['Personal Tag'].relation.some(tag => tag.id === primaryContactTagId);
+      }
+      
+      return {
+        id: contact.id,
+        name: props.Name?.title?.[0]?.text?.content || 'Unknown Name',
+        firstName: props['First Name']?.rich_text?.[0]?.text?.content || '',
+        workEmail: props['Work Email']?.email || '',
+        workPhone: props['Work Phone Number']?.phone_number || '',
+        roleTitle: props['Role/Title']?.rich_text?.[0]?.text?.content || '',
+        contactType: props['Contact Type']?.select?.name || '',
+        tags: props.Tags?.multi_select?.map(tag => tag.name) || [],
+        notes: props.Notes?.rich_text?.[0]?.text?.content || '',
+        isAttending: false,
+        isPrimaryContact: isPrimaryContact  // Now this is actually checking the database!
+      };
+    });
     
     // Step 3: Format the contacts data
     const contacts = contactsData.results.map(contact => {

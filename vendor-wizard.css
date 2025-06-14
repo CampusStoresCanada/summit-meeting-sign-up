@@ -748,48 +748,43 @@ body::before {
     color: #333333;
 }
 
-/* Mobile adaptations */
 @media (orientation: portrait), (max-width: 768px) {
-   .main-content {
-         padding-bottom: 100px !important;
-   }
-    .get-started-btn,{
-        position: fixed;
-        bottom: 20px;
-        width: calc(100% - 40px);
-        max-width: none;
-        min-width: auto;
-        font-size: 18px;
-        padding: 16px 24px;
-        border-radius: 12px;
-        z-index: 10;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    .main-content {
+        padding-bottom: 100px !important;
     }
-
+    
+    /* All buttons same base properties */
+    .get-started-btn, .next-btn, .previous-btn {
+        position: fixed !important;
+        bottom: 20px !important;  /* Same height for all */
+        font-size: 18px !important;
+        padding: 16px 24px !important;
+        border-radius: 12px !important;
+        z-index: 10 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    /* Get started - full width */
+    .get-started-btn {
+        left: 20px !important;
+        width: calc(100% - 40px) !important;
+        background: #0071bc !important;
+        color: #ffffff !important;
+    }
+    
+    /* Previous - left side */
     .previous-btn {
-        position: fixed;
-        bottom: 80px;
-        left: 20px;
-        width: calc(35% - 40px);
-        max-width: none;
-        min-width: auto;
-        font-size: 18px;
-        padding: 16px 24px;
-        border-radius: 12px;
-        z-index: 10;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        background: #f8f9fa;
-        color: #666666;
-        border: 2px solid #dee2e6;
+        left: 20px !important;
+        width: 35% !important;
+        background: #f8f9fa !important;
+        color: #666666 !important;
+        border: 2px solid #dee2e6 !important;
     }
-
-    .previous-btn:hover {
-        background: #e9ecef;
-        border-color: #adb5bd;
-    }
-       .next-btn {
+    
+    /* Next - right side */
+    .next-btn {
         right: 20px !important;
-        width: calc(65% -60px) !important;
+        width: 60% !important;
         background: #0071bc !important;
         color: #ffffff !important;
         border: none !important;

@@ -606,14 +606,20 @@
                 if (nextBtn) {
                     nextBtn.style.display = 'flex';
                     
-                    // Update next button text for final step
+                    // Update button text and click handler based on step
                     if (currentStep === 5) {
+                        // Step 5 is Product catalogue - show Finish
                         nextBtn.innerHTML = 'Finish <span>→</span>';
-                        // Don't reassign onclick directly, it might cause issues
+                        // Remove any existing onclick and add new one
+                        nextBtn.onclick = finishWizard;
+                        console.log('📱 Set finish button for step 5');
                     } else {
+                        // All other steps - show Next Step
                         nextBtn.innerHTML = 'Next step <span>→</span>';
+                        // Remove any existing onclick and add new one
+                        nextBtn.onclick = nextStep;
+                        console.log('📱 Set next step button for step', currentStep);
                     }
-                    console.log('📱 Showing next button with text:', nextBtn.innerHTML);
                 }
             }
         }

@@ -567,28 +567,7 @@
         // MOBILE INITIALIZATION
         // ===========================================
         
-        function initializeMobile() {
-            // Check if mobile
-            isMobile = window.innerWidth <= 768;
-            
-            if (isMobile) {
-                setupKeyboardDetection();
-                updateMobileButtons();
-                
-                // Hide desktop buttons on mobile
-                const desktopButtons = document.querySelectorAll('.main-content .get-started-btn, .main-content .next-btn, .main-content .previous-btn');
-                desktopButtons.forEach(btn => {
-                    btn.style.display = 'none';
-                });
-            }
-        }
         
-        // Update your existing navigation functions to update mobile buttons
-        function updateMobileButtonsOnStepChange() {
-            if (isMobile) {
-                updateMobileButtons();
-            }
-        }
         document.addEventListener('DOMContentLoaded', () => {
             // Get started button handler
             const mobileGetStartedBtn = document.getElementById('mobileGetStartedBtn');
@@ -630,9 +609,7 @@
             setTimeout(() => {
                 initialViewportHeight = window.innerHeight;
                 isMobile = window.innerWidth <= 768;
-                
-                // Reinitialize mobile features
-                initializeMobile();
+
                 
                 // Call your existing updateMobileProgress function if it exists
                 if (typeof updateMobileProgress === 'function') {
@@ -676,10 +653,6 @@
                 location.reload(); // Simple approach - reload to reset layout
             }
         });
-
-        // Update your existing nextStep() and previousStep() functions to include:
-        // addMobileScrollToTop();
-        // updateMobileButtonsOnStepChange();
         
         console.log('📱 Mobile-optimized vendor profile wizard loaded!');
         
@@ -1234,7 +1207,6 @@
             showStep(currentStep);
             updateStepNavigation();
             updateMobileProgress(); // If this function exists
-            updateMobileButtonsOnStepChange(); // Add this line
         }
 
         function nextStep() {
@@ -1252,7 +1224,6 @@
                 showStep(currentStep);
                 updateStepNavigation();
                 updateMobileProgress(); // If this function exists
-                updateMobileButtonsOnStepChange(); // Add this line
             }
         }
         
@@ -1266,7 +1237,6 @@
                 showStep(currentStep);
                 updateStepNavigation();
                 updateMobileProgress(); // If this function exists
-                updateMobileButtonsOnStepChange(); // Add this line
             }
         }
 

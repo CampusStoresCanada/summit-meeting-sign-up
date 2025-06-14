@@ -1987,49 +1987,21 @@
         .uploading-title {
             font-family: 'davis-sans', sans-serif;
             font-weight: 700;
-            font-size: 3.0vw;
+            font-size: 48px;
             color: #000000;
-            margin-bottom: 30px;
-            line-height: 1.1;
-            display: flex;
-            align-items: center;
-            gap: 0.5vw;
         }
         
-        .uploading-dots {
-            display: flex;
-            gap: 0.3vw;
+        .dot {
+            animation: wave 1.4s ease-in-out infinite;
         }
         
-        .uploading-dot {
-            width: 0.4vw;
-            height: 0.4vw;
-            background: #0071bc;
-            border-radius: 50%;
-            animation: wave 2s ease-in-out infinite;
-        }
-        
-        .uploading-dot:nth-child(1) { animation-delay: 0s; }
-        .uploading-dot:nth-child(2) { animation-delay: 0.2s; }
-        .uploading-dot:nth-child(3) { animation-delay: 0.4s; }
+        .dot:nth-child(1) { animation-delay: 0s; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
         
         @keyframes wave {
-            0%, 60%, 100% {
-                transform: translateY(0);
-            }
-            30% {
-                transform: translateY(-1vw);
-            }
-        }
-        
-        .uploading-subtitle {
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 400;
-            font-size: 1.0vw;
-            color: #808080;
-            line-height: 1.6;
-            text-align: center;
-            max-width: 600px;
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
         }
         
         /* Mobile responsiveness */
@@ -2140,15 +2112,11 @@
             <!-- Upload Animation State -->
             <div class="uploading-state" id="uploadingState">
                 <div class="uploading-title">
-                    <span id="uploadingText">Processing</span>
-                    <div class="uploading-dots">
-                        <div class="uploading-dot"></div>
-                        <div class="uploading-dot"></div>
-                        <div class="uploading-dot"></div>
-                    </div>
-                </div>
-                <div class="uploading-subtitle" id="uploadingSubtitle">
-                    Saving your team information and submitting your profile for review...
+                    Uploading<span class="dots">
+                        <span class="dot">.</span>
+                        <span class="dot">.</span>
+                        <span class="dot">.</span>
+                    </span>
                 </div>
             </div>
             <!-- Main Content -->
@@ -4475,7 +4443,6 @@
         function showUploadingState() {
             const uploadingElement = document.getElementById('uploadingState');
             const uploadingTitle = document.getElementById('uploadingText');
-            const uploadingSubtitle = document.getElementById('uploadingSubtitle');
             
             console.log('🔍 Uploading element:', uploadingElement);
             console.log('🔍 Title element:', uploadingTitle);
@@ -4490,11 +4457,6 @@
             console.log('🔍 Title computed display:', window.getComputedStyle(uploadingTitle).display);
             console.log('🔍 Title computed visibility:', window.getComputedStyle(uploadingTitle).visibility);
             console.log('🔍 Title computed color:', window.getComputedStyle(uploadingTitle).color);
-        }
-        
-        function updateUploadingState(title, subtitle) {
-            document.getElementById('uploadingText').textContent = title;
-            document.getElementById('uploadingSubtitle').textContent = subtitle;
         }
         
         function hideUploadingState() {

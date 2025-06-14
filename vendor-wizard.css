@@ -770,7 +770,7 @@ body::before {
         position: fixed;
         bottom: 80px;
         left: 20px;
-        width: calc(100% - 40px);
+        width: calc(35% - 40px);
         max-width: none;
         min-width: auto;
         font-size: 18px;
@@ -789,7 +789,7 @@ body::before {
     }
        .next-btn {
         right: 20px !important;
-        width: 55% !important;
+        width: calc(65% -60px) !important;
         background: #0071bc !important;
         color: #ffffff !important;
         border: none !important;

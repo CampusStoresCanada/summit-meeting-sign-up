@@ -35,11 +35,6 @@ body::before {
         display: flex;
     }
     
-    /* Hide desktop buttons on mobile */
-    .get-started-btn, .next-btn, .previous-btn {
-        display: none !important;
-    }
-    
     /* Add extra bottom padding to prevent content overlap */
     .main-content {
         padding-bottom: 140px !important; /* Increased from 120px */

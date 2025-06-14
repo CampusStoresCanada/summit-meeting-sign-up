@@ -2817,3 +2817,30 @@ body::before {
     background: #0071bc;
     color: white;
 }
+@media (orientation: portrait), (max-width: 768px) {
+    .get-started-btn, .next-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        width: calc(100% - 40px);
+        font-size: 18px;
+        padding: 16px 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .previous-btn {
+        position: fixed;
+        bottom: 80px;
+        left: 20px;
+        right: 20px;
+        width: calc(100% - 40px);
+        font-size: 18px;
+        padding: 16px 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .main-content {
+        padding-bottom: 160px !important;
+    }
+}

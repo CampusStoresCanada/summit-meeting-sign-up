@@ -2032,79 +2032,6 @@
             max-width: 600px;
         }
         
-        /* Updated Success and Error States */
-        .final-state {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #ffffff;
-            z-index: 1000;
-            padding: 3vh 3vw;
-        }
-        
-        .final-state.active {
-            display: flex;
-        }
-        
-        .final-state .wizard-container {
-            display: flex;
-            width: 100%;
-            height: calc(100vh - 6vh);
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.66);
-            border-radius: 20px;
-            border: 3px solid #000000;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-        
-        .final-content {
-            flex: 1;
-            padding: 0px 60px 80px 5%;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            position: relative;
-        }
-        
-        .final-section {
-            width: 50%;
-            max-width: none;
-        }
-        
-        .final-title {
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 700;
-            font-size: 3.0vw;
-            color: #000000;
-            margin-bottom: 30px;
-            line-height: 1.1;
-            display: flex;
-            align-items: center;
-            gap: 1vw;
-        }
-        
-        .final-title.success {
-            color: #28a745;
-        }
-        
-        .final-title.error {
-            color: #dc3545;
-        }
-        
-        .final-text {
-            font-family: 'davis-sans', sans-serif;
-            font-weight: 400;
-            font-size: 1.0vw;
-            color: #808080;
-            line-height: 1.6;
-            margin-bottom: 24px;
-        }
-        
         /* Mobile responsiveness */
         @media (orientation: portrait), (max-width: 768px) {
             .uploading-title {
@@ -2133,54 +2060,6 @@
             .uploading-subtitle {
                 font-size: 16px;
                 padding: 0 20px;
-            }
-            
-            .final-state {
-                padding: 0;
-            }
-            
-            .final-state .wizard-container {
-                height: 100vh;
-                border-radius: 0;
-                border: none;
-                box-shadow: none;
-                background: #ffffff;
-                flex-direction: column;
-            }
-            
-            .final-content {
-                padding: 20px;
-                align-items: flex-start;
-                justify-content: center;
-                margin-top: 10vh;
-            }
-            
-            .final-section {
-                width: 100%;
-            }
-            
-            .final-title {
-                font-size: 36px;
-                gap: 12px;
-            }
-            
-            .final-text {
-                font-size: 16px;
-            }
-            .final-state.active {
-                display: flex !important;
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                bottom: 0 !important;
-                z-index: 9999 !important;
-                background: #ffffff !important;
-            }
-            
-            .final-state.active .wizard-container {
-                position: relative !important;
-                z-index: 10000 !important;
             }
         }
     </style>
@@ -2622,154 +2501,45 @@
                         <span>→</span>
                     </button>
                 </div> 
-                 <!-- Step 6: Endgame -->
-                 <div class="final-state" id="finalSuccessState">
-                    <div class="wizard-container">
-                        <!-- Keep the same sidebar as the main wizard -->
-                        <div class="sidebar">
-                            <div class="logo-section">
-                                <div class="logo-and-title">
-                                    <img src="https://images.squarespace-cdn.com/content/v1/5cf7db4cc0827b0001c9ff81/3c43cc7d-5f2a-4b5e-888e-887d3bb38ebc/Logo+Only.png?format=750w" alt="Campus Stores Conference" class="logo">
-                                    <div class="logo-text">
-                                        <div class="conference-title">CAMPUS STORES<br>CONFERENCE</div>
-                                    </div>
-                                </div>
-                                <div class="booth-section">
-                                    <div class="booth-number" id="finalBoothNumber">Booth 501</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Show all steps as completed -->
-                            <div class="step-navigation">
-                                <div class="step-item completed" data-step="0">
-                                    <div class="step-number"></div>
-                                    <div class="step-title">Company information</div>
-                                </div>
-                                <div class="step-item completed" data-step="1">
-                                    <div class="step-number"></div>
-                                    <div class="step-title">Conference highlight</div>
-                                </div>
-                                <div class="step-item completed" data-step="2">
-                                    <div class="step-number"></div>
-                                    <div class="step-title">Conference team</div>
-                                </div>
-                                <div class="step-item completed" data-step="3">
-                                    <div class="step-number"></div>
-                                    <div class="step-title">Product catalogue</div>
-                                </div>
-                            </div>
+                 <!-- Step 6: Upload Results -->
+                <div id="step6Section" class="content-section">
+                    <div class="welcome-section">
+                        <!-- Success content (hidden initially) -->
+                        <div id="successContent" style="display: none;">
+                            <h1 class="welcome-title">
+                                <span>🎉</span>
+                                Success!
+                            </h1>
+                            <p class="welcome-text">
+                                Things are in process. There is a human review process underway.
+                                In general we'll try to get this done in a couple of minutes.
+                            </p>
+                            <p class="welcome-text">
+                                If you haven't seen an update go live and it has been a couple hours,
+                                and is between 8:30 AM and 4:30 PM Mountain Time on a
+                                weekday, you can reach out to <a href="mailto:google@campusstores.ca" style="color: #0071bc;">Steve Thomas</a>.
+                            </p>
+                            <p class="welcome-text">
+                                Thanks once again for choosing to support Campus Stores Canada,
+                                our members, and the more than 2 million students, faculty and
+                                staff represented by CSC.
+                            </p>
                         </div>
-                
-                        <!-- Success Content -->
-                        <div class="final-content">
-                            <div class="final-section">
-                                <h1 class="final-title success">
-                                    <span>🎉</span>
-                                    Success!
-                                </h1>
-                                <p class="final-text">
-                                    Things are in process. There is a human review process underway.
-                                    In general we'll try to get this done in a couple of minutes.
-                                </p>
-                                <p class="final-text">
-                                    If you haven't seen an update go live and it has been a couple hours,
-                                    and is between 8:30 AM and 4:30 PM Mountain Time on a
-                                    weekday, you can reach out to <a href="mailto:steve@example.com" style="color: #0071bc;">Steve Thomas</a> he'll let you know
-                                    what the problem is.
-                                </p>
-                                <p class="final-text">
-                                    Thanks once again for choosing to support Campus Stores Canada,
-                                    our members, and the more than 2 million, students, faculty and
-                                    staff represented by CSC.
-                                </p>
-                                <p class="final-text">
-                                    We'll see you, or your team, at the Fallsview Sheraton, Niagara Falls,
-                                    Ontario from January 26-29th, 2026.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Final Error State -->
-                <div class="final-state" id="finalErrorState">
-                    <div class="wizard-container">
-                        <!-- Keep the same sidebar structure -->
-                        <div class="sidebar">
-                            <div class="logo-section">
-                                <div class="logo-and-title">
-                                    <img src="https://images.squarespace-cdn.com/content/v1/5cf7db4cc0827b0001c9ff81/3c43cc7d-5f2a-4b5e-888e-887d3bb38ebc/Logo+Only.png?format=750w" alt="Campus Stores Conference" class="logo">
-                                    <div class="logo-text">
-                                        <div class="conference-title">CAMPUS STORES<br>CONFERENCE</div>
-                                    </div>
-                                </div>
-                                <div class="booth-section">
-                                    <div class="booth-number" id="errorBoothNumber">Booth 501</div>
-                                </div>
-                            </div>
-                            
-                            <div class="step-navigation">
-                                <div class="step-item" data-step="0">
-                                    <div class="step-number">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.01">
-                                            <path d="M14.01,28.01C6.28,28.01,0,21.73,0,14.01S6.28,0,14.01,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2C7.39,2,2,7.39,2,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2,14.01,2Z"/>
-                                            <path d="M13.25,22.55v-13.78l-1.63.89-1.06-1.8,4.51-2.4h.38v17.09h-2.21Z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="step-title">Company information</div>
-                                </div>
-                                <div class="step-item" data-step="1">
-                                    <div class="step-number">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.04 28.01">
-                                            <path d="M13.98,28.01C6.25,28.01-.03,21.73-.03,14.01S6.25,0,13.98,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM13.98,2C7.36,2,1.97,7.39,1.97,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.6,2,13.98,2Z"/>
-                                            <path d="M8.94,22.55v-.82l5.21-7.15c1.44-1.97,2.18-3.34,2.18-4.73,0-1.66-1.06-2.47-2.42-2.47-1.46,0-2.47.94-2.47,2.35,0,1.27.84,1.78.84,1.78l-1.7,1.25s-1.44-1.15-1.44-3c0-1.49.96-4.3,4.99-4.3s4.58,2.98,4.58,4.51c0,.79-.12,2.16-2.06,4.8l-4.32,5.9h6.7v1.87h-10.08Z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="step-title">Conference highlight</div>
-                                </div>
-                                <div class="step-item" data-step="2">
-                                    <div class="step-number">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.25">
-                                            <path d="M14.01,28.25C6.28,28.25,0,21.97,0,14.25S6.28.24,14.01.24s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2.24C7.39,2.24,2,7.63,2,14.25s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2.24,14.01,2.24Z"/>
-                                            <path d="M10.36,18.67c.46,1.03,1.46,2.33,3.41,2.33,2.09,0,3.1-1.51,3.1-3.43,0-1.8-.86-3.22-3.41-3.22h-1.32v-1.87h1.37c2.02,0,2.78-.89,2.78-2.47s-.79-2.52-2.35-2.52c-1.39,0-2.23.72-2.86,2.11l-1.73-1.10c.79-1.58,2.14-2.93,4.66-2.93,2.93,0,4.66,1.82,4.66,4.25s-1.63,3.24-2.4,3.48c.65.19,2.98.94,2.98,4.22s-2.45,5.42-5.47,5.42c-2.69,0-4.32-1.63-4.99-3.12l1.58-1.15Z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="step-title">Conference team</div>
-                                </div>
-                                <div class="step-item" data-step="3">
-                                    <div class="step-number">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.01 28.01">
-                                            <path d="M14.01,28.01C6.28,28.01,0,21.73,0,14.01S6.28,0,14.01,0s14.01,6.28,14.01,14.01-6.28,14.01-14.01,14.01ZM14.01,2C7.39,2,2,7.39,2,14.01s5.39,12.01,12.01,12.01,12.01-5.39,12.01-12.01S20.63,2,14.01,2Z"/>
-                                            <path d="M15.23,22.31v-5.38h-6.84v-1.15l4.22-10.27h2.35l-3.84,9.55h4.1v-5.62h2.26v5.62h2.23v1.87h-2.23v5.38h-2.26Z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="step-title">Product catalogue</div>
-                                </div>
-                            </div>
-                        </div>
-                
-                        <!-- Error Content -->
-                        <div class="final-content">
-                            <div class="final-section">
-                                <h1 class="final-title error">
-                                    <span>😱</span>
-                                    Uh-oh
-                                </h1>
-                                <p class="final-text">
-                                    Oh, uhmm... this is awkward. Something is wrong. We are probably
-                                    getting a really weird series of alerts right now and also freaking
-                                    out.
-                                </p>
-                                <p class="final-text">
-                                    If it is between 8:30 AM and 4:30 PM Mountain Time on a
-                                    weekday, can you reach out to <a href="mailto:steve@example.com" style="color: #0071bc;">Steve Thomas</a>?
-                                </p>
-                                <p class="final-text">
-                                    Please don't give up. Steve built this and is way to familiar with how
-                                    it can fail, so give him a call 1 (888) 288-4044 and let him know that
-                                    you got this screen.
-                                </p>
-                            </div>
+                        
+                        <!-- Error content (hidden initially) -->
+                        <div id="errorContent" style="display: none;">
+                            <h1 class="welcome-title" style="color: #dc3545;">
+                                <span>😱</span>
+                                Uh-oh
+                            </h1>
+                            <p class="welcome-text">
+                                Oh, uhmm... this is awkward. Something is wrong. We are probably
+                                getting a really weird series of alerts right now and also freaking out.
+                            </p>
+                            <p class="welcome-text">
+                                If it is between 8:30 AM and 4:30 PM Mountain Time on a
+                                weekday, can you reach out to <a href="mailto:google@campusstores.ca" style="color: #0071bc;">Steve Thomas</a>?
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -2796,7 +2566,7 @@
         // WIZARD STATE MANAGEMENT
         // ===========================================
         let currentStep = 0;
-        const totalSteps = 5;
+        const totalSteps = 6;
         let vendorData = {};
         let organizationContacts = [];
         let conferenceTeam = [];
@@ -4594,15 +4364,21 @@
         async function finishWizard() {
             console.log('🎉 Wizard complete! Validating submission...');
             
-            // Validate before submitting
             if (!validateFinalSubmission()) {
                 return;
             }
             
             console.log('✅ Validation passed, processing submission...');
             
-            // Hide main wizard and show uploading animation
+            // Show step 6 and uploading overlay
+            showStep(6);
             showUploadingState();
+            
+            // Mark all steps as completed in sidebar
+            document.querySelectorAll('.step-item').forEach(item => {
+                item.classList.remove('active');
+                item.classList.add('completed');
+            });
             
             let teamProcessed = false;
             let vendorSubmitted = false;
@@ -4610,7 +4386,7 @@
             try {
                 const token = new URLSearchParams(window.location.search).get('token');
                 
-                // Step 1: Process conference team changes (immediate)
+                // Step 1: Process conference team changes
                 console.log('👥 Processing conference team...');
                 updateUploadingState('Saving team', 'Processing your team selections and contact updates...');
                 
@@ -4623,7 +4399,7 @@
                         workPhone: teamState.editedContacts[contactId].phone,
                         roleTitle: teamState.editedContacts[contactId].title
                     })),
-                    delete: [], // We're not deleting contacts in this flow
+                    delete: [],
                     conferenceTeam: Array.from(teamState.attendingContacts).map(contactId => ({
                         id: contactId,
                         attending: true,
@@ -4657,7 +4433,6 @@
                     token: token,
                     formState: formState,
                     catalogueState: catalogueState
-                    // Note: We don't send team state here since it's already processed
                 };
                 
                 const vendorResponse = await fetch(`${API_BASE}/submit-vendor-profile`, {
@@ -4678,18 +4453,18 @@
                 // Success! Both operations completed
                 console.log('🎉 Complete! Team processed + Vendor data submitted for review');
                 
-                // Small delay to let the animation finish
-                setTimeout(() => {
-                    showFinalSuccessState();
-                }, 1000);
+                // Show success content
+                hideUploadingState();
+                document.getElementById('successContent').style.display = 'block';
                 
             } catch (error) {
                 console.error('💥 Submission failed:', error);
                 
-                // Show error state with details
-                setTimeout(() => {
-                    showFinalErrorState(error.message, teamProcessed, vendorSubmitted);
-                }, 1000);
+                // Show error content
+                hideUploadingState();
+                document.getElementById('errorContent').style.display = 'block';
+                
+                console.log('Error details:', { error: error.message, teamProcessed, vendorSubmitted });
             }
         }
         

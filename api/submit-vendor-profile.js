@@ -1,4 +1,4 @@
-// api/submit-vendor-profile.js - Submit to Submissions database for review
+// api/submit-vendor-profile.js
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -17,7 +17,6 @@ export default async function handler(req, res) {
   const notionToken = process.env.NOTION_TOKEN;
   const submissionsDbId = process.env.NOTION_SUBMISSIONS_DB_ID || '209a69bf0cfd80afa65dcf0575c9224f';
   const organizationsDbId = process.env.NOTION_ORGANIZATIONS_DB_ID;
-  const contactsDbId = process.env.NOTION_CONTACTS_DB_ID;
   
   if (!notionToken || !submissionsDbId || !organizationsDbId) {
     console.error('❌ Missing environment variables!');
@@ -26,22 +25,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    const {
-      token,
-      formState,
-      teamState,
-      primaryContactState,
-      catalogueState
-    } = req.body;
+    const { token, formState, catalogueState } = req.body;
 
     if (!token) {
       res.status(400).json({ error: 'Token is required' });
       return;
     }
 
-    console.log('🚀 Creating submission record for token:', token);
+    console.log('🚀 Creating vendor submission for token:', token);
 
-    // Step 1: Get organization info for booth number
+    // Get organization info for booth number
     const orgResponse = await fetch(`https://api.notion.com/v1/databases/${organizationsDbId}/query`, {
       method: 'POST',
       headers: {
@@ -66,7 +59,7 @@ export default async function handler(req, res) {
     const org = orgData.results[0];
     console.log('🏢 Found organization:', org.properties.Organization?.title?.[0]?.text?.content);
 
-    // Get booth number using the proven method from update-vendor-profile.js
+    // Get booth number using the proven method
     let boothNumber = 'TBD';
     const boothRelationArray = org.properties['26 Booth Number']?.relation;
     
@@ -88,11 +81,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // Step 2: Process conference team changes FIRST (so contacts exist)
-    console.log('👥 Processing conference team changes...');
-    const teamResults = await processConferenceTeam(token, teamState, primaryContactState.selectedContactId);
-
-    // Step 3: Create comprehensive submission record
+    // Create submission record with ONLY vendor data
     console.log('📝 Creating submission record...');
     const submissionData = {
       parent: { database_id: submissionsDbId },
@@ -112,7 +101,7 @@ export default async function handler(req, res) {
       }
     };
 
-    // Add all form fields
+    // Add form fields
     if (formState.companyName) {
       submissionData.properties["Company Name"] = {
         rich_text: [{ text: { content: formState.companyName } }]
@@ -168,19 +157,6 @@ export default async function handler(req, res) {
       };
     }
 
-    // Add team summary information
-    const attendingCount = Array.isArray(teamState.attendingContacts) ? teamState.attendingContacts.length : 0;
-    const newContactsCount = Array.isArray(teamState.newContacts) ? teamState.newContacts.length : 0;
-    const editedContactsCount = Object.keys(teamState.editedContacts || {}).length;
-    
-    submissionData.properties["Team Summary"] = {
-      rich_text: [{ 
-        text: { 
-          content: `${attendingCount} attending, ${newContactsCount} new contacts added, ${editedContactsCount} contacts updated`
-        } 
-      }]
-    };
-
     // Submit to Notion
     const submissionResponse = await fetch('https://api.notion.com/v1/pages', {
       method: 'POST',
@@ -199,16 +175,12 @@ export default async function handler(req, res) {
     }
 
     const submission = await submissionResponse.json();
-    console.log(`🎉 SUCCESS! Created submission: ${submission.id}`);
+    console.log(`🎉 SUCCESS! Created vendor submission: ${submission.id}`);
 
     res.status(200).json({
       success: true,
       submissionId: submission.id,
-      message: 'Vendor profile submitted for review!',
-      results: {
-        submission: 'created',
-        team: teamResults
-      }
+      message: 'Vendor profile submitted for review!'
     });
 
   } catch (error) {
@@ -217,49 +189,5 @@ export default async function handler(req, res) {
       error: 'Failed to submit vendor profile', 
       details: error.message 
     });
-  }
-}
-
-// Helper function to process conference team changes
-async function processConferenceTeam(token, teamState, primaryContactId) {
-  console.log('👥 Processing conference team changes...');
-  
-  // Use the existing save-conference-team.js API
-  const contactOperations = {
-    create: teamState.newContacts || [],
-    update: Object.keys(teamState.editedContacts || {}).map(contactId => ({
-      originalId: contactId,
-      ...teamState.editedContacts[contactId]
-    })),
-    delete: [], // We're not deleting contacts in this flow
-    conferenceTeam: (teamState.attendingContacts || []).map(contactId => ({
-      id: contactId,
-      attending: true,
-      isPrimary: contactId === primaryContactId
-    }))
-  };
-
-  try {
-    // Call the existing conference team API
-    const teamResponse = await fetch(`${process.env.VERCEL_URL || 'http://localhost:3000'}/api/save-conference-team`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        token: token,
-        contactOperations: contactOperations
-      })
-    });
-
-    if (teamResponse.ok) {
-      const teamResult = await teamResponse.json();
-      console.log('✅ Conference team processed successfully');
-      return teamResult.results;
-    } else {
-      console.error('❌ Conference team processing failed:', teamResponse.status);
-      return { error: 'Failed to process conference team' };
-    }
-  } catch (error) {
-    console.error('💥 Error calling conference team API:', error);
-    return { error: error.message };
   }
 }

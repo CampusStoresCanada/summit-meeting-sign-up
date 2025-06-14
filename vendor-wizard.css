@@ -750,11 +750,12 @@ body::before {
 
 /* Mobile adaptations */
 @media (orientation: portrait), (max-width: 768px) {
-    .get-started-btn, .next-btn {
+   .main-content {
+         padding-bottom: 100px !important;
+   }
+    .get-started-btn,{
         position: fixed;
         bottom: 20px;
-        left: 20px;
-        right: 20px;
         width: calc(100% - 40px);
         max-width: none;
         min-width: auto;
@@ -769,7 +770,6 @@ body::before {
         position: fixed;
         bottom: 80px;
         left: 20px;
-        right: 20px;
         width: calc(100% - 40px);
         max-width: none;
         min-width: auto;
@@ -787,7 +787,13 @@ body::before {
         background: #e9ecef;
         border-color: #adb5bd;
     }
-}
+       .next-btn {
+        right: 20px !important;
+        width: 55% !important;
+        background: #0071bc !important;
+        color: #ffffff !important;
+        border: none !important;
+    }
 
 /* ===========================================
    LOADING & STATE MANAGEMENT

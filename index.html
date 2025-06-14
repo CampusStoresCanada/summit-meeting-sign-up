@@ -549,7 +549,141 @@
         let initializedSteps = new Set();
 
         // ===========================================
-        // MOBILE-SPECIFIC ENHANCEMENTS (ADD THIS TO YOUR EXISTING JS)
+        // MOBILE BUTTON MANAGEMENT
+        // ===========================================
+        
+        let isMobile = window.innerWidth <= 768;
+        let keyboardVisible = false;
+        let initialViewportHeight = window.innerHeight;
+        
+        function updateMobileButtons() {
+            if (!isMobile) return;
+            
+            const mobileButtons = document.getElementById('mobileButtons');
+            const prevBtn = document.getElementById('mobilePrevBtn');
+            const nextBtn = document.getElementById('mobileNextBtn');
+            const getStartedBtn = document.getElementById('mobileGetStartedBtn');
+            
+            // Show mobile button container
+            mobileButtons.style.display = 'flex';
+            
+            // Hide all buttons first
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+            getStartedBtn.style.display = 'none';
+            
+            // Show appropriate buttons based on current step
+            if (typeof currentStep !== 'undefined') {
+                if (currentStep === 0) {
+                    getStartedBtn.style.display = 'flex';
+                } else {
+                    if (currentStep > 1) {
+                        prevBtn.style.display = 'flex';
+                    }
+                    nextBtn.style.display = 'flex';
+                    
+                    // Update next button text for final step
+                    if (currentStep === 5) { // Assuming step 5 is final
+                        nextBtn.innerHTML = 'Finish <span>→</span>';
+                        nextBtn.onclick = finishWizard;
+                    } else {
+                        nextBtn.innerHTML = 'Next step <span>→</span>';
+                        nextBtn.onclick = nextStep;
+                    }
+                }
+            }
+        }
+        
+        // ===========================================
+        // KEYBOARD DETECTION
+        // ===========================================
+        
+        function setupKeyboardDetection() {
+            if (!isMobile) return;
+            
+            const mobileButtons = document.getElementById('mobileButtons');
+            
+            // Method 1: Visual Viewport API (modern browsers)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', () => {
+                    const heightDifference = initialViewportHeight - window.visualViewport.height;
+                    keyboardVisible = heightDifference > 150; // Threshold for keyboard
+                    
+                    if (keyboardVisible) {
+                        mobileButtons.classList.add('hidden');
+                    } else {
+                        mobileButtons.classList.remove('hidden');
+                    }
+                });
+            }
+            // Method 2: Fallback for older browsers
+            else {
+                let resizeTimer;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(() => {
+                        const heightDifference = initialViewportHeight - window.innerHeight;
+                        keyboardVisible = heightDifference > 150;
+                        
+                        if (keyboardVisible) {
+                            mobileButtons.classList.add('hidden');
+                        } else {
+                            mobileButtons.classList.remove('hidden');
+                        }
+                    }, 100);
+                });
+            }
+            
+            // Method 3: Input focus detection (additional safety)
+            document.addEventListener('focusin', (e) => {
+                if (e.target.matches('input, textarea, select')) {
+                    setTimeout(() => {
+                        mobileButtons.classList.add('hidden');
+                    }, 300); // Delay to allow keyboard animation
+                }
+            });
+            
+            document.addEventListener('focusout', (e) => {
+                if (e.target.matches('input, textarea, select')) {
+                    setTimeout(() => {
+                        if (!document.activeElement.matches('input, textarea, select')) {
+                            mobileButtons.classList.remove('hidden');
+                        }
+                    }, 300);
+                }
+            });
+        }
+        
+        // ===========================================
+        // MOBILE INITIALIZATION
+        // ===========================================
+        
+        function initializeMobile() {
+            // Check if mobile
+            isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                setupKeyboardDetection();
+                updateMobileButtons();
+                
+                // Hide desktop buttons on mobile
+                const desktopButtons = document.querySelectorAll('.main-content .get-started-btn, .main-content .next-btn, .main-content .previous-btn');
+                desktopButtons.forEach(btn => {
+                    btn.style.display = 'none';
+                });
+            }
+        }
+        
+        // Update your existing navigation functions to update mobile buttons
+        function updateMobileButtonsOnStepChange() {
+            if (isMobile) {
+                updateMobileButtons();
+            }
+        }
+        
+        
+        // ===========================================
+        // MOBILE ENHANCEMENTS
         // ===========================================
         
         // Prevent zoom on input focus for iOS
@@ -557,11 +691,21 @@
             const viewportMeta = document.querySelector('meta[name="viewport"]');
             viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
         }
-        
+
         // Handle orientation changes
         window.addEventListener('orientationchange', () => {
             setTimeout(() => {
-                updateMobileProgress(); // Your existing function
+                initialViewportHeight = window.innerHeight;
+                isMobile = window.innerWidth <= 768;
+                
+                // Reinitialize mobile features
+                initializeMobile();
+                
+                // Call your existing updateMobileProgress function if it exists
+                if (typeof updateMobileProgress === 'function') {
+                    updateMobileProgress();
+                }
+                
                 // Force layout recalculation
                 document.body.style.height = '100vh';
                 setTimeout(() => {
@@ -569,18 +713,42 @@
                 }, 100);
             }, 500);
         });
-        
+
         // Improve touch scrolling on mobile
         if ('ontouchstart' in window) {
             document.addEventListener('touchstart', () => {}, { passive: true });
             document.addEventListener('touchmove', () => {}, { passive: true });
         }
-        
-        // Update your existing nextStep() and previousStep() functions to include:
-        // Scroll to top on mobile
-        if (window.innerWidth <= 768) {
-            window.scrollTo(0, 0);
+
+        // Add scroll-to-top for mobile navigation
+        function addMobileScrollToTop() {
+            if (window.innerWidth <= 768) {
+                window.scrollTo(0, 0);
+            }
         }
+
+        // Initialize mobile features on load
+        window.addEventListener('load', () => {
+            initialViewportHeight = window.innerHeight;
+            initializeMobile();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const wasMobile = isMobile;
+            isMobile = window.innerWidth <= 768;
+            
+            // If switching between mobile/desktop
+            if (wasMobile !== isMobile) {
+                location.reload(); // Simple approach - reload to reset layout
+            }
+        });
+
+        // Update your existing nextStep() and previousStep() functions to include:
+        // addMobileScrollToTop();
+        // updateMobileButtonsOnStepChange();
+        
+        console.log('📱 Mobile-optimized vendor profile wizard loaded!');
         
         // ===========================================
         // CUSTOM DROPDOWN FUNCTIONALITY

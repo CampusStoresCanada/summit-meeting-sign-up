@@ -1016,6 +1016,15 @@
             const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
             const config = fieldConfigs[fieldName];
             
+            // Check if we're on mobile
+            const isMobile = window.innerWidth <= 768 || window.orientation !== undefined;
+            
+            if (isMobile) {
+                // Use a simple modal approach for mobile instead of overlay
+                createMobileFieldModal(fieldName, config);
+                return;
+            }
+            
             const overlay = document.createElement('div');
             overlay.className = 'field-overlay active';
             overlay.id = `overlay-${fieldName}`;
@@ -1113,6 +1122,58 @@
             setupInputEventListeners(inputElement, fieldName);
         }
 
+        function createMobileFieldModal(fieldName, config) {
+            // Create a simple modal for mobile editing
+            const modal = document.createElement('div');
+            modal.className = 'mobile-field-modal';
+            modal.innerHTML = `
+                <div class="mobile-field-content">
+                    <div class="mobile-field-header">
+                        <h3>Edit ${config.label}</h3>
+                        <button onclick="cancelMobileEdit('${fieldName}')">&times;</button>
+                    </div>
+                    <div class="mobile-field-body">
+                        ${config.type === 'textarea' ? 
+                            `<textarea id="mobileInput-${fieldName}" placeholder="${config.placeholder}">${formState[fieldName] || ''}</textarea>` :
+                            `<input type="text" id="mobileInput-${fieldName}" placeholder="${config.placeholder}" value="${formState[fieldName] || ''}">`
+                        }
+                    </div>
+                    <div class="mobile-field-actions">
+                        <button onclick="cancelMobileEdit('${fieldName}')">Cancel</button>
+                        <button onclick="saveMobileEdit('${fieldName}')">Save</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Focus the input (this should work better than absolutely positioned inputs)
+            setTimeout(() => {
+                const input = document.getElementById(`mobileInput-${fieldName}`);
+                if (input) {
+                    input.focus();
+                    if (input.select) input.select();
+                }
+            }, 100);
+        }
+        
+        function saveMobileEdit(fieldName) {
+            const input = document.getElementById(`mobileInput-${fieldName}`);
+            if (input) {
+                formState[fieldName] = input.value;
+                updateFieldDisplay(fieldName, input.value);
+            }
+            cancelMobileEdit(fieldName);
+        }
+        
+        function cancelMobileEdit(fieldName) {
+            const modal = document.querySelector('.mobile-field-modal');
+            if (modal) {
+                modal.remove();
+            }
+            activeField = null;
+        }
+        
         function setupInputEventListeners(inputElement, fieldName) {
             inputElement.addEventListener('blur', () => {
                 if (activeField === fieldName) {

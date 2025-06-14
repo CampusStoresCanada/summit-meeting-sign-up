@@ -4188,57 +4188,106 @@
                 return;
             }
             
-            console.log('✅ Validation passed, submitting...');
+            console.log('✅ Validation passed, processing submission...');
             
             // Show loading state
             const nextBtn = document.querySelector('.next-btn');
             const originalText = nextBtn.innerHTML;
-            nextBtn.innerHTML = 'Submitting... <span>⏳</span>';
+            nextBtn.innerHTML = 'Processing... <span>⏳</span>';
             nextBtn.disabled = true;
             
+            let teamProcessed = false;
+            let vendorSubmitted = false;
+            
             try {
-                // Collect all the data
-                const submissionData = {
-                    token: new URLSearchParams(window.location.search).get('token'),
-                    formState: formState,
-                    teamState: {
-                        attendingContacts: Array.from(teamState.attendingContacts),
-                        editedContacts: teamState.editedContacts,
-                        newContacts: teamState.newContacts
-                    },
-                    primaryContactState: primaryContactState,
-                    catalogueState: catalogueState
+                const token = new URLSearchParams(window.location.search).get('token');
+                
+                // Step 1: Process conference team changes (immediate)
+                console.log('👥 Processing conference team...');
+                nextBtn.innerHTML = 'Saving team... <span>⏳</span>';
+                
+                const contactOperations = {
+                    create: teamState.newContacts || [],
+                    update: Object.keys(teamState.editedContacts || {}).map(contactId => ({
+                        originalId: contactId,
+                        name: teamState.editedContacts[contactId].name,
+                        workEmail: teamState.editedContacts[contactId].email,
+                        workPhone: teamState.editedContacts[contactId].phone,
+                        roleTitle: teamState.editedContacts[contactId].title
+                    })),
+                    delete: [], // We're not deleting contacts in this flow
+                    conferenceTeam: Array.from(teamState.attendingContacts).map(contactId => ({
+                        id: contactId,
+                        attending: true,
+                        isPrimary: contactId === primaryContactState.selectedContactId
+                    }))
                 };
                 
-                console.log('📋 Final submission data:', submissionData);
-                
-                // Submit to the API
-                const response = await fetch(`${API_BASE}/submit-vendor-profile`, {
+                const teamResponse = await fetch(`${API_BASE}/save-conference-team`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(submissionData)
+                    body: JSON.stringify({
+                        token: token,
+                        contactOperations: contactOperations
+                    })
                 });
                 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.details || 'Submission failed');
+                if (!teamResponse.ok) {
+                    const teamError = await teamResponse.json();
+                    throw new Error(`Team processing failed: ${teamError.details || teamError.error}`);
                 }
                 
-                const result = await response.json();
-                console.log('✅ Submission successful:', result);
+                const teamResult = await teamResponse.json();
+                console.log('✅ Conference team processed:', teamResult);
+                teamProcessed = true;
                 
-                // Show success state
+                // Step 2: Submit vendor data for approval
+                console.log('📝 Submitting vendor data for review...');
+                nextBtn.innerHTML = 'Submitting profile... <span>⏳</span>';
+                
+                const vendorData = {
+                    token: token,
+                    formState: formState,
+                    catalogueState: catalogueState
+                    // Note: We don't send team state here since it's already processed
+                };
+                
+                const vendorResponse = await fetch(`${API_BASE}/submit-vendor-profile`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(vendorData)
+                });
+                
+                if (!vendorResponse.ok) {
+                    const vendorError = await vendorResponse.json();
+                    throw new Error(`Vendor submission failed: ${vendorError.details || vendorError.error}`);
+                }
+                
+                const vendorResult = await vendorResponse.json();
+                console.log('✅ Vendor data submitted:', vendorResult);
+                vendorSubmitted = true;
+                
+                // Success! Both operations completed
+                console.log('🎉 Complete! Team processed + Vendor data submitted for review');
                 showSuccessState();
                 
             } catch (error) {
                 console.error('💥 Submission failed:', error);
                 
-                // Restore button and show error
+                // Restore button and show detailed error
                 nextBtn.innerHTML = originalText;
                 nextBtn.disabled = false;
                 
-                // Show error message
-                alert(`Submission failed: ${error.message}. Please try again.`);
+                // Provide helpful error message based on what succeeded/failed
+                let errorMessage = `Submission failed: ${error.message}`;
+                
+                if (teamProcessed && !vendorSubmitted) {
+                    errorMessage += '\n\nNote: Your team changes were saved successfully, but the vendor profile submission failed. You can try submitting again and your team data will not be affected.';
+                } else if (!teamProcessed) {
+                    errorMessage += '\n\nPlease try again.';
+                }
+                
+                alert(errorMessage);
             }
         }
     </script>

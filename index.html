@@ -2167,6 +2167,21 @@
             .final-text {
                 font-size: 16px;
             }
+            .final-state.active {
+                display: flex !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                z-index: 9999 !important;
+                background: #ffffff !important;
+            }
+            
+            .final-state.active .wizard-container {
+                position: relative !important;
+                z-index: 10000 !important;
+            }
         }
     </style>
 </head>
@@ -2779,7 +2794,7 @@
         // WIZARD STATE MANAGEMENT
         // ===========================================
         let currentStep = 0;
-        const totalSteps = 6;
+        const totalSteps = 5;
         let vendorData = {};
         let organizationContacts = [];
         let conferenceTeam = [];
@@ -4507,6 +4522,14 @@
                 reader.readAsDataURL(file);
             });
         }
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
         
         function showCatalogueError(message) {
             const errorElement = document.getElementById('catalogueError');
@@ -4514,6 +4537,26 @@
             errorElement.textContent = message;
             errorElement.style.display = 'block';
             setTimeout(() => errorElement.style.display = 'none', 5000);
+        }
+
+        function showUploadedImage(imageUrl) {
+            const placeholder = document.getElementById('imagePlaceholder');
+            const uploadedImage = document.getElementById('uploadedImage');
+            const container = document.getElementById('imageUploadContainer');
+            
+            if (placeholder && uploadedImage && container) {
+                placeholder.style.display = 'none';
+                uploadedImage.src = imageUrl;
+                uploadedImage.style.display = 'block';
+                
+                // Update overlay text for uploaded state
+                const overlay = document.getElementById('imageOverlay');
+                if (overlay) {
+                    overlay.textContent = 'Click to change image';
+                }
+                
+                console.log('📸 Image displayed successfully');
+            }
         }
 
         function validateFinalSubmission() {
@@ -4669,22 +4712,35 @@
             
             // Set booth number in success state
             const boothNumber = document.getElementById('boothNumber').textContent;
-            document.getElementById('finalBoothNumber').textContent = boothNumber;
+            const finalBoothNumber = document.getElementById('finalBoothNumber');
+            if (finalBoothNumber) {
+                finalBoothNumber.textContent = boothNumber;
+            }
+            
+            // Hide main wizard completely
+            document.getElementById('wizardContent').style.display = 'none';
             
             document.getElementById('finalSuccessState').classList.add('active');
+            console.log('🎉 Showing final success state');
         }
         
         function showFinalErrorState(errorMessage, teamProcessed, vendorSubmitted) {
             hideUploadingState();
             
-            // Set booth number in error state
+            // Set booth number in error state  
             const boothNumber = document.getElementById('boothNumber').textContent;
-            document.getElementById('errorBoothNumber').textContent = boothNumber;
+            const errorBoothNumber = document.getElementById('errorBoothNumber');
+            if (errorBoothNumber) {
+                errorBoothNumber.textContent = boothNumber;
+            }
             
-            // Could customize error message based on what failed
+            // Hide main wizard completely
+            document.getElementById('wizardContent').style.display = 'none';
+            
             console.log('Error details:', { errorMessage, teamProcessed, vendorSubmitted });
             
             document.getElementById('finalErrorState').classList.add('active');
+            console.log('❌ Showing final error state');
         }
     </script>
 </body>

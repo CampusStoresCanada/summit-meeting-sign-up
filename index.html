@@ -552,6 +552,18 @@
         const API_BASE = '/api';
         
         // ===========================================
+        // STUPID REINITIALIZE STOPPER
+        // ===========================================
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // Only update progress bar, don't reinitialize
+                updateMobileProgress();
+            }, 250);
+        });
+        
+        // ===========================================
         // CROPPER MANAGEMENT
         // ===========================================
         let cropperInstance = null;

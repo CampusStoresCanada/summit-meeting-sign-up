@@ -4473,9 +4473,16 @@
         
         // State management functions
         function showUploadingState() {
-            document.getElementById('uploadingState').classList.add('active');
-            // Hide the main wizard
+            const uploadingElement = document.getElementById('uploadingState');
+            console.log('🔍 Uploading element:', uploadingElement);
+            console.log('🔍 Before - display style:', uploadingElement.style.display);
+            console.log('🔍 Before - has active class:', uploadingElement.classList.contains('active'));
+            
+            uploadingElement.classList.add('active');
             document.getElementById('wizardContent').style.display = 'none';
+            
+            console.log('🔍 After - has active class:', uploadingElement.classList.contains('active'));
+            console.log('🔍 After - computed style:', window.getComputedStyle(uploadingElement).display);
         }
         
         function updateUploadingState(title, subtitle) {

@@ -2728,3 +2728,92 @@ body::before {
         bottom: 76px;
     }
 }
+/* ===========================================
+   Mobile Field Modal
+   =========================================== */
+.mobile-field-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.mobile-field-content {
+    background: white;
+    margin: 20px;
+    border-radius: 12px;
+    max-width: 400px;
+    width: calc(100% - 40px);
+}
+
+.mobile-field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.mobile-field-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.mobile-field-header button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.mobile-field-body {
+    padding: 20px;
+}
+
+.mobile-field-body input,
+.mobile-field-body textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px; /* Important for iOS to prevent zoom */
+    font-family: inherit;
+}
+
+.mobile-field-body textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.mobile-field-actions {
+    display: flex;
+    gap: 12px;
+    padding: 20px;
+    border-top: 1px solid #eee;
+}
+
+.mobile-field-actions button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.mobile-field-actions button:first-child {
+    background: #f8f9fa;
+    color: #666;
+}
+
+.mobile-field-actions button:last-child {
+    background: #0071bc;
+    color: white;
+}

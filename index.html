@@ -2509,6 +2509,27 @@
             document.getElementById('uploadingState').classList.remove('active');
             document.getElementById('wizardContent').style.display = 'flex';
         }
+        // Handle orientation changes
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                // Force layout recalculation
+                document.body.style.height = '100vh';
+                setTimeout(() => {
+                    document.body.style.height = 'auto';
+                }, 100);
+            }, 500);
+        });
+
+        // Simple resize handler
+        window.addEventListener('resize', () => {
+            clearTimeout(window.resizeTimeout);
+            window.resizeTimeout = setTimeout(() => {
+            }, 250);
+        });
+
+        console.log('📱 Simplified vendor profile wizard loaded!');
+        
+        });
     </script>
 </body>
 </html>

@@ -3348,15 +3348,16 @@
                     if (progress > 90) progress = 90;
                     progressFill.style.width = progress + '%';
                 }, 200);
-
+        
                 try {
                     const organizationName = formState?.companyName || 'Demo Company';
                     const token = new URLSearchParams(window.location.search).get('token') || 'demo-token';
                     const base64 = await blobToBase64(blob);
                     
+                    // Consistent naming - always overwrites the previous image
                     const uploadData = {
                         files: [{
-                            name: `highlight-image-${Date.now()}.jpg`,
+                            name: 'highlight-image.jpg', // Always the same name
                             content: base64.split(',')[1],
                             type: 'image/jpeg',
                             fieldName: 'highlightImage'
@@ -3364,15 +3365,15 @@
                         organizationName: organizationName,
                         token: token
                     };
-
+        
                     const response = await fetch(`${API_BASE}/upload-to-s3`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(uploadData)
                     });
-
+        
                     if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
-
+        
                     const result = await response.json();
                     
                     clearInterval(progressInterval);
@@ -3382,7 +3383,7 @@
                         progressContainer.style.display = 'none';
                         progressFill.style.width = '0%';
                     }, 1000);
-
+        
                     const imageUrl = result.uploadResults?.highlightImageUrl;
                     
                     if (imageUrl) {
@@ -3392,7 +3393,7 @@
                     } else {
                         throw new Error('No highlight image URL found in response');
                     }
-
+        
                 } catch (error) {
                     console.error('💥 Upload failed:', error);
                     clearInterval(progressInterval);
@@ -3400,26 +3401,6 @@
                     progressFill.style.width = '0%';
                     showImageError('Upload failed. Please try again.');
                 }
-            }
-        }
-        
-        function blobToBase64(blob) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
-        }
-        
-        function showUploadedImage(imageUrl) {
-            const placeholder = document.getElementById('imagePlaceholder');
-            const uploadedImage = document.getElementById('uploadedImage');
-            
-            if (placeholder && uploadedImage) {
-                placeholder.style.display = 'none';
-                uploadedImage.src = imageUrl;
-                uploadedImage.style.display = 'block';
             }
         }
         // ===========================================
@@ -4095,9 +4076,10 @@
                 const token = new URLSearchParams(window.location.search).get('token') || 'demo-token';
                 const base64 = await fileToBase64(file);
                 
+                // Consistent naming - always overwrites the previous catalogue
                 const uploadData = {
                     files: [{
-                        name: file.name,
+                        name: 'catalogue.pdf', // Always the same name
                         content: base64.split(',')[1],
                         type: file.type,
                         fieldName: 'catalogFile'
@@ -4128,7 +4110,7 @@
                     successSection.style.display = 'flex';
                     container.classList.add('uploaded');
                     
-                    // Update success text
+                    // Update success text with original filename for user feedback
                     document.getElementById('successFilename').textContent = file.name;
                     
                 }, 1000);

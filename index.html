@@ -2622,23 +2622,8 @@
                         <span>→</span>
                     </button>
                 </div> 
-        <!-- Crop Modal -->
-        <div class="crop-modal" id="cropModal">
-            <div class="crop-container">
-                <div class="crop-header">
-                    <div class="crop-title">Crop your image</div>
-                    <div class="crop-subtitle">Adjust the image to fit a 9:16 aspect ratio (portrait)</div>
-                </div>
-                <div class="crop-image-container">
-                    <img class="crop-image" id="cropImage" alt="Image to crop">
-                </div>
-                <div class="crop-actions">
-                    <button class="crop-btn secondary" onclick="cancelCrop()">Cancel</button>
-                    <button class="crop-btn primary" onclick="applyCrop()">Apply Crop</button>
-                </div>
-            </div>
-        </div>
-         <div class="final-state" id="finalSuccessState">
+                 <!-- Step 6: Endgame -->
+                 <div class="final-state" id="finalSuccessState">
                     <div class="wizard-container">
                         <!-- Keep the same sidebar as the main wizard -->
                         <div class="sidebar">
@@ -2788,6 +2773,23 @@
                         </div>
                     </div>
                 </div>
+        <!-- Crop Modal -->
+        <div class="crop-modal" id="cropModal">
+            <div class="crop-container">
+                <div class="crop-header">
+                    <div class="crop-title">Crop your image</div>
+                    <div class="crop-subtitle">Adjust the image to fit a 9:16 aspect ratio (portrait)</div>
+                </div>
+                <div class="crop-image-container">
+                    <img class="crop-image" id="cropImage" alt="Image to crop">
+                </div>
+                <div class="crop-actions">
+                    <button class="crop-btn secondary" onclick="cancelCrop()">Cancel</button>
+                    <button class="crop-btn primary" onclick="applyCrop()">Apply Crop</button>
+                </div>
+            </div>
+        </div>
+        
     </div>
     <script>
         // ===========================================
@@ -4720,7 +4722,11 @@
             // Hide main wizard completely
             document.getElementById('wizardContent').style.display = 'none';
             
-            document.getElementById('finalSuccessState').classList.add('active');
+            // Fix: Explicitly set display style to override inline style
+            const successState = document.getElementById('finalSuccessState');
+            successState.classList.add('active');
+            successState.style.display = 'flex';  // Add this line!
+            
             console.log('🎉 Showing final success state');
         }
         
@@ -4737,9 +4743,11 @@
             // Hide main wizard completely
             document.getElementById('wizardContent').style.display = 'none';
             
-            console.log('Error details:', { errorMessage, teamProcessed, vendorSubmitted });
+            const errorState = document.getElementById('finalErrorState');
+            errorState.classList.add('active');
+            errorState.style.display = 'flex';  // Add this line!
             
-            document.getElementById('finalErrorState').classList.add('active');
+            console.log('Error details:', { errorMessage, teamProcessed, vendorSubmitted });
             console.log('❌ Showing final error state');
         }
     </script>

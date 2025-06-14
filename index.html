@@ -4361,7 +4361,6 @@
            try {
                // Process conference team
                console.log('👥 Processing conference team...');
-               updateUploadingState('Saving team', 'Processing your team selections and contact updates...');
                
                const contactOperations = {
                    create: teamState.newContacts || [],
@@ -4398,7 +4397,6 @@
                
                // Submit vendor data
                console.log('📝 Submitting vendor data for review...');
-               updateUploadingState('Submitting profile', 'Sending your company information for review...');
                
                const vendorData = {
                    token: token,
@@ -4441,20 +4439,8 @@
         
         // State management functions
         function showUploadingState() {
-            const uploadingElement = document.getElementById('uploadingState');
-            const uploadingTitle = document.getElementById('uploadingText');
-            
-            console.log('🔍 Uploading element:', uploadingElement);
-            console.log('🔍 Title element:', uploadingTitle);
-            console.log('🔍 Title text:', uploadingTitle?.textContent);
-            
-            uploadingElement.classList.add('active');
+            document.getElementById('uploadingState').classList.add('active');
             document.getElementById('wizardContent').style.display = 'none';
-            
-            // Force check the computed styles of the inner elements
-            console.log('🔍 Title computed display:', window.getComputedStyle(uploadingTitle).display);
-            console.log('🔍 Title computed visibility:', window.getComputedStyle(uploadingTitle).visibility);
-            console.log('🔍 Title computed color:', window.getComputedStyle(uploadingTitle).color);
         }
         
         function hideUploadingState() {

@@ -2042,7 +2042,16 @@
         <div id="loadingState" class="loading">
             <div class="loading-title">Loading...</div>
         </div>
-
+         <!-- Upload Animation State -->
+        <div class="uploading-state" id="uploadingState">
+            <div class="uploading-title">
+                Uploading<span class="dots">
+                    <span class="dot">.</span>
+                    <span class="dot">.</span>
+                    <span class="dot">.</span>
+                </span>
+            </div>
+        </div>
         <!-- Error State -->
         <div id="errorState" class="error">
             <strong>Oops!</strong> <span id="errorMessage"></span>
@@ -2107,16 +2116,6 @@
                         </div>
                         <div class="step-title">Product catalogue</div>
                     </div>
-                </div>
-            </div>
-            <!-- Upload Animation State -->
-            <div class="uploading-state" id="uploadingState">
-                <div class="uploading-title">
-                    Uploading<span class="dots">
-                        <span class="dot">.</span>
-                        <span class="dot">.</span>
-                        <span class="dot">.</span>
-                    </span>
                 </div>
             </div>
             <!-- Main Content -->

@@ -4474,15 +4474,22 @@
         // State management functions
         function showUploadingState() {
             const uploadingElement = document.getElementById('uploadingState');
+            const uploadingTitle = document.getElementById('uploadingText');
+            const uploadingSubtitle = document.getElementById('uploadingSubtitle');
+            
             console.log('🔍 Uploading element:', uploadingElement);
-            console.log('🔍 Before - display style:', uploadingElement.style.display);
-            console.log('🔍 Before - has active class:', uploadingElement.classList.contains('active'));
+            console.log('🔍 Title element:', uploadingTitle);
+            console.log('🔍 Subtitle element:', uploadingSubtitle);
+            console.log('🔍 Title text:', uploadingTitle?.textContent);
+            console.log('🔍 Subtitle text:', uploadingSubtitle?.textContent);
             
             uploadingElement.classList.add('active');
             document.getElementById('wizardContent').style.display = 'none';
             
-            console.log('🔍 After - has active class:', uploadingElement.classList.contains('active'));
-            console.log('🔍 After - computed style:', window.getComputedStyle(uploadingElement).display);
+            // Force check the computed styles of the inner elements
+            console.log('🔍 Title computed display:', window.getComputedStyle(uploadingTitle).display);
+            console.log('🔍 Title computed visibility:', window.getComputedStyle(uploadingTitle).visibility);
+            console.log('🔍 Title computed color:', window.getComputedStyle(uploadingTitle).color);
         }
         
         function updateUploadingState(title, subtitle) {

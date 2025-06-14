@@ -514,17 +514,6 @@
                     </div>
                 </div>
             </div>
-            <div class="mobile-buttons" id="mobileButtons">
-                <button class="mobile-btn mobile-get-started" id="mobileGetStartedBtn" onclick="startWizard()">
-                    Get started <span>→</span>
-                </button>
-                <button class="mobile-btn mobile-prev" id="mobilePrevBtn" onclick="previousStep()">
-                    <span>←</span> Previous
-                </button>
-                <button class="mobile-btn mobile-next" id="mobileNextBtn" onclick="nextStep()">
-                    Next step <span>→</span>
-                </button>
-            </div>
     <script>
         // ===========================================
         // WIZARD STATE MANAGEMENT
@@ -558,8 +547,6 @@
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-                // Only update progress bar, don't reinitialize
-                updateMobileProgress();
             }, 250);
         });
         
@@ -569,255 +556,21 @@
         let cropperInstance = null;
         let currentFile = null;
         let initializedSteps = new Set();
-
-        // ===========================================
-        // IMPROVED MOBILE BUTTON MANAGEMENT - FIXED
-        // ===========================================
         
-        let isMobile = window.innerWidth <= 768;
-        let keyboardVisible = false;
-        let initialViewportHeight = window.innerHeight;
-        
-        function updateMobileButtons() {
-            if (!isMobile) return;
-            
-            const mobileButtons = document.getElementById('mobileButtons');
-            const prevBtn = document.getElementById('mobilePrevBtn');
-            const nextBtn = document.getElementById('mobileNextBtn');
-            const getStartedBtn = document.getElementById('mobileGetStartedBtn');
-            
-            if (!mobileButtons) {
-                console.log('❌ Mobile buttons container not found');
-                return;
-            }
-            
-            console.log('📱 Updating mobile buttons for step:', currentStep);
-            
-            // Show mobile button container
-            mobileButtons.style.display = 'flex';
-            
-            // Hide all buttons first
-            if (prevBtn) prevBtn.style.display = 'none';
-            if (nextBtn) nextBtn.style.display = 'none';
-            if (getStartedBtn) getStartedBtn.style.display = 'none';
-            
-            // Show appropriate buttons based on current step
-            if (currentStep === 0) {
-                // Welcome screen - show get started
-                if (getStartedBtn) {
-                    getStartedBtn.style.display = 'flex';
-                    console.log('📱 Showing get started button');
-                }
-            } else {
-                // Step screens - show prev/next
-                if (currentStep > 1 && prevBtn) {
-                    prevBtn.style.display = 'flex';
-                    console.log('📱 Showing previous button');
-                }
-                
-                if (nextBtn) {
-                    nextBtn.style.display = 'flex';
-                    
-                    // Update button text and click handler based on step
-                    if (currentStep === 5) {
-                        // Step 5 is Product catalogue - show Finish
-                        nextBtn.innerHTML = 'Finish <span>→</span>';
-                        // Remove any existing onclick and add new one
-                        nextBtn.onclick = finishWizard;
-                        console.log('📱 Set finish button for step 5');
-                    } else {
-                        // All other steps - show Next Step
-                        nextBtn.innerHTML = 'Next step <span>→</span>';
-                        // Remove any existing onclick and add new one
-                        nextBtn.onclick = nextStep;
-                        console.log('📱 Set next step button for step', currentStep);
-                    }
-                }
-            }
-        }
-        
-        function setupKeyboardDetection() {
-            if (!isMobile) return;
-            
-            const mobileButtons = document.getElementById('mobileButtons');
-            if (!mobileButtons) return;
-            
-            // Method 1: Visual Viewport API (modern browsers)
-            if (window.visualViewport) {
-                window.visualViewport.addEventListener('resize', () => {
-                    const heightDifference = initialViewportHeight - window.visualViewport.height;
-                    keyboardVisible = heightDifference > 150;
-                    
-                    console.log('📱 Keyboard detection - height diff:', heightDifference, 'visible:', keyboardVisible);
-                    
-                    if (keyboardVisible) {
-                        mobileButtons.classList.add('hidden');
-                    } else {
-                        mobileButtons.classList.remove('hidden');
-                    }
-                });
-            }
-            // Method 2: Fallback for older browsers
-            else {
-                let resizeTimer;
-                window.addEventListener('resize', () => {
-                    clearTimeout(resizeTimer);
-                    resizeTimer = setTimeout(() => {
-                        const heightDifference = initialViewportHeight - window.innerHeight;
-                        keyboardVisible = heightDifference > 150;
-                        
-                        if (keyboardVisible) {
-                            mobileButtons.classList.add('hidden');
-                        } else {
-                            mobileButtons.classList.remove('hidden');
-                        }
-                    }, 100);
-                });
-            }
-            
-            // Method 3: Input focus detection
-            document.addEventListener('focusin', (e) => {
-                if (e.target.matches('input, textarea, select')) {
-                    setTimeout(() => {
-                        if (mobileButtons) mobileButtons.classList.add('hidden');
-                    }, 300);
-                }
-            });
-            
-            document.addEventListener('focusout', (e) => {
-                if (e.target.matches('input, textarea, select')) {
-                    setTimeout(() => {
-                        if (!document.activeElement.matches('input, textarea, select')) {
-                            if (mobileButtons) mobileButtons.classList.remove('hidden');
-                        }
-                    }, 300);
-                }
-            });
-        }
-        
-        function initializeMobile() {
-            isMobile = window.innerWidth <= 768;
-            console.log('📱 Initializing mobile, isMobile:', isMobile);
-            
-            if (isMobile) {
-                setupKeyboardDetection();
-                // Call updateMobileButtons after a short delay to ensure DOM is ready
-                setTimeout(updateMobileButtons, 100);
-            }
-        }
-        
-        function updateMobileButtonsOnStepChange() {
-            if (isMobile) {
-                console.log('📱 Step changed, updating mobile buttons');
-                updateMobileButtons();
-            }
-        }
         
         // Initialize on DOMContentLoaded instead of just load
         document.addEventListener('DOMContentLoaded', () => {
             initialViewportHeight = window.innerHeight;
-            initializeMobile();
         });
         
         // Also initialize on load for backup
         window.addEventListener('load', () => {
             initialViewportHeight = window.innerHeight;
-            initializeMobile();
         });
         
         // Handle orientation changes
         window.addEventListener('orientationchange', () => {
             setTimeout(() => {
-                initialViewportHeight = window.innerHeight;
-                isMobile = window.innerWidth <= 768;
-                initializeMobile();
-                
-                if (typeof updateMobileProgress === 'function') {
-                    updateMobileProgress();
-                }
-            }, 500);
-        });
-        // ===========================================
-        // MOBILE INITIALIZATION
-        // ===========================================
-        
-        function initializeMobile() {
-            // Check if mobile
-            isMobile = window.innerWidth <= 768;
-            
-            if (isMobile) {
-                setupKeyboardDetection();
-                updateMobileButtons();
-                
-                // Hide desktop buttons on mobile
-                const desktopButtons = document.querySelectorAll('.main-content .get-started-btn, .main-content .next-btn, .main-content .previous-btn');
-                desktopButtons.forEach(btn => {
-                    btn.style.display = 'none';
-                });
-            }
-        }
-        
-        // Update your existing navigation functions to update mobile buttons
-        function updateMobileButtonsOnStepChange() {
-            if (isMobile) {
-                updateMobileButtons();
-            }
-        }
-        document.addEventListener('DOMContentLoaded', () => {
-            // Get started button handler
-            const mobileGetStartedBtn = document.getElementById('mobileGetStartedBtn');
-            if (mobileGetStartedBtn) {
-                mobileGetStartedBtn.addEventListener('click', startWizard);
-            }
-            
-            // Previous button handler
-            const mobilePrevBtn = document.getElementById('mobilePrevBtn');
-            if (mobilePrevBtn) {
-                mobilePrevBtn.addEventListener('click', previousStep);
-            }
-            
-            // Next button handler (handles both next and finish)
-            const mobileNextBtn = document.getElementById('mobileNextBtn');
-            if (mobileNextBtn) {
-                mobileNextBtn.addEventListener('click', () => {
-                    if (currentStep === 5) {
-                        finishWizard();
-                    } else {
-                        nextStep();
-                    }
-                });
-            }
-        });
-        
-        // ===========================================
-        // MOBILE ENHANCEMENTS
-        // ===========================================
-        
-        // Prevent zoom on input focus for iOS
-        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-            const viewportMeta = document.querySelector('meta[name="viewport"]');
-            viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-        }
-
-        // Handle orientation changes
-        window.addEventListener('orientationchange', () => {
-            setTimeout(() => {
-                initialViewportHeight = window.innerHeight;
-                isMobile = window.innerWidth <= 768;
-                
-                // Reinitialize mobile features
-                initializeMobile();
-                
-                // Call your existing updateMobileProgress function if it exists
-                if (typeof updateMobileProgress === 'function') {
-                    updateMobileProgress();
-                }
-                
-                // Force layout recalculation
-                document.body.style.height = '100vh';
-                setTimeout(() => {
-                    document.body.style.height = 'auto';
-                }, 100);
             }, 500);
         });
 
@@ -826,35 +579,6 @@
             document.addEventListener('touchstart', () => {}, { passive: true });
             document.addEventListener('touchmove', () => {}, { passive: true });
         }
-
-        // Add scroll-to-top for mobile navigation
-        function addMobileScrollToTop() {
-            if (window.innerWidth <= 768) {
-                window.scrollTo(0, 0);
-            }
-        }
-
-        // Initialize mobile features on load
-        window.addEventListener('load', () => {
-            initialViewportHeight = window.innerHeight;
-            initializeMobile();
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            const wasMobile = isMobile;
-            isMobile = window.innerWidth <= 768;
-            
-            // If switching between mobile/desktop
-            if (wasMobile !== isMobile) {
-                location.reload(); // Simple approach - reload to reset layout
-            }
-        });
-
-        // Update your existing nextStep() and previousStep() functions to include:
-        // addMobileScrollToTop();
-        // updateMobileButtonsOnStepChange();
-        
         console.log('📱 Mobile-optimized vendor profile wizard loaded!');
         
         // ===========================================
@@ -1027,15 +751,6 @@
         function createFieldOverlay(fieldName, x, y, width, height) {
             const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
             const config = fieldConfigs[fieldName];
-            
-            // Check if we're on mobile
-            const isMobile = window.innerWidth <= 768 || window.orientation !== undefined;
-            
-            if (isMobile) {
-                // Use a simple modal approach for mobile instead of overlay
-                createMobileFieldModal(fieldName, config);
-                return;
-            }
             
             const overlay = document.createElement('div');
             overlay.className = 'field-overlay active';
@@ -1468,8 +1183,6 @@
             currentStep = 1;
             showStep(currentStep);
             updateStepNavigation();
-            updateMobileProgress(); // If this function exists
-            updateMobileButtonsOnStepChange(); // Add this line
         }
 
         function nextStep() {
@@ -1486,9 +1199,6 @@
                 currentStep++;
                 showStep(currentStep);
                 updateStepNavigation();
-                updateMobileProgress(); // If this function exists
-                updateMobileButtonsOnStepChange(); // Add this line
-            }
         }
         
         function previousStep() {
@@ -1500,8 +1210,6 @@
                 currentStep--;
                 showStep(currentStep);
                 updateStepNavigation();
-                updateMobileProgress(); // If this function exists
-                updateMobileButtonsOnStepChange(); // Add this line
             }
         }
 
@@ -1561,12 +1269,6 @@
                     }
                 }
             });
-        }
-
-        function updateMobileProgress() {
-            const progressFill = document.querySelector('.mobile-progress-fill');
-            const progressPercent = ((currentStep - 1) / (totalSteps - 1)) * 100;
-            progressFill.style.width = `${Math.max(0, progressPercent)}%`;
         }
 
         // ===========================================

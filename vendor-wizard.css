@@ -31,7 +31,7 @@ body::before {
 }
 
 /* ===========================================
-   MOBILE BUTTONS (30% / 70% SPLIT)
+   MOBILE BUTTONS (30% / 70% SPLIT) - FIXED
    =========================================== */
 
 .mobile-buttons {
@@ -44,8 +44,8 @@ body::before {
     border-top: 1px solid #e6e6e6;
     padding: 12px;
     gap: 12px;
-    z-index: 1000;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 2000; /* Increased from 1000 */
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
     transition: transform 0.3s ease;
 }
 
@@ -61,6 +61,38 @@ body::before {
     /* Hide desktop buttons on mobile */
     .get-started-btn, .next-btn, .previous-btn {
         display: none !important;
+    }
+    
+    /* Add extra bottom padding to prevent content overlap */
+    .main-content {
+        padding-bottom: 140px !important; /* Increased from 120px */
+    }
+    
+    /* Ensure dropdowns appear above mobile buttons */
+    .dropdown-options {
+        z-index: 2100 !important;
+    }
+    
+    .custom-dropdown {
+        z-index: 2100;
+    }
+    
+    /* Ensure modals appear above everything */
+    .contact-modal {
+        z-index: 2200 !important;
+    }
+    
+    .crop-modal {
+        z-index: 2200 !important;
+    }
+    
+    /* Add extra space for upload containers */
+    .image-upload-container {
+        margin-bottom: 100px;
+    }
+    
+    .catalogue-upload-container {
+        margin-bottom: 100px;
     }
 }
 

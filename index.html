@@ -4150,17 +4150,66 @@
             setTimeout(() => errorElement.style.display = 'none', 5000);
         }
         
-        function finishWizard() {
-            console.log('🎉 Wizard complete!');
-            console.log('📋 Final state:');
-            console.log('- Form data:', formState);
-            console.log('- Team state:', teamState);
-            console.log('- Primary contact:', primaryContactState);
-            console.log('- Catalogue:', catalogueState);
+        async function finishWizard() {
+            console.log('🎉 Wizard complete! Validating submission...');
             
-            // TODO: Send all data to the backend API
-            // For now, just show success
-            showSuccessState();
+            // Validate before submitting
+            if (!validateFinalSubmission()) {
+                return;
+            }
+            
+            console.log('✅ Validation passed, submitting...');
+            
+            // Show loading state
+            const nextBtn = document.querySelector('.next-btn');
+            const originalText = nextBtn.innerHTML;
+            nextBtn.innerHTML = 'Submitting... <span>⏳</span>';
+            nextBtn.disabled = true;
+            
+            try {
+                // Collect all the data
+                const submissionData = {
+                    token: new URLSearchParams(window.location.search).get('token'),
+                    formState: formState,
+                    teamState: {
+                        attendingContacts: Array.from(teamState.attendingContacts),
+                        editedContacts: teamState.editedContacts,
+                        newContacts: teamState.newContacts
+                    },
+                    primaryContactState: primaryContactState,
+                    catalogueState: catalogueState
+                };
+                
+                console.log('📋 Final submission data:', submissionData);
+                
+                // Submit to the API
+                const response = await fetch(`${API_BASE}/submit-vendor-profile`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(submissionData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.details || 'Submission failed');
+                }
+                
+                const result = await response.json();
+                console.log('✅ Submission successful:', result);
+                
+                // Show success state
+                showSuccessState();
+                
+            } catch (error) {
+                console.error('💥 Submission failed:', error);
+                
+                // Restore button and show error
+                nextBtn.innerHTML = originalText;
+                nextBtn.disabled = false;
+                
+                // Show error message
+                alert(`Submission failed: ${error.message}. Please try again.`);
+            }
         }
     </script>
 </body>

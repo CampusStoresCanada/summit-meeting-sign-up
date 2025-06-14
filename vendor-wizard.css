@@ -937,7 +937,7 @@ body::before {
     height: 500px;
     border: 2px dashed #cccccc;
     border-radius: 12px;
-    background: #f8f8f8;
+    background: #cccccc; /* Changed from #f8f8f8 */
     cursor: pointer;
     transition: all 0.3s ease;
     overflow: hidden;
@@ -1757,9 +1757,9 @@ body::before {
     position: relative;
     width: 100%;
     height: 40vh;
-    border: 2px dashed #cccccc;
+    border: #cccccc;
     border-radius: 12px;
-    background: #f8f8f8;
+    background: #cccccc;
     cursor: pointer;
     transition: all 0.3s ease;
     overflow: hidden;
@@ -1770,7 +1770,7 @@ body::before {
 
 .catalogue-upload-container:hover {
     border-color: #0071bc;
-    background: #f0f8ff;
+    background: #e3f2fd;
 }
 
 .catalogue-upload-container.dragover {
@@ -1798,7 +1798,7 @@ body::before {
     height: 140px;
     margin-bottom: 16px;
     opacity: 0.6;
-    fill: #cccccc;
+    fill: #e8e8e8;
 }
 
 .catalogue-upload-container:hover .pdf-icon {
@@ -1984,7 +1984,7 @@ body::before {
     }
 
     .main-content {
-        padding: 24px 20px 100px 20px;
+        padding: 24px 20px 120px 20px;
         flex: 1;
         order: 2;
         display: flex;
@@ -2176,7 +2176,7 @@ body::before {
 
     .image-upload-container {
         height: 240px;
-        margin-bottom: 20px;
+        margin-bottom: 80px;
     }
 
     .content-section-right {
@@ -2420,6 +2420,7 @@ body::before {
     .catalogue-upload-container {
         height: 50vh;
         min-height: 300px;
+       margin-bottom: 80px;
     }
 
     .pdf-icon {

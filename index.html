@@ -4149,6 +4149,36 @@
             errorElement.style.display = 'block';
             setTimeout(() => errorElement.style.display = 'none', 5000);
         }
+
+        function validateFinalSubmission() {
+            const errors = [];
+            
+            // Validate required fields
+            if (!formState.companyName) {
+                errors.push('Company name is required');
+            }
+            
+            if (!formState.category) {
+                errors.push('Primary category is required');
+            }
+            
+            // Validate at least one attending contact
+            if (teamState.attendingContacts.size === 0) {
+                errors.push('At least one team member must be attending the conference');
+            }
+            
+            // Validate primary contact is selected
+            if (!primaryContactState.selectedContactId) {
+                errors.push('A primary contact must be selected');
+            }
+            
+            if (errors.length > 0) {
+                alert('Please fix the following issues:\n\n' + errors.join('\n'));
+                return false;
+            }
+            
+            return true;
+        }
         
         async function finishWizard() {
             console.log('🎉 Wizard complete! Validating submission...');

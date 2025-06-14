@@ -2622,7 +2622,23 @@
                         <span>→</span>
                     </button>
                 </div> 
-                <div class="final-state" id="finalSuccessState">
+        <!-- Crop Modal -->
+        <div class="crop-modal" id="cropModal">
+            <div class="crop-container">
+                <div class="crop-header">
+                    <div class="crop-title">Crop your image</div>
+                    <div class="crop-subtitle">Adjust the image to fit a 9:16 aspect ratio (portrait)</div>
+                </div>
+                <div class="crop-image-container">
+                    <img class="crop-image" id="cropImage" alt="Image to crop">
+                </div>
+                <div class="crop-actions">
+                    <button class="crop-btn secondary" onclick="cancelCrop()">Cancel</button>
+                    <button class="crop-btn primary" onclick="applyCrop()">Apply Crop</button>
+                </div>
+            </div>
+        </div>
+         <div class="final-state" id="finalSuccessState">
                     <div class="wizard-container">
                         <!-- Keep the same sidebar as the main wizard -->
                         <div class="sidebar">
@@ -2772,22 +2788,6 @@
                         </div>
                     </div>
                 </div>
-        <!-- Crop Modal -->
-        <div class="crop-modal" id="cropModal">
-            <div class="crop-container">
-                <div class="crop-header">
-                    <div class="crop-title">Crop your image</div>
-                    <div class="crop-subtitle">Adjust the image to fit a 9:16 aspect ratio (portrait)</div>
-                </div>
-                <div class="crop-image-container">
-                    <img class="crop-image" id="cropImage" alt="Image to crop">
-                </div>
-                <div class="crop-actions">
-                    <button class="crop-btn secondary" onclick="cancelCrop()">Cancel</button>
-                    <button class="crop-btn primary" onclick="applyCrop()">Apply Crop</button>
-                </div>
-            </div>
-        </div>
     </div>
     <script>
         // ===========================================

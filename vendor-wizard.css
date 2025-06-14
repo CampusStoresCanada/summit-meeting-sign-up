@@ -779,15 +779,11 @@ body::before {
     }
     
     .next-btn {
-        position: fixed !important;
-        right: 0px !important;
-        left: auto !important;
-        bottom: 20px !important;
-        width: 200px !important;
-        background: red !important;
-        z-index: 9999 !important;
-        margin: 0 !important;
-        transform: none !important;
+     right: 20px !important;
+     width: 60% !important;
+     background: #0071bc !important;
+     color: #ffffff !important;
+     border: none !important;
     }
 }
 /* ===========================================

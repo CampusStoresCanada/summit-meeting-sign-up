@@ -4366,110 +4366,106 @@
         }
         
         async function finishWizard() {
-            console.log('🎉 Wizard complete! Validating submission...');
-            
-            if (!validateFinalSubmission()) {
-                return;
-            }
-            
-            console.log('✅ Validation passed, processing submission...');
-            
-            // Show step 6 and uploading overlay
-            showStep(6);
-            showUploadingState();
-            
-            // Mark all steps as completed in sidebar
-            document.querySelectorAll('.step-item').forEach(item => {
-                item.classList.remove('active');
-                item.classList.add('completed');
-            });
-            
-            let teamProcessed = false;
-            let vendorSubmitted = false;
-            
-            try {
-                const token = new URLSearchParams(window.location.search).get('token');
-                
-                // Step 1: Process conference team changes
-                console.log('👥 Processing conference team...');
-                updateUploadingState('Saving team', 'Processing your team selections and contact updates...');
-                
-                const contactOperations = {
-                    create: teamState.newContacts || [],
-                    update: Object.keys(teamState.editedContacts || {}).map(contactId => ({
-                        originalId: contactId,
-                        name: teamState.editedContacts[contactId].name,
-                        workEmail: teamState.editedContacts[contactId].email,
-                        workPhone: teamState.editedContacts[contactId].phone,
-                        roleTitle: teamState.editedContacts[contactId].title
-                    })),
-                    delete: [],
-                    conferenceTeam: Array.from(teamState.attendingContacts).map(contactId => ({
-                        id: contactId,
-                        attending: true,
-                        isPrimary: contactId === primaryContactState.selectedContactId
-                    }))
-                };
-                
-                const teamResponse = await fetch(`${API_BASE}/save-conference-team`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        token: token,
-                        contactOperations: contactOperations
-                    })
-                });
-                
-                if (!teamResponse.ok) {
-                    const teamError = await teamResponse.json();
-                    throw new Error(`Team processing failed: ${teamError.details || teamError.error}`);
-                }
-                
-                const teamResult = await teamResponse.json();
-                console.log('✅ Conference team processed:', teamResult);
-                teamProcessed = true;
-                
-                // Step 2: Submit vendor data for approval
-                console.log('📝 Submitting vendor data for review...');
-                updateUploadingState('Submitting profile', 'Sending your company information for review...');
-                
-                const vendorData = {
-                    token: token,
-                    formState: formState,
-                    catalogueState: catalogueState
-                };
-                
-                const vendorResponse = await fetch(`${API_BASE}/submit-vendor-profile`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(vendorData)
-                });
-                
-                if (!vendorResponse.ok) {
-                    const vendorError = await vendorResponse.json();
-                    throw new Error(`Vendor submission failed: ${vendorError.details || vendorError.error}`);
-                }
-                
-                const vendorResult = await vendorResponse.json();
-                console.log('✅ Vendor data submitted:', vendorResult);
-                vendorSubmitted = true;
-                
-            // Success! Both operations completed
-            console.log('🎉 Complete! Team processed + Vendor data submitted for review');
-            
-            // Show success content
-            hideUploadingState();
-            document.getElementById('successContent').style.display = 'block';
-            
-            } catch (error) {
-                console.error('💥 Submission failed:', error);
-                
-                // Show error content
-                hideUploadingState();
-                document.getElementById('errorContent').style.display = 'block';
-                
-                console.log('Error details:', { error: error.message, teamProcessed, vendorSubmitted });
-            }
+           console.log('🎉 Wizard complete! Validating submission...');
+           
+           // Step 1: Validate
+           if (!validateFinalSubmission()) {
+               return;
+           }
+           
+           // Step 2: Initialize step 6 and mark everything complete
+           showStep(6);
+           document.querySelectorAll('.step-item').forEach(item => {
+               item.classList.remove('active');
+               item.classList.add('completed');
+           });
+           
+           // Step 3: Show uploading screen
+           showUploadingState();
+           
+           // Step 4: Try all the upload APIs
+           let hasErrors = false;
+           const token = new URLSearchParams(window.location.search).get('token');
+           
+           try {
+               // Process conference team
+               console.log('👥 Processing conference team...');
+               updateUploadingState('Saving team', 'Processing your team selections and contact updates...');
+               
+               const contactOperations = {
+                   create: teamState.newContacts || [],
+                   update: Object.keys(teamState.editedContacts || {}).map(contactId => ({
+                       originalId: contactId,
+                       name: teamState.editedContacts[contactId].name,
+                       workEmail: teamState.editedContacts[contactId].email,
+                       workPhone: teamState.editedContacts[contactId].phone,
+                       roleTitle: teamState.editedContacts[contactId].title
+                   })),
+                   delete: [],
+                   conferenceTeam: Array.from(teamState.attendingContacts).map(contactId => ({
+                       id: contactId,
+                       attending: true,
+                       isPrimary: contactId === primaryContactState.selectedContactId
+                   }))
+               };
+               
+               const teamResponse = await fetch(`${API_BASE}/save-conference-team`, {
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/json' },
+                   body: JSON.stringify({
+                       token: token,
+                       contactOperations: contactOperations
+                   })
+               });
+               
+               if (!teamResponse.ok) {
+                   const teamError = await teamResponse.json();
+                   throw new Error(`Team processing failed: ${teamError.details || teamError.error}`);
+               }
+               
+               console.log('✅ Conference team processed');
+               
+               // Submit vendor data
+               console.log('📝 Submitting vendor data for review...');
+               updateUploadingState('Submitting profile', 'Sending your company information for review...');
+               
+               const vendorData = {
+                   token: token,
+                   formState: formState,
+                   catalogueState: catalogueState
+               };
+               
+               const vendorResponse = await fetch(`${API_BASE}/submit-vendor-profile`, {
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/json' },
+                   body: JSON.stringify(vendorData)
+               });
+               
+               if (!vendorResponse.ok) {
+                   const vendorError = await vendorResponse.json();
+                   throw new Error(`Vendor submission failed: ${vendorError.details || vendorError.error}`);
+               }
+               
+               console.log('✅ Vendor data submitted');
+               
+           } catch (error) {
+               console.error('💥 API Error:', error);
+               hasErrors = true;
+           }
+           
+           // Step 5: Hide uploading and show results
+           hideUploadingState();
+           
+           // Step 6: Show success or failure
+           if (hasErrors) {
+               console.log('❌ Showing failure screen');
+               document.getElementById('errorContent').style.display = 'block';
+               document.getElementById('successContent').style.display = 'none';
+           } else {
+               console.log('✅ Showing success screen');
+               document.getElementById('successContent').style.display = 'block';
+               document.getElementById('errorContent').style.display = 'none';
+           }
         }
         
         // State management functions
@@ -4486,48 +4482,7 @@
         
         function hideUploadingState() {
             document.getElementById('uploadingState').classList.remove('active');
-        }
-        
-        function showFinalSuccessState() {
-            hideUploadingState();
-            
-            // Set booth number in success state
-            const boothNumber = document.getElementById('boothNumber').textContent;
-            const finalBoothNumber = document.getElementById('finalBoothNumber');
-            if (finalBoothNumber) {
-                finalBoothNumber.textContent = boothNumber;
-            }
-            
-            // Hide main wizard completely
-            document.getElementById('wizardContent').style.display = 'none';
-            
-            // Fix: Explicitly set display style to override inline style
-            const successState = document.getElementById('finalSuccessState');
-            successState.classList.add('active');
-            successState.style.display = 'flex';  // Add this line!
-            
-            console.log('🎉 Showing final success state');
-        }
-        
-        function showFinalErrorState(errorMessage, teamProcessed, vendorSubmitted) {
-            hideUploadingState();
-            
-            // Set booth number in error state  
-            const boothNumber = document.getElementById('boothNumber').textContent;
-            const errorBoothNumber = document.getElementById('errorBoothNumber');
-            if (errorBoothNumber) {
-                errorBoothNumber.textContent = boothNumber;
-            }
-            
-            // Hide main wizard completely
-            document.getElementById('wizardContent').style.display = 'none';
-            
-            const errorState = document.getElementById('finalErrorState');
-            errorState.classList.add('active');
-            errorState.style.display = 'flex';  // Add this line!
-            
-            console.log('Error details:', { errorMessage, teamProcessed, vendorSubmitted });
-            console.log('❌ Showing final error state');
+            document.getElementById('wizardContent').style.display = 'flex';
         }
     </script>
 </body>

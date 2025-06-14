@@ -514,7 +514,17 @@
                     </div>
                 </div>
             </div>
-    
+            <div class="mobile-buttons" id="mobileButtons">
+                <button class="mobile-btn mobile-get-started" id="mobileGetStartedBtn" onclick="startWizard()">
+                    Get started <span>→</span>
+                </button>
+                <button class="mobile-btn mobile-prev" id="mobilePrevBtn" onclick="previousStep()">
+                    <span>←</span> Previous
+                </button>
+                <button class="mobile-btn mobile-next" id="mobileNextBtn" onclick="nextStep()">
+                    Next step <span>→</span>
+                </button>
+            </div>
     <script>
         // ===========================================
         // WIZARD STATE MANAGEMENT
@@ -549,7 +559,7 @@
         let initializedSteps = new Set();
 
         // ===========================================
-        // MOBILE BUTTON MANAGEMENT
+        // IMPROVED MOBILE BUTTON MANAGEMENT
         // ===========================================
         
         let isMobile = window.innerWidth <= 768;
@@ -563,6 +573,8 @@
             const prevBtn = document.getElementById('mobilePrevBtn');
             const nextBtn = document.getElementById('mobileNextBtn');
             const getStartedBtn = document.getElementById('mobileGetStartedBtn');
+            
+            if (!mobileButtons) return;
             
             // Show mobile button container
             mobileButtons.style.display = 'flex';
@@ -583,7 +595,7 @@
                     nextBtn.style.display = 'flex';
                     
                     // Update next button text for final step
-                    if (currentStep === 5) { // Assuming step 5 is final
+                    if (currentStep === 5) {
                         nextBtn.innerHTML = 'Finish <span>→</span>';
                         nextBtn.onclick = finishWizard;
                     } else {
@@ -593,6 +605,105 @@
                 }
             }
         }
+        
+        function setupKeyboardDetection() {
+            if (!isMobile) return;
+            
+            const mobileButtons = document.getElementById('mobileButtons');
+            if (!mobileButtons) return;
+            
+            // Method 1: Visual Viewport API (modern browsers)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', () => {
+                    const heightDifference = initialViewportHeight - window.visualViewport.height;
+                    keyboardVisible = heightDifference > 150; // Threshold for keyboard
+                    
+                    if (keyboardVisible) {
+                        mobileButtons.classList.add('hidden');
+                    } else {
+                        mobileButtons.classList.remove('hidden');
+                    }
+                });
+            }
+            // Method 2: Fallback for older browsers
+            else {
+                let resizeTimer;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(() => {
+                        const heightDifference = initialViewportHeight - window.innerHeight;
+                        keyboardVisible = heightDifference > 150;
+                        
+                        if (keyboardVisible) {
+                            mobileButtons.classList.add('hidden');
+                        } else {
+                            mobileButtons.classList.remove('hidden');
+                        }
+                    }, 100);
+                });
+            }
+            
+            // Method 3: Input focus detection (additional safety)
+            document.addEventListener('focusin', (e) => {
+                if (e.target.matches('input, textarea, select')) {
+                    setTimeout(() => {
+                        mobileButtons.classList.add('hidden');
+                    }, 300); // Delay to allow keyboard animation
+                }
+            });
+            
+            document.addEventListener('focusout', (e) => {
+                if (e.target.matches('input, textarea, select')) {
+                    setTimeout(() => {
+                        if (!document.activeElement.matches('input, textarea, select')) {
+                            mobileButtons.classList.remove('hidden');
+                        }
+                    }, 300);
+                }
+            });
+        }
+        
+        function initializeMobile() {
+            // Check if mobile
+            isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                setupKeyboardDetection();
+                updateMobileButtons();
+            }
+        }
+        
+        // Update your existing navigation functions to include:
+        function updateMobileButtonsOnStepChange() {
+            if (isMobile) {
+                updateMobileButtons();
+            }
+        }
+        
+        // Initialize mobile features on load
+        window.addEventListener('load', () => {
+            initialViewportHeight = window.innerHeight;
+            initializeMobile();
+        });
+        
+        // Handle orientation changes
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                initialViewportHeight = window.innerHeight;
+                isMobile = window.innerWidth <= 768;
+                initializeMobile();
+                
+                if (typeof updateMobileProgress === 'function') {
+                    updateMobileProgress();
+                }
+                
+                // Force layout recalculation
+                document.body.style.height = '100vh';
+                setTimeout(() => {
+                    document.body.style.height = 'auto';
+                }, 100);
+            }, 500);
+        });
         
         // ===========================================
         // KEYBOARD DETECTION
@@ -1317,9 +1428,10 @@
                 showStep(currentStep);
                 updateStepNavigation();
                 updateMobileProgress();
+                updateMobileButtonsOnStepChange(); // Add this line
             }
         }
-
+        
         function previousStep() {
             if (activeField) {
                 saveField(activeField);
@@ -1330,6 +1442,7 @@
                 showStep(currentStep);
                 updateStepNavigation();
                 updateMobileProgress();
+                updateMobileButtonsOnStepChange(); // Add this line
             }
         }
 

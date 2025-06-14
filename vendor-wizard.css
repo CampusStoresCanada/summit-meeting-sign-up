@@ -753,7 +753,6 @@ body::before {
         padding-bottom: 100px !important;
     }
     
-    /* All buttons same base properties */
     .get-started-btn, .next-btn, .previous-btn {
         position: fixed !important;
         bottom: 20px !important;  /* Same height for all */
@@ -764,7 +763,6 @@ body::before {
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
     }
     
-    /* Get started - full width */
     .get-started-btn {
         left: 20px !important;
         width: calc(100% - 40px) !important;
@@ -772,7 +770,6 @@ body::before {
         color: #ffffff !important;
     }
     
-    /* Previous - left side */
     .previous-btn {
         left: 20px !important;
         width: 35% !important;
@@ -781,13 +778,16 @@ body::before {
         border: 2px solid #dee2e6 !important;
     }
     
-    /* Next - right side */
     .next-btn {
-        right: 20px !important;
-        width: 60% !important;
-        background: #0071bc !important;
-        color: #ffffff !important;
-        border: none !important;
+        position: fixed !important;
+        right: 0px !important;
+        left: auto !important;
+        bottom: 20px !important;
+        width: 200px !important;
+        background: red !important;
+        z-index: 9999 !important;
+        margin: 0 !important;
+        transform: none !important;
     }
 }
 /* ===========================================

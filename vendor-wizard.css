@@ -2719,7 +2719,7 @@ body::before {
 
 .video-container {
     position: relative;
-    aspect-ratio: 1/2;
+    aspect-ratio: 9/16;
     height: 60vh;
     border-radius: 12px;
     overflow: hidden !important;

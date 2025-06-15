@@ -246,7 +246,7 @@ body::before {
 
 /* Welcome Screen */
 .welcome-section {
-    width: 50%;
+    width: 45%;
     max-width: none;
     margin-top: 140px;
 }
@@ -2710,12 +2710,6 @@ body::before {
     gap: 40px;
     align-items: center;
     margin-top: 60px;
-}
-
-.welcome-section {
-    width: 37vw;
-    max-width: none;
-    margin-top: 0;
 }
 
 .welcome-video-section {

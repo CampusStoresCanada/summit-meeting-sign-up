@@ -2705,3 +2705,55 @@ body::before {
         bottom: 76px;
     }
 }
+.welcome-container {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    margin-top: 60px;
+}
+
+.welcome-section {
+    width: 37vw;
+    max-width: none;
+    margin-top: 0;
+}
+
+.welcome-video-section {
+    flex: 1;
+    max-width: 500px;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9/16; /* Portrait video */
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.video-fallback {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .welcome-container {
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 20px;
+    }
+    
+    .welcome-section {
+        width: 100%;
+    }
+    
+    .welcome-video-section {
+        max-width: 300px;
+    }
+}

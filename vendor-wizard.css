@@ -2726,10 +2726,11 @@ body::before {
 .video-container {
     position: relative;
     width: auto;
-    height: 50vh; /* Start here, adjust up/down as needed */
-    aspect-ratio: 9/16; /* Width will auto-calculate from height */
+    height: 60vh;
+    aspect-ratio: 1/2;
     border-radius: 12px;
     overflow: hidden;
+    right: 5vw;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 

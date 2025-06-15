@@ -2724,7 +2724,7 @@ body::before {
     aspect-ratio: 1/2;
     border-radius: 12px;
     overflow: hidden;
-    right: 5vw;
+    left: 5vw;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
@@ -2735,7 +2735,6 @@ body::before {
     width: 100% !important;
     height: 100% !important;
     border: none;
-    border-radius: 12px;
 }
 
 .video-fallback {

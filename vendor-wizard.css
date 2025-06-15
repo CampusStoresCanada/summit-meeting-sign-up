@@ -2723,7 +2723,7 @@ body::before {
     height: 60vh;
     aspect-ratio: 1/2;
     border-radius: 12px;
-    overflow: hidden;
+    overflow: hidden !important;
     left: 5vw;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }

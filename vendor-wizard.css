@@ -2725,11 +2725,22 @@ body::before {
 
 .video-container {
     position: relative;
-    width: 100%;
-    aspect-ratio: 9/16; /* Portrait video */
+    width: auto;
+    height: 50vh; /* Start here, adjust up/down as needed */
+    aspect-ratio: 9/16; /* Width will auto-calculate from height */
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    border: none;
+    border-radius: 12px;
 }
 
 .video-fallback {
@@ -2753,7 +2764,7 @@ body::before {
         width: 100%;
     }
     
-    .welcome-video-section {
-        max-width: 300px;
+   .video-container {
+        height: 40vh; /* Shorter on mobile so it fits better */
     }
 }

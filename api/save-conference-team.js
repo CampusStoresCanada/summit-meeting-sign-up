@@ -28,7 +28,8 @@ export default async function handler(req, res) {
 
   try {
     const { token, contactOperations } = req.body;
-    
+    console.log('🔍 BACKEND DEBUG - Received contactOperations:', JSON.stringify(contactOperations, null, 2));
+
     if (!token) {
       res.status(400).json({ error: 'Token is required' });
       return;

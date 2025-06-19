@@ -261,6 +261,10 @@ export default async function handler(req, res) {
       // First, we need to get the tag IDs from the Tag System database
       const tagSystemDbId = process.env.NOTION_TAG_SYSTEM_DB_ID || '1f9a69bf0cfd8034b919f51b7c4f2c67';
       
+      // Get the tags we need
+      const tagsToFind = ['26 Conference Exhibitor', 'Primary Contact', 'Secondary Contact'];
+      const tagIds = {};
+      
       for (const tagName of tagsToFind) {
         try {
           const tagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
@@ -272,11 +276,10 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
               filter: {
-                property: 'Name',
+                property: 'Name', // Assuming the tag name property is called 'Name'
                 title: { equals: tagName }
               }
             })
-          });
           });
           
           const tagData = await tagResponse.json();

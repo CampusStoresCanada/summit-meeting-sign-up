@@ -139,11 +139,10 @@ export default async function handler(req, res) {
     }
 
     if (formState.highlightDeal) {
-      submissionData.properties["Conference Special"] = {
+      submissionData.properties["Highlight The Deal"] = {
         rich_text: [{ text: { content: formState.highlightDeal } }]
       };
     }
-
     // Add file URLs
     if (formState.highlightImageUrl) {
       submissionData.properties["Highlight Picture S3"] = {

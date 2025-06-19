@@ -253,6 +253,10 @@ export default async function handler(req, res) {
         }
       }
     }
+    // DEBUG: Check if we reach the tagging section
+    console.log('🔍 DEBUG - About to check conference team tagging...');
+    console.log('🔍 DEBUG - contactOperations.conferenceTeam exists:', !!contactOperations.conferenceTeam);
+    console.log('🔍 DEBUG - contactOperations.conferenceTeam length:', contactOperations.conferenceTeam?.length);
 
     // Step 5: Handle conference team tagging
     if (contactOperations.conferenceTeam) {

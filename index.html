@@ -1251,23 +1251,16 @@
                     initializedSteps.add(3);
                     console.log('🚀 Step 3 initialized on first visit!');
                 }
-               function initializeStep4() {
-                    // First populate the list with all available contacts
-                    populatePrimaryContactList();
-                    
-                    // Then auto-select primary contact if one exists
-                    const primaryContact = organizationContacts.find(contact => contact.isPrimaryContact);
-                    if (primaryContact) {
-                        primaryContactState.selectedContactId = primaryContact.id;
-                        console.log(`🎯 Auto-selected primary contact: ${primaryContact.name}`);
-                        
-                        // Re-populate to show the selection
-                        setTimeout(() => {
-                            populatePrimaryContactList();
-                        }, 50);
+                if (stepNumber === 4) {
+                    if (!initializedSteps.has(4)) {
+                        initializeStep4();
+                        initializedSteps.add(4);
+                        console.log('🚀 Step 4 initialized on first visit!');
+                    } else {
+                        // Repopulate the list in case attending status changed
+                        populatePrimaryContactList();
+                        console.log('🔄 Step 4 refreshed with updated attending list');
                     }
-                    
-                    console.log('🚀 Step 4 (Primary Contact) initialized!');
                 }
                 if (stepNumber === 5 && !initializedSteps.has(5)) {
                     initializeStep5();
@@ -2111,44 +2104,13 @@
             }
         }
         // ===========================================
-        // STEP 4: PRIMARY CONTACT - DEBUG VERSION
+        // STEP 4: PRIMARY CONTACT SELECTION - FIXED
         // ===========================================
         
-        function initializeStep4() {
-            console.log('🚀 Step 4 (Primary Contact) initializing...');
-            console.log('📊 organizationContacts:', organizationContacts);
-            console.log('📊 teamState.newContacts:', teamState.newContacts);
-            
-            // First populate the list with all available contacts
-            populatePrimaryContactList();
-            
-            // Then auto-select primary contact if one exists
-            const primaryContact = organizationContacts.find(contact => contact.isPrimaryContact);
-            if (primaryContact) {
-                primaryContactState.selectedContactId = primaryContact.id;
-                console.log(`🎯 Auto-selected primary contact: ${primaryContact.name}`);
-                
-                // Re-populate to show the selection
-                setTimeout(() => {
-                    populatePrimaryContactList();
-                }, 50);
-            }
-            
-            console.log('✅ Step 4 (Primary Contact) initialized!');
-        }
-        
         function populatePrimaryContactList() {
-            console.log('👥 populatePrimaryContactList() starting...');
-            
             const primaryContactList = document.getElementById('primaryContactList');
-            console.log('🔍 primaryContactList element:', primaryContactList);
+            if (!primaryContactList) return;
             
-            if (!primaryContactList) {
-                console.error('❌ primaryContactList element not found!');
-                return;
-            }
-            
-            console.log('🧹 Clearing existing content...');
             primaryContactList.innerHTML = '';
         
             // COMBINE original contacts + newly created contacts from Step 3
@@ -2165,28 +2127,15 @@
                 }))
             ];
             
-            console.log('📋 allAvailableContacts:', allAvailableContacts);
-            console.log(`📊 Total contacts: ${allAvailableContacts.length} (${organizationContacts.length} original + ${teamState.newContacts.length} new)`);
-            
-            if (allAvailableContacts.length === 0) {
-                console.warn('⚠️ No contacts available for primary selection!');
-                primaryContactList.innerHTML = '<p style="padding: 20px; color: #666;">No contacts available for selection.</p>';
-                return;
-            }
-            
             allAvailableContacts.forEach((contact, index) => {
-                console.log(`👤 Creating element for contact ${index}:`, contact.name);
                 const contactElement = createPrimaryContactElement(contact, index);
                 primaryContactList.appendChild(contactElement);
             });
             
-            console.log(`✅ Populated ${allAvailableContacts.length} contacts in primary contact list`);
-            console.log('📏 Final primaryContactList innerHTML length:', primaryContactList.innerHTML.length);
+            console.log(`👤 Populated ${allAvailableContacts.length} contacts for primary selection (${organizationContacts.length} original + ${teamState.newContacts.length} new)`);
         }
         
         function createPrimaryContactElement(contact, index) {
-            console.log(`🏗️ Creating element for: ${contact.name}`);
-            
             const contactDiv = document.createElement('div');
             contactDiv.className = 'primary-contact-item';
             contactDiv.dataset.contactId = contact.id;
@@ -2195,7 +2144,6 @@
             const isSelected = primaryContactState.selectedContactId === contact.id;
             if (isSelected) {
                 contactDiv.classList.add('selected');
-                console.log(`✨ Contact ${contact.name} is pre-selected`);
             }
             
             // Get the contact data (check for edits from Step 3)
@@ -2224,26 +2172,7 @@
             // Make the whole item clickable
             contactDiv.addEventListener('click', () => selectPrimaryContact(contact.id));
             
-            console.log(`✅ Created element for ${contact.name}`);
             return contactDiv;
-        }
-        
-        function selectPrimaryContact(contactId) {
-            console.log(`👑 Selecting primary contact: ${contactId}`);
-            
-            // Update the state
-            primaryContactState.selectedContactId = contactId;
-            
-            // Find contact name for logging
-            const allContacts = [...organizationContacts, ...teamState.newContacts];
-            const contact = allContacts.find(c => c.id === contactId);
-            const contactData = teamState.editedContacts[contactId] || contact;
-            const contactName = contactData?.name || contact?.name || 'Unknown';
-            
-            console.log(`👑 Selected primary contact: ${contactName} (${contactId})`);
-            
-            // Refresh the entire list to show the updated selection
-            populatePrimaryContactList();
         }
         // ===========================================
         // STEP 5: PRODUCT CATALOGUE UPLOAD

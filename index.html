@@ -2123,7 +2123,7 @@
                     workPhone: newContact.workPhone,
                     roleTitle: newContact.roleTitle,
                     isPrimaryContact: false,
-                    isNew: true // Flag to indicate this is a newly created contact
+                    isNew: true
                 }))
             ];
             
@@ -2132,7 +2132,11 @@
                 primaryContactList.appendChild(contactElement);
             });
             
-            console.log(`👤 Populated ${allAvailableContacts.length} contacts for primary selection (${organizationContacts.length} original + ${teamState.newContacts.length} new)`);
+            // Count primary contacts for debugging
+            const primaryContactsCount = allAvailableContacts.filter(c => c.isPrimaryContact).length;
+            console.log(`👑 Found ${primaryContactsCount} primary contacts`);
+            
+            console.log(`✅ Returning ${allAvailableContacts.length} contacts for primary selection (${organizationContacts.length} original + ${teamState.newContacts.length} new)`);
         }
         
         function createPrimaryContactElement(contact, index) {

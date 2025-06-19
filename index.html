@@ -2483,7 +2483,12 @@
                        attending: true,
                        isPrimary: contactId === primaryContactState.selectedContactId
                    }))
-               };
+                };
+                
+                // ADD THIS DEBUG LOGGING:
+                console.log('🔍 DEBUG - teamState.attendingContacts:', teamState.attendingContacts);
+                console.log('🔍 DEBUG - primaryContactState.selectedContactId:', primaryContactState.selectedContactId);
+                console.log('🔍 DEBUG - contactOperations.conferenceTeam:', contactOperations.conferenceTeam);
                
                const teamResponse = await fetch(`${API_BASE}/save-conference-team`, {
                    method: 'POST',

@@ -146,9 +146,9 @@ export default async function handler(req, res) {
 
     // Add file URLs
     if (formState.highlightImageUrl) {
-      submissionData.properties["Highlight Image URL"] = {
-        url: formState.highlightImageUrl
-      };
+      submissionData.properties["Highlight Picture S3"] = {
+      url: formState.highlightImageUrl
+    };
     }
 
     if (catalogueState.uploadedUrl) {

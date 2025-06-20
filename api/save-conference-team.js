@@ -97,7 +97,7 @@ export default async function handler(req, res) {
                 rich_text: [{ text: { content: newContact.roleTitle || '' } }]
               },
               "Contact Type": {
-                multi_select: { name: "Vendor Partner" }
+                multi_select: [{ name: "Vendor Partner" }]
               },
               "Organization": {
                 relation: [{ id: organizationId }]

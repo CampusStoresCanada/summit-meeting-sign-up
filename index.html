@@ -1900,7 +1900,13 @@
         
         function openEditContactModal(contactId, contactIndex) {
             // Find the contact data
-            const contact = organizationContacts.find(c => c.id === contactId);
+            let contact = organizationContacts.find(c => c.id === contactId);
+            
+            // If not found in original contacts, check new contacts
+            if (!contact) {
+                contact = teamState.newContacts.find(c => c.id === contactId);
+            }
+            
             if (!contact) {
                 console.error('❌ Contact not found:', contactId);
                 return;

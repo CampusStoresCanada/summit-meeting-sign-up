@@ -1359,7 +1359,13 @@
         function populateForm(data) {
             console.log('📝 Populating form with:', data);
             
-            document.getElementById('boothNumber').textContent = `Booth ${data.boothNumber}`;
+            // Display organization logo instead of booth number
+            const boothElement = document.getElementById('boothNumber');
+            if (data.organization?.logo) {
+                boothElement.innerHTML = `<img src="${data.organization.logo}" alt="${data.organization.name} Logo" class="organization-logo">`;
+            } else {
+                boothElement.textContent = data.organization?.name || 'Organization';
+            }
             
             formState.companyName = data.organization?.name || '';
             formState.website = data.organization?.website || '';

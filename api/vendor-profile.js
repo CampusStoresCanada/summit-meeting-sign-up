@@ -97,6 +97,11 @@ module.exports = async function handler(req, res) {
       console.log(`No booth relation found for token: ${token}`);
     }
     
+    // Extract logo URL if available
+    const logoUrl = org.properties.Logo?.files?.[0]?.external?.url ||
+                   org.properties.Logo?.files?.[0]?.file?.url ||
+                   '';
+
     // Return the data
     const vendorData = {
       boothNumber: boothNumber,
@@ -104,7 +109,8 @@ module.exports = async function handler(req, res) {
         name: org.properties.Organization?.title?.[0]?.text?.content || '',
         website: org.properties.Website?.url || '',
         primaryCategory: org.properties['Primary Category']?.select?.name || '',
-        description: ''
+        description: '',
+        logo: logoUrl
       }
     };
     

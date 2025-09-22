@@ -187,11 +187,11 @@ body::before {
 
 /* Active step styling */
 .step-item.active .step-number svg {
-    fill: #0071bc !important;
+    fill: #ba003b !important;
 }
 
 .step-item.active .step-title {
-    color: #0071bc;
+    color: #ba003b;
     font-weight: 700;
 }
 
@@ -425,7 +425,7 @@ body::before {
     left: -2px;
     right: -2px;
     bottom: -2px;
-    border: 2px solid #0071bc;
+    border: 2px solid #ba003b;
     border-radius: 8px;
     clip-path: inset(0 100% 0 0);
     animation: drawBorderSweep 0.3s ease-out forwards;
@@ -441,7 +441,7 @@ body::before {
     font-family: 'davis-sans', sans-serif;
     font-weight: 600;
     font-size: 0.9vw;
-    color: #0071bc;
+    color: #ba003b;
     background: #ffffff;
     padding: 0 0.4vw;
     white-space: nowrap;
@@ -540,11 +540,11 @@ body::before {
 }
 
 .dropdown-display:hover {
-    border-color: #0071bc;
+    border-color: #ba003b;
 }
 
 .dropdown-display.open {
-    border-color: #0071bc;
+    border-color: #ba003b;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
@@ -571,7 +571,7 @@ body::before {
     left: 0;
     right: 0;
     background: #ffffff;
-    border: 2px solid #0071bc;
+    border: 2px solid #ba003b;
     border-top: none;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
@@ -587,7 +587,7 @@ body::before {
     font-weight: 400;
     font-size: 1.2vw;
     line-height: 1.2;
-    color: #0071bc;
+    color: #ba003b;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
@@ -605,7 +605,7 @@ body::before {
     position: absolute;
     font-family: 'davis-sans', sans-serif;
     font-size: 0.7vw;
-    color: #0071bc;
+    color: #ba003b;
     font-weight: 400;
     background: #ffffff;
     padding: 0.2vw 0.4vw;
@@ -617,7 +617,7 @@ body::before {
 
 .character-counter.warning {
     font-weight: 700;
-    color: #0071bc;
+    color: #ba003b;
 }
 
 /* ===========================================
@@ -692,7 +692,7 @@ body::before {
    =========================================== */
 
 .get-started-btn, .next-btn {
-    background: #0071bc;
+    background: #ba003b;
     color: #ffffff;
     border: none;
     width: max(12.5vw);
@@ -716,7 +716,7 @@ body::before {
 }
 
 .get-started-btn:hover, .next-btn:hover {
-    background: #005a94;
+    background: #9a0030;
 }
 
 .previous-btn {
@@ -766,7 +766,7 @@ body::before {
     .get-started-btn {
         left: 20px !important;
         width: calc(100% - 40px) !important;
-        background: #0071bc !important;
+        background: #ba003b !important;
         color: #ffffff !important;
     }
     
@@ -781,7 +781,7 @@ body::before {
     .next-btn {
      right: 20px !important;
      width: 60% !important;
-     background: #0071bc !important;
+     background: #ba003b !important;
      color: #ffffff !important;
      border: none !important;
     }
@@ -860,7 +860,7 @@ body::before {
 
 .mobile-progress-fill {
     height: 100%;
-    background: #0071bc;
+    background: #ba003b;
     transition: width 0.3s ease;
     border-radius: 3px;
 }
@@ -938,12 +938,12 @@ body::before {
 }
 
 .image-upload-container:hover {
-    border-color: #0071bc;
+    border-color: #ba003b;
     background: #f0f8ff;
 }
 
 .image-upload-container.dragover {
-    border-color: #0071bc;
+    border-color: #ba003b;
     background: #e3f2fd;
     transform: scale(1.02);
 }
@@ -1024,7 +1024,7 @@ body::before {
 
 .upload-progress-fill {
     height: 100%;
-    background: #0071bc;
+    background: #ba003b;
     width: 0%;
     transition: width 0.3s ease;
 }
@@ -1103,13 +1103,13 @@ body::before {
 }
 
 .crop-btn.primary {
-    background: #0071bc;
+    background: #ba003b;
     color: white;
     border: none;
 }
 
 .crop-btn.primary:hover {
-    background: #005a94;
+    background: #9a0030;
 }
 
 .crop-btn.secondary {
@@ -1393,7 +1393,7 @@ body::before {
 }
 
 .add-contact-section:hover {
-    border-color: #0071bc;
+    border-color: #ba003b;
     background: #f0f8ff;
 }
 
@@ -1405,7 +1405,7 @@ body::before {
 
 .add-contact-item .contact-name {
     font-weight: 600;
-    color: #0071bc;
+    color: #ba003b;
 }
 
 .add-contact-item .contact-details {
@@ -1631,7 +1631,7 @@ body::before {
     left: -2px;
     right: -2px;
     bottom: -2px;
-    border: 2px solid #0071bc;
+    border: 2px solid #ba003b;
     border-radius: 8px;
     clip-path: inset(0 100% 0 0);
     animation: drawBorderSweep 0.3s ease-out forwards;
@@ -1655,7 +1655,7 @@ body::before {
 }
 
 .modal-field-label.focused {
-    color: #0071bc;
+    color: #ba003b;
 }
 
 .modal-field-label.unfocused {
@@ -1698,12 +1698,12 @@ body::before {
 }
 
 .modal-btn.primary {
-    background: #0071bc;
+    background: #ba003b;
     color: #ffffff;
 }
 
 .modal-btn.primary:hover {
-    background: #005a94;
+    background: #9a0030;
 }
 
 .modal-btn.secondary {
@@ -1763,12 +1763,12 @@ body::before {
 }
 
 .catalogue-upload-container:hover {
-    border-color: #0071bc;
+    border-color: #ba003b;
     background: #e3f2fd;
 }
 
 .catalogue-upload-container.dragover {
-    border-color: #0071bc;
+    border-color: #ba003b;
     background: #e3f2fd;
     transform: scale(1.02);
 }
@@ -1796,7 +1796,7 @@ body::before {
 }
 
 .catalogue-upload-container:hover .pdf-icon {
-    fill: #0071bc;
+    fill: #ba003b;
     opacity: 0.8;
 }
 
@@ -2650,7 +2650,7 @@ body::before {
     .next-btn, .get-started-btn {
         right: 20px !important;
         width: calc(60% - 30px) !important; /* 60% minus gap */
-        background: #0071bc !important;
+        background: #ba003b !important;
         color: #ffffff !important;
         border: none !important;
     }

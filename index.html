@@ -615,7 +615,13 @@
             const display = document.getElementById('categoryDisplay');
             const options = document.getElementById('categoryOptions');
             const text = document.getElementById('categoryText');
-            
+
+            // Check if category dropdown exists (might not exist in membership renewal version)
+            if (!dropdown || !display || !options || !text) {
+                console.log('ℹ️ Category dropdown not found - skipping initialization (expected for membership renewal)');
+                return;
+            }
+
             // Click on display to toggle dropdown
             display.addEventListener('click', (e) => {
                 e.stopPropagation();

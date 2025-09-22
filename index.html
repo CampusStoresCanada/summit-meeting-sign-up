@@ -611,16 +611,21 @@
         // CUSTOM DROPDOWN FUNCTIONALITY - Updated for membership renewal
         // ===========================================
         function initializeDropdown() {
+            console.log('🔧 Initializing dropdown...');
             const dropdown = document.getElementById('categoryDropdown');
             const display = document.getElementById('categoryDisplay');
             const options = document.getElementById('categoryOptions');
             const text = document.getElementById('categoryText');
+
+            console.log('🔍 Dropdown elements:', { dropdown, display, options, text });
 
             // Check if category dropdown exists (might not exist in membership renewal version)
             if (!dropdown || !display || !options || !text) {
                 console.log('ℹ️ Category dropdown not found - skipping initialization (expected for membership renewal)');
                 return;
             }
+
+            console.log('✅ All dropdown elements found, proceeding with initialization');
 
             // Click on display to toggle dropdown
             display.addEventListener('click', (e) => {

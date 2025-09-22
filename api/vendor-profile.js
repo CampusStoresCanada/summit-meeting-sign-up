@@ -102,6 +102,24 @@ module.exports = async function handler(req, res) {
                    org.properties.Logo?.files?.[0]?.file?.url ||
                    '';
 
+    // Extract institution size
+    const institutionSize = org.properties['Institution Size']?.select?.name || '';
+
+    // Translation map for Institution Size
+    const institutionSizeLabels = {
+      'xsmall': 'XSmall (< 2,000 FTE)',
+      'small': 'Small (2,001 - 5,000 FTE)',
+      'medium': 'Medium (5,001 - 10,000 FTE)',
+      'large': 'Large (10,001 - 15,000 FTE)',
+      'xlarge': 'XLarge (> 15,001 FTE)'
+    };
+
+    // Create options array for dropdown
+    const institutionSizeOptions = Object.entries(institutionSizeLabels).map(([value, label]) => ({
+      value: value,
+      label: label
+    }));
+
     // Return the data
     const vendorData = {
       boothNumber: boothNumber,
@@ -109,9 +127,10 @@ module.exports = async function handler(req, res) {
         name: org.properties.Organization?.title?.[0]?.text?.content || '',
         website: org.properties.Website?.url || '',
         primaryCategory: org.properties['Primary Category']?.select?.name || '',
-        description: '',
+        institutionSize: institutionSize,
         logo: logoUrl
-      }
+      },
+      institutionSizeOptions: institutionSizeOptions
     };
     
     res.status(200).json(vendorData);

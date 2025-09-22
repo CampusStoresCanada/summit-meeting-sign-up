@@ -1,22 +1,30 @@
 // api/get-organization-contacts.js - Get all contacts for an organization
 export default async function handler(req, res) {
+  console.log('🚀 API called: get-organization-contacts');
+  console.log('📥 Request method:', req.method);
+  console.log('📥 Request query:', req.query);
+
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
+
   if (req.method === 'OPTIONS') {
+    console.log('✅ OPTIONS request handled');
     res.status(200).end();
     return;
   }
 
   if (req.method !== 'GET') {
+    console.log('❌ Wrong method:', req.method);
     res.status(405).json({ error: `Method ${req.method} not allowed, expected GET` });
     return;
   }
-  
+
   const token = req.query.token;
-  
+  console.log('🔑 Token received:', token);
+
   if (!token) {
+    console.log('❌ No token provided');
     res.status(400).json({ error: 'Token is required' });
     return;
   }
@@ -30,7 +38,17 @@ export default async function handler(req, res) {
   // Safety check
   if (!notionToken || !organizationsDbId || !contactsDbId) {
     console.error('❌ Missing environment variables!');
-    res.status(500).json({ error: 'Missing configuration' });
+    console.error('NOTION_TOKEN:', notionToken ? 'SET' : 'MISSING');
+    console.error('NOTION_ORGANIZATIONS_DB_ID:', organizationsDbId ? 'SET' : 'MISSING');
+    console.error('NOTION_CONTACTS_DB_ID:', contactsDbId ? 'SET' : 'MISSING');
+    res.status(500).json({
+      error: 'Missing configuration',
+      details: {
+        notionToken: notionToken ? 'SET' : 'MISSING',
+        organizationsDbId: organizationsDbId ? 'SET' : 'MISSING',
+        contactsDbId: contactsDbId ? 'SET' : 'MISSING'
+      }
+    });
     return;
   }
   
@@ -56,7 +74,13 @@ export default async function handler(req, res) {
     });
     
     if (!orgResponse.ok) {
-      throw new Error(`Organization lookup failed: ${orgResponse.status}`);
+      const errorText = await orgResponse.text();
+      console.error('❌ Organization lookup failed:', {
+        status: orgResponse.status,
+        statusText: orgResponse.statusText,
+        response: errorText
+      });
+      throw new Error(`Organization lookup failed: ${orgResponse.status} - ${errorText}`);
     }
     
     const orgData = await orgResponse.json();
@@ -129,7 +153,13 @@ export default async function handler(req, res) {
     });
     
     if (!contactsResponse.ok) {
-      throw new Error(`Contacts lookup failed: ${contactsResponse.status}`);
+      const errorText = await contactsResponse.text();
+      console.error('❌ Contacts lookup failed:', {
+        status: contactsResponse.status,
+        statusText: contactsResponse.statusText,
+        response: errorText
+      });
+      throw new Error(`Contacts lookup failed: ${contactsResponse.status} - ${errorText}`);
     }
     
     const contactsData = await contactsResponse.json();
@@ -188,9 +218,11 @@ export default async function handler(req, res) {
     
   } catch (error) {
     console.error('💥 Error fetching organization contacts:', error);
-    res.status(500).json({ 
-      error: 'Failed to fetch contacts', 
-      details: error.message 
+    console.error('💥 Error stack:', error.stack);
+    res.status(500).json({
+      error: 'Failed to fetch contacts',
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 }

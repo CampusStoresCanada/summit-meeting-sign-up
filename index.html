@@ -1467,12 +1467,12 @@
             } else {
                 document.getElementById(`step${stepNumber}Section`).classList.add('active');
                 if (stepNumber === 2 && !initializedSteps.has(2)) {
-                    initializeStep2();
+                    initializeStep3(); // Contact Management (Campus store team)
                     initializedSteps.add(2);
-                    console.log('🚀 Step 2 initialized on first visit!');
-                } 
+                    console.log('🚀 Step 2 (Contact Management) initialized on first visit!');
+                }
                 if (stepNumber === 3 && !initializedSteps.has(3)) {
-                    initializeStep3();
+                    initializeStep2(); // This was the old Step 2 functionality (image upload, etc.)
                     initializedSteps.add(3);
                     console.log('🚀 Step 3 initialized on first visit!');
                 }

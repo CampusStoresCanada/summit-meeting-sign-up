@@ -600,21 +600,34 @@
         // CUSTOM DROPDOWN FUNCTIONALITY - Updated for membership renewal
         // ===========================================
         function initializeDropdown() {
-            console.log('🔧 Initializing dropdown...');
-            const dropdown = document.getElementById('categoryDropdown');
-            const display = document.getElementById('categoryDisplay');
-            const options = document.getElementById('categoryOptions');
-            const text = document.getElementById('categoryText');
+            console.log('🔧 Initializing dropdowns...');
 
-            console.log('🔍 Dropdown elements:', { dropdown, display, options, text });
+            // Try category dropdown first (legacy)
+            const categoryDropdown = document.getElementById('categoryDropdown');
+            const categoryDisplay = document.getElementById('categoryDisplay');
+            const categoryOptions = document.getElementById('categoryOptions');
+            const categoryText = document.getElementById('categoryText');
 
-            // Check if category dropdown exists (might not exist in membership renewal version)
-            if (!dropdown || !display || !options || !text) {
-                console.log('ℹ️ Category dropdown not found - skipping initialization (expected for membership renewal)');
-                return;
+            // Try institution size dropdown
+            const sizeDropdown = document.getElementById('institutionSizeDropdown');
+            const sizeDisplay = document.getElementById('institutionSizeDisplay');
+            const sizeOptions = document.getElementById('institutionSizeOptions');
+            const sizeText = document.getElementById('institutionSizeText');
+
+            // Initialize category dropdown if it exists
+            if (categoryDropdown && categoryDisplay && categoryOptions && categoryText) {
+                console.log('✅ Initializing category dropdown');
+                initializeSpecificDropdown(categoryDropdown, categoryDisplay, categoryOptions, categoryText, 'category');
             }
 
-            console.log('✅ All dropdown elements found, proceeding with initialization');
+            // Initialize institution size dropdown if it exists
+            if (sizeDropdown && sizeDisplay && sizeOptions && sizeText) {
+                console.log('✅ Initializing institution size dropdown');
+                initializeSpecificDropdown(sizeDropdown, sizeDisplay, sizeOptions, sizeText, 'institutionSize');
+            }
+        }
+
+        function initializeSpecificDropdown(dropdown, display, options, text, fieldType) {
 
             // Click on display to toggle dropdown
             display.addEventListener('click', (e) => {
@@ -634,7 +647,6 @@
                     const value = e.target.getAttribute('data-value');
                     selectOption(value);
                     closeDropdown();
-                    clearCategoryError();
                 }
             });
             
@@ -648,10 +660,7 @@
             function openDropdown() {
                 options.style.display = 'block';
                 display.classList.add('open');
-                categoryDropdownOpen = true;
-                clearCategoryError();
-                
-                const currentValue = formState.category;
+                const currentValue = formState[fieldType];
                 options.querySelectorAll('.dropdown-option').forEach(option => {
                     option.classList.remove('selected');
                     if (option.getAttribute('data-value') === currentValue) {
@@ -663,14 +672,24 @@
             function closeDropdown() {
                 options.style.display = 'none';
                 display.classList.remove('open');
-                categoryDropdownOpen = false;
+                // Dropdown closed
             }
             
             function selectOption(value) {
-                formState.category = value;
-                text.textContent = value;
+                formState[fieldType] = value;
+
+                // For institution size, we need to show the label, not the value
+                if (fieldType === 'institutionSize') {
+                    const selectedOption = options.querySelector(`[data-value="${value}"]`);
+                    if (selectedOption) {
+                        text.textContent = selectedOption.textContent;
+                    }
+                } else {
+                    text.textContent = value;
+                }
+
                 display.classList.remove('placeholder');
-                console.log('📝 Selected category:', value);
+                console.log(`📝 Selected ${fieldType}:`, value);
             }
         }
 

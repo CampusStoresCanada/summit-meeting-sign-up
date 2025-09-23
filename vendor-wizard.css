@@ -1516,9 +1516,20 @@ body::before {
     text-align: center;
 }
 
+.header-spacer {
+    flex: 1;
+    min-width: 0;
+}
+
+.header-edit {
+    width: 2vw;
+    flex-shrink: 0;
+}
+
 .header-attending {
-    margin-left: auto;
-    margin-right: 3vw;
+    width: 1.5vw;
+    flex-shrink: 0;
+    text-align: center;
 }
 
 /* Primary Contact Selector */
@@ -2551,8 +2562,12 @@ body::before {
         width: 24px;
     }
 
+    .header-edit {
+        width: 32px;
+    }
+
     .header-attending {
-        margin-right: 44px;
+        width: 24px;
     }
 
     /* Primary Contact Selector Mobile */

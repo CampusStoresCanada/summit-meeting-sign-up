@@ -1547,14 +1547,13 @@ body::before {
 .primary-placeholder {
     width: 1.2vw;
     height: 1.2vw;
-    border: 2px dashed #ddd;
+    border: 2px dashed #ccc;
     border-radius: 50%;
-    opacity: 0.5;
-    transition: opacity 0.2s ease;
+    opacity: 1;
+    transition: border-color 0.2s ease;
 }
 
 .primary-contact-selector:hover .primary-placeholder {
-    opacity: 1;
     border-color: #ba003b;
 }
 

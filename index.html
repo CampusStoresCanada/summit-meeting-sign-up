@@ -180,47 +180,15 @@
                             </div>
                         </div>
 
-                        <!-- Street Address Field -->
-                        <div class="form-field" data-field="streetAddress">
-                            <div class="field-display" id="streetAddressDisplay">Street address</div>
-                            <button class="edit-btn" onclick="editField('streetAddress')" id="editStreetAddress">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
-                                    <path d="m14.5 5.5 4 4"/>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <!-- City Field -->
-                        <div class="form-field" data-field="city">
-                            <div class="field-display" id="cityDisplay">City</div>
-                            <button class="edit-btn" onclick="editField('city')" id="editCity">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
-                                    <path d="m14.5 5.5 4 4"/>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <!-- Province Field -->
-                        <div class="form-field" data-field="province">
-                            <div class="custom-dropdown" id="provinceDropdown">
-                                <div class="dropdown-display" id="provinceDisplay">
-                                    <span id="provinceText">Select province</span>
-                                    <svg class="dropdown-arrow" viewBox="0 0 19.87 12.22">
-                                        <path d="M19.68.11c-.21-.17-.52-.15-.7.07l-9.03,10.77-.02-.02-.02.02L.88.18C.7-.04.39-.06.18.11-.04.29-.06.61.11.82l9.42,11.22c.1.12.24.18.38.18h.04c.14,0,.28-.06.38-.18L19.75.82c.17-.21.15-.53-.07-.71Z" fill="#999999"/>
-                                    </svg>
-                                </div>
-                                <div class="dropdown-options" id="provinceOptions" style="display: none;">
-                                    <!-- Options will be populated dynamically -->
+                        <!-- Address Block -->
+                        <div class="form-field" data-field="address">
+                            <div class="field-display address-block" id="addressDisplay">
+                                <div class="address-line-1" id="addressLine1">Street address</div>
+                                <div class="address-line-2" id="addressLine2">
+                                    <span id="cityPart">City</span>, <span id="provincePart">Province</span> <span id="postalCodePart">Postal Code</span>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Postal Code Field -->
-                        <div class="form-field" data-field="postalCode">
-                            <div class="field-display" id="postalCodeDisplay">Postal code</div>
-                            <button class="edit-btn" onclick="editField('postalCode')" id="editPostalCode">
+                            <button class="edit-btn" onclick="editField('address')" id="editAddress">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
                                     <path d="m14.5 5.5 4 4"/>
@@ -756,11 +724,11 @@
         // Field configurations
         const fieldConfigs = {
             // Step 1 fields (38vw width)
-            companyName: {
-                label: 'Company name',
+            institutionName: {
+                label: 'Institution name',
                 type: 'input',
-                inputClass: 'company-name',
-                placeholder: 'Enter company name',
+                inputClass: 'institution-name',
+                placeholder: 'Enter institution name',
                 maxLength: 100,
                 required: true,
                 width: '38vw'
@@ -809,6 +777,34 @@
                 maxLength: 200,
                 required: false,
                 width: '22vw'
+            },
+            address: {
+                label: 'Address',
+                type: 'address',
+                required: false,
+                width: '38vw',
+                fields: {
+                    streetAddress: {
+                        label: 'Street Address',
+                        placeholder: 'Enter street address',
+                        maxLength: 100
+                    },
+                    city: {
+                        label: 'City',
+                        placeholder: 'Enter city',
+                        maxLength: 50
+                    },
+                    province: {
+                        label: 'Province',
+                        placeholder: 'Select province',
+                        type: 'select'
+                    },
+                    postalCode: {
+                        label: 'Postal Code',
+                        placeholder: 'Enter postal code',
+                        maxLength: 7
+                    }
+                }
             }
         };
 
@@ -856,21 +852,27 @@
         function createFieldOverlay(fieldName, x, y, width, height) {
             const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
             const config = fieldConfigs[fieldName];
-            
+
+            // Handle address field specially
+            if (config.type === 'address') {
+                createAddressOverlay(fieldName, x, y, width, height);
+                return;
+            }
+
             const overlay = document.createElement('div');
             overlay.className = 'field-overlay active';
             overlay.id = `overlay-${fieldName}`;
-            
+
             const border = document.createElement('div');
             border.className = 'field-border';
-            
+
             const label = document.createElement('div');
             label.className = 'field-label';
             label.textContent = config.label;
-            
+
             const inputContainer = document.createElement('div');
             inputContainer.className = 'field-input-container';
-            
+
             let inputElement;
             if (config.type === 'textarea') {
                 inputElement = document.createElement('textarea');
@@ -884,32 +886,32 @@
                     inputElement.maxLength = config.maxLength;
                 }
             }
-            
+
             inputElement.placeholder = config.placeholder;
             inputElement.value = formState[fieldName] || '';
-            
+
             // Use the width from config (22vw for Step 2, 38vw for Step 1)
             const fieldWidth = config.width || '38vw';
             inputContainer.style.left = x + 'px';
             inputContainer.style.top = y + 'px';
             inputContainer.style.width = fieldWidth;
-            
+
             if (config.type === 'textarea') {
                 inputContainer.style.height = Math.max(height, 120) + 'px';
             } else {
                 inputContainer.style.height = height + 'px';
             }
-            
+
             const padding = 16;
             // Calculate border width based on the field's specific width
             const fieldWidthPercent = parseFloat(fieldWidth) / 100; // Convert 22vw to 0.22
             const inputWidthVw = window.innerWidth * fieldWidthPercent;
             const borderWidth = inputWidthVw + (padding * 2);
-            
+
             border.style.left = (x - padding) + 'px';
             border.style.top = (y - padding) + 'px';
             border.style.width = borderWidth + 'px';
-            
+
             if (config.type === 'textarea') {
                 border.style.height = (Math.max(height, 120) + padding * 2) + 'px';
             } else {
@@ -960,7 +962,7 @@
                     saveField(fieldName);
                 }
             });
-            
+
             inputElement.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && fieldConfigs[fieldName].type !== 'textarea') {
                     inputElement.blur();
@@ -968,6 +970,182 @@
                     cancelEdit(fieldName);
                 }
             });
+        }
+
+        function createAddressOverlay(fieldName, x, y, width, height) {
+            const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
+            const config = fieldConfigs[fieldName];
+
+            const overlay = document.createElement('div');
+            overlay.className = 'field-overlay active';
+            overlay.id = `overlay-${fieldName}`;
+
+            const border = document.createElement('div');
+            border.className = 'field-border';
+
+            const label = document.createElement('div');
+            label.className = 'field-label';
+            label.textContent = config.label;
+
+            const formContainer = document.createElement('div');
+            formContainer.className = 'address-form-container';
+
+            // Calculate dimensions for address form
+            const fieldWidth = config.width || '38vw';
+            const padding = 16;
+            const fieldWidthPercent = parseFloat(fieldWidth) / 100;
+            const inputWidthVw = window.innerWidth * fieldWidthPercent;
+            const borderWidth = inputWidthVw + (padding * 2);
+            const formHeight = 200; // Height for multiple fields
+
+            // Position form container
+            formContainer.style.left = x + 'px';
+            formContainer.style.top = y + 'px';
+            formContainer.style.width = fieldWidth;
+            formContainer.style.height = formHeight + 'px';
+
+            // Position border
+            border.style.left = (x - padding) + 'px';
+            border.style.top = (y - padding) + 'px';
+            border.style.width = borderWidth + 'px';
+            border.style.height = (formHeight + padding * 2) + 'px';
+
+            // Position label
+            label.style.left = (x - padding + 12) + 'px';
+            label.style.top = (y - padding - 9) + 'px';
+
+            // Create address form fields
+            const addressFields = ['streetAddress', 'city', 'province', 'postalCode'];
+            const addressData = formState.address || {};
+
+            addressFields.forEach((fieldKey, index) => {
+                const fieldConfig = config.fields[fieldKey];
+                const fieldRow = document.createElement('div');
+                fieldRow.className = 'address-field-row';
+                fieldRow.style.marginBottom = '12px';
+
+                const fieldLabel = document.createElement('label');
+                fieldLabel.className = 'address-field-label';
+                fieldLabel.textContent = fieldConfig.label;
+                fieldLabel.style.display = 'block';
+                fieldLabel.style.marginBottom = '4px';
+                fieldLabel.style.fontSize = '0.9em';
+                fieldLabel.style.color = '#666';
+
+                let fieldInput;
+                if (fieldKey === 'province') {
+                    fieldInput = document.createElement('select');
+                    fieldInput.className = 'address-field-select';
+
+                    // Add default option
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = 'Select province';
+                    fieldInput.appendChild(defaultOption);
+
+                    // Add province options from vendorData
+                    if (window.vendorData && window.vendorData.provinceOptions) {
+                        window.vendorData.provinceOptions.forEach(option => {
+                            const optionElement = document.createElement('option');
+                            optionElement.value = option.value;
+                            optionElement.textContent = option.label;
+                            fieldInput.appendChild(optionElement);
+                        });
+                    }
+
+                    fieldInput.value = addressData[fieldKey] || '';
+                } else {
+                    fieldInput = document.createElement('input');
+                    fieldInput.className = 'address-field-input';
+                    fieldInput.type = 'text';
+                    fieldInput.placeholder = fieldConfig.placeholder;
+                    fieldInput.value = addressData[fieldKey] || '';
+                    if (fieldConfig.maxLength) {
+                        fieldInput.maxLength = fieldConfig.maxLength;
+                    }
+                }
+
+                fieldInput.dataset.addressField = fieldKey;
+
+                fieldRow.appendChild(fieldLabel);
+                fieldRow.appendChild(fieldInput);
+                formContainer.appendChild(fieldRow);
+
+                // Focus first field
+                if (index === 0) {
+                    requestAnimationFrame(() => fieldInput.focus());
+                }
+            });
+
+            // Add save/cancel buttons
+            const buttonRow = document.createElement('div');
+            buttonRow.className = 'address-button-row';
+            buttonRow.style.marginTop = '16px';
+            buttonRow.style.display = 'flex';
+            buttonRow.style.gap = '8px';
+
+            const saveButton = document.createElement('button');
+            saveButton.className = 'address-save-btn';
+            saveButton.textContent = 'Save';
+            saveButton.style.padding = '8px 16px';
+            saveButton.style.backgroundColor = '#ba003b';
+            saveButton.style.color = 'white';
+            saveButton.style.border = 'none';
+            saveButton.style.borderRadius = '4px';
+            saveButton.style.cursor = 'pointer';
+
+            const cancelButton = document.createElement('button');
+            cancelButton.className = 'address-cancel-btn';
+            cancelButton.textContent = 'Cancel';
+            cancelButton.style.padding = '8px 16px';
+            cancelButton.style.backgroundColor = '#ccc';
+            cancelButton.style.color = '#333';
+            cancelButton.style.border = 'none';
+            cancelButton.style.borderRadius = '4px';
+            cancelButton.style.cursor = 'pointer';
+
+            buttonRow.appendChild(saveButton);
+            buttonRow.appendChild(cancelButton);
+            formContainer.appendChild(buttonRow);
+
+            overlay.appendChild(border);
+            overlay.appendChild(label);
+            overlay.appendChild(formContainer);
+            fieldElement.appendChild(overlay);
+
+            // Event listeners
+            saveButton.addEventListener('click', () => saveAddressField());
+            cancelButton.addEventListener('click', () => cancelEdit(fieldName));
+
+            // Handle Enter/Escape keys
+            formContainer.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.target.tagName !== 'SELECT') {
+                    saveAddressField();
+                } else if (e.key === 'Escape') {
+                    cancelEdit(fieldName);
+                }
+            });
+
+            function saveAddressField() {
+                const addressData = {};
+                const inputs = formContainer.querySelectorAll('[data-address-field]');
+
+                inputs.forEach(input => {
+                    const fieldKey = input.dataset.addressField;
+                    addressData[fieldKey] = input.value;
+                });
+
+                formState.address = addressData;
+                updateAddressDisplay();
+                removeFieldOverlay(fieldName);
+
+                const displayElement = document.getElementById('addressDisplay');
+                const editButton = document.getElementById('editAddress');
+                if (displayElement) displayElement.style.opacity = '1';
+                if (editButton) editButton.style.opacity = '1';
+
+                activeField = null;
+            }
         }
 
         function saveField(fieldName) {
@@ -1459,9 +1637,9 @@
             updateFieldDisplay('institutionName', formState.institutionName);
             updateFieldDisplay('website', formState.website);
             updateFieldDisplay('category', formState.category);
-            updateFieldDisplay('streetAddress', formState.streetAddress);
-            updateFieldDisplay('city', formState.city);
-            updateFieldDisplay('postalCode', formState.postalCode);
+
+            // Update address block display
+            updateAddressDisplay();
 
             // Populate dropdowns and set current values
             populateInstitutionSizeDropdown(data.institutionSizeOptions, formState.institutionSize);
@@ -1553,6 +1731,29 @@
                 }
             } else {
                 console.log('ℹ️ No current province value to set');
+            }
+        }
+
+        function updateAddressDisplay() {
+            const addressLine1 = document.getElementById('addressLine1');
+            const cityPart = document.getElementById('cityPart');
+            const provincePart = document.getElementById('provincePart');
+            const postalCodePart = document.getElementById('postalCodePart');
+
+            if (addressLine1) {
+                addressLine1.textContent = formState.streetAddress || 'Street address';
+            }
+
+            if (cityPart) {
+                cityPart.textContent = formState.city || 'City';
+            }
+
+            if (provincePart) {
+                provincePart.textContent = formState.province || 'Province';
+            }
+
+            if (postalCodePart) {
+                postalCodePart.textContent = formState.postalCode || 'Postal Code';
             }
         }
 

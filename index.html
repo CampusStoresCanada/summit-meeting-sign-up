@@ -996,7 +996,13 @@
             const fieldWidthPercent = parseFloat(fieldWidth) / 100;
             const inputWidthVw = window.innerWidth * fieldWidthPercent;
             const borderWidth = inputWidthVw + (padding * 2);
-            const formHeight = 220; // Height for multiple fields + buttons
+
+            // Calculate form height dynamically:
+            // 4 fields * 60px (label + input + margin) + 48px (button row + margins) + 20px extra padding
+            const fieldRowHeight = 60; // Estimated height per field row
+            const buttonRowHeight = 48; // Height for button row
+            const extraPadding = 20; // Extra padding for spacing
+            const formHeight = (4 * fieldRowHeight) + buttonRowHeight + extraPadding;
 
             // Position form container
             formContainer.style.left = x + 'px';
@@ -1004,9 +1010,8 @@
             formContainer.style.width = fieldWidth;
             formContainer.style.height = formHeight + 'px';
 
-            // Position border to match the original address display size but accommodate form
-            // Use the original height as minimum, but expand for form content
-            const borderHeight = Math.max(height + padding * 2, formHeight + padding * 2);
+            // Position border to encompass the entire form including buttons
+            const borderHeight = formHeight + (padding * 2);
             border.style.left = (x - padding) + 'px';
             border.style.top = (y - padding) + 'px';
             border.style.width = borderWidth + 'px';

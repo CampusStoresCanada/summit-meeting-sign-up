@@ -105,6 +105,12 @@ module.exports = async function handler(req, res) {
     // Extract institution size
     const institutionSize = org.properties['Institution Size']?.select?.name || '';
 
+    // Extract address information
+    const streetAddress = org.properties['Street Address']?.rich_text?.[0]?.text?.content || '';
+    const city = org.properties['City']?.rich_text?.[0]?.text?.content || '';
+    const province = org.properties['Province']?.select?.name || '';
+    const postalCode = org.properties['Postal Code']?.rich_text?.[0]?.text?.content || '';
+
     // Translation map for Institution Size
     const institutionSizeLabels = {
       'XSmall': 'XSmall (< 2,000 FTE)',
@@ -114,7 +120,25 @@ module.exports = async function handler(req, res) {
       'XLarge': 'XLarge (> 15,001 FTE)'
     };
 
-    // Create options array for dropdown
+    // Province options for dropdown
+    const provinceOptions = [
+      { value: 'Alberta', label: 'Alberta' },
+      { value: 'British Columbia', label: 'British Columbia' },
+      { value: 'Manitoba', label: 'Manitoba' },
+      { value: 'New Brunswick', label: 'New Brunswick' },
+      { value: 'Newfoundland and Labrador', label: 'Newfoundland and Labrador' },
+      { value: 'Northwest Territories', label: 'Northwest Territories' },
+      { value: 'Nova Scotia', label: 'Nova Scotia' },
+      { value: 'Nunavut', label: 'Nunavut' },
+      { value: 'Ontario', label: 'Ontario' },
+      { value: 'Prince Edward Island', label: 'Prince Edward Island' },
+      { value: 'Quebec', label: 'Quebec' },
+      { value: 'Saskatchewan', label: 'Saskatchewan' },
+      { value: 'Yukon', label: 'Yukon' },
+      { value: 'Out of Canada', label: 'Out of Canada' }
+    ];
+
+    // Create options array for institution size dropdown
     const institutionSizeOptions = Object.entries(institutionSizeLabels).map(([value, label]) => ({
       value: value,
       label: label
@@ -128,9 +152,16 @@ module.exports = async function handler(req, res) {
         website: org.properties.Website?.url || '',
         primaryCategory: org.properties['Primary Category']?.select?.name || '',
         institutionSize: institutionSize,
-        logo: logoUrl
+        logo: logoUrl,
+        address: {
+          streetAddress: streetAddress,
+          city: city,
+          province: province,
+          postalCode: postalCode
+        }
       },
-      institutionSizeOptions: institutionSizeOptions
+      institutionSizeOptions: institutionSizeOptions,
+      provinceOptions: provinceOptions
     };
     
     res.status(200).json(vendorData);

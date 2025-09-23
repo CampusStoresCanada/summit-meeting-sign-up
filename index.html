@@ -179,6 +179,54 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Street Address Field -->
+                        <div class="form-field" data-field="streetAddress">
+                            <div class="field-display" id="streetAddressDisplay">Street address</div>
+                            <button class="edit-btn" onclick="editField('streetAddress')" id="editStreetAddress">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                    <path d="m14.5 5.5 4 4"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- City Field -->
+                        <div class="form-field" data-field="city">
+                            <div class="field-display" id="cityDisplay">City</div>
+                            <button class="edit-btn" onclick="editField('city')" id="editCity">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                    <path d="m14.5 5.5 4 4"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Province Field -->
+                        <div class="form-field" data-field="province">
+                            <div class="custom-dropdown" id="provinceDropdown">
+                                <div class="dropdown-display" id="provinceDisplay">
+                                    <span id="provinceText">Select province</span>
+                                    <svg class="dropdown-arrow" viewBox="0 0 19.87 12.22">
+                                        <path d="M19.68.11c-.21-.17-.52-.15-.7.07l-9.03,10.77-.02-.02-.02.02L.88.18C.7-.04.39-.06.18.11-.04.29-.06.61.11.82l9.42,11.22c.1.12.24.18.38.18h.04c.14,0,.28-.06.38-.18L19.75.82c.17-.21.15-.53-.07-.71Z" fill="#999999"/>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-options" id="provinceOptions" style="display: none;">
+                                    <!-- Options will be populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Postal Code Field -->
+                        <div class="form-field" data-field="postalCode">
+                            <div class="field-display" id="postalCodeDisplay">Postal code</div>
+                            <button class="edit-btn" onclick="editField('postalCode')" id="editPostalCode">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                    <path d="m14.5 5.5 4 4"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Navigation Buttons -->
@@ -614,6 +662,12 @@
             const sizeOptions = document.getElementById('institutionSizeOptions');
             const sizeText = document.getElementById('institutionSizeText');
 
+            // Try province dropdown
+            const provinceDropdown = document.getElementById('provinceDropdown');
+            const provinceDisplay = document.getElementById('provinceDisplay');
+            const provinceOptionsElement = document.getElementById('provinceOptions');
+            const provinceTextElement = document.getElementById('provinceText');
+
             // Initialize category dropdown if it exists
             if (categoryDropdown && categoryDisplay && categoryOptions && categoryText) {
                 console.log('✅ Initializing category dropdown');
@@ -624,6 +678,12 @@
             if (sizeDropdown && sizeDisplay && sizeOptions && sizeText) {
                 console.log('✅ Initializing institution size dropdown');
                 initializeSpecificDropdown(sizeDropdown, sizeDisplay, sizeOptions, sizeText, 'institutionSize');
+            }
+
+            // Initialize province dropdown if it exists
+            if (provinceDropdown && provinceDisplay && provinceOptionsElement && provinceTextElement) {
+                console.log('✅ Initializing province dropdown');
+                initializeSpecificDropdown(provinceDropdown, provinceDisplay, provinceOptionsElement, provinceTextElement, 'province');
             }
         }
 
@@ -1391,13 +1451,21 @@
             formState.website = data.organization?.website || '';
             formState.category = data.organization?.primaryCategory || '';
             formState.institutionSize = data.organization?.institutionSize || '';
+            formState.streetAddress = data.organization?.address?.streetAddress || '';
+            formState.city = data.organization?.address?.city || '';
+            formState.province = data.organization?.address?.province || '';
+            formState.postalCode = data.organization?.address?.postalCode || '';
 
             updateFieldDisplay('institutionName', formState.institutionName);
             updateFieldDisplay('website', formState.website);
             updateFieldDisplay('category', formState.category);
+            updateFieldDisplay('streetAddress', formState.streetAddress);
+            updateFieldDisplay('city', formState.city);
+            updateFieldDisplay('postalCode', formState.postalCode);
 
-            // Populate institution size dropdown and set current value
+            // Populate dropdowns and set current values
             populateInstitutionSizeDropdown(data.institutionSizeOptions, formState.institutionSize);
+            populateProvinceDropdown(data.provinceOptions, formState.province);
             
             window.formData = {
                 organization: data.organization,
@@ -1444,6 +1512,47 @@
                 }
             } else {
                 console.log('ℹ️ No current value to set');
+            }
+        }
+
+        function populateProvinceDropdown(options, currentValue) {
+            console.log('🍁 Populating province dropdown:', { options, currentValue });
+
+            const optionsContainer = document.getElementById('provinceOptions');
+            const displayText = document.getElementById('provinceText');
+
+            if (!optionsContainer || !options) {
+                console.log('❌ Missing province elements:', { optionsContainer, options });
+                return;
+            }
+
+            // Clear existing options
+            optionsContainer.innerHTML = '';
+
+            // Populate options
+            options.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'dropdown-option';
+                optionElement.setAttribute('data-value', option.value);
+                optionElement.textContent = option.label;
+                optionsContainer.appendChild(optionElement);
+            });
+
+            // Set current value if exists
+            if (currentValue) {
+                console.log('🔍 Looking for current province:', currentValue);
+                const currentOption = options.find(option => option.value === currentValue);
+                console.log('📍 Found current province option:', currentOption);
+
+                if (currentOption) {
+                    displayText.textContent = currentOption.label;
+                    formState.province = currentValue;
+                    console.log('✅ Set province display to:', currentOption.label);
+                } else {
+                    console.log('❌ Current province value not found in options');
+                }
+            } else {
+                console.log('ℹ️ No current province value to set');
             }
         }
 

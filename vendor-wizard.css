@@ -1519,7 +1519,6 @@ body::before {
 .header-spacer {
     flex: 1;
     min-width: 0;
-    max-width: 20vw;
 }
 
 .header-attending {

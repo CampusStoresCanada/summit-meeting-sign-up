@@ -1406,10 +1406,15 @@
         }
 
         function populateInstitutionSizeDropdown(options, currentValue) {
+            console.log('🎯 Populating institution size dropdown:', { options, currentValue });
+
             const optionsContainer = document.getElementById('institutionSizeOptions');
             const displayText = document.getElementById('institutionSizeText');
 
-            if (!optionsContainer || !options) return;
+            if (!optionsContainer || !options) {
+                console.log('❌ Missing elements:', { optionsContainer, options });
+                return;
+            }
 
             // Clear existing options
             optionsContainer.innerHTML = '';
@@ -1421,15 +1426,24 @@
                 optionElement.setAttribute('data-value', option.value);
                 optionElement.textContent = option.label;
                 optionsContainer.appendChild(optionElement);
+                console.log('➕ Added option:', option);
             });
 
             // Set current value if exists
             if (currentValue) {
+                console.log('🔍 Looking for current value:', currentValue);
                 const currentOption = options.find(option => option.value === currentValue);
+                console.log('📍 Found current option:', currentOption);
+
                 if (currentOption) {
                     displayText.textContent = currentOption.label;
                     formState.institutionSize = currentValue;
+                    console.log('✅ Set display to:', currentOption.label);
+                } else {
+                    console.log('❌ Current value not found in options');
                 }
+            } else {
+                console.log('ℹ️ No current value to set');
             }
         }
 

@@ -1118,18 +1118,15 @@
 
         function validateAllFields() {
             let allValid = true;
-            
-            const companyNameError = validateField('companyName', formState.companyName);
-            if (companyNameError) {
-                console.log('❌ Company name validation failed:', companyNameError);
+
+            const institutionNameError = validateField('institutionName', formState.institutionName);
+            if (institutionNameError) {
+                console.log('❌ Institution name validation failed:', institutionNameError);
                 allValid = false;
             }
-            
-            if (!validateCategorySelection()) {
-                console.log('❌ Category validation failed');
-                allValid = false;
-            }
-            
+
+            // Institution size is optional, no validation needed
+
             return allValid;
         }
 

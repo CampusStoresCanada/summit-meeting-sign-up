@@ -1497,6 +1497,55 @@ body::before {
     background: #999999;
 }
 
+/* Contact Headers */
+.contact-headers {
+    display: flex;
+    align-items: center;
+    gap: 1.2vw;
+    padding: 0.5vw 0;
+    margin-bottom: 0.5vw;
+    font-family: 'davis-sans', sans-serif;
+    font-size: 0.9vw;
+    font-weight: 600;
+    color: #666;
+}
+
+.header-primary {
+    width: 1.5vw;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.header-attending {
+    margin-left: auto;
+    margin-right: 3vw;
+}
+
+/* Primary Contact Indicator */
+.primary-contact-indicator {
+    width: 1.5vw;
+    height: 1.5vw;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.1vw;
+}
+
+.primary-crown {
+    font-size: 1.2vw;
+    line-height: 1;
+}
+
+/* Dietary Restrictions */
+.contact-dietary {
+    font-family: 'davis-sans', sans-serif;
+    font-size: 0.8vw;
+    color: #999;
+    font-style: italic;
+    margin-top: 0.2vw;
+}
+
 .team-list-fade {
     position: absolute;
     bottom: 0;
@@ -2468,6 +2517,40 @@ body::before {
 
     .contact-edit svg {
         width: 16px;
+    }
+
+    /* Contact Headers Mobile */
+    .contact-headers {
+        font-size: 14px;
+        gap: 12px;
+        padding: 8px 0;
+        margin-bottom: 8px;
+    }
+
+    .header-primary {
+        width: 24px;
+    }
+
+    .header-attending {
+        margin-right: 44px;
+    }
+
+    /* Primary Contact Indicator Mobile */
+    .primary-contact-indicator {
+        width: 24px;
+        height: 24px;
+    }
+
+    .primary-crown {
+        font-size: 16px;
+    }
+
+    /* Dietary Restrictions Mobile */
+    .contact-dietary {
+        font-size: 12px;
+        grid-column: 1;
+        grid-row: 5;
+        margin-top: 4px;
         height: 16px;
     }
 

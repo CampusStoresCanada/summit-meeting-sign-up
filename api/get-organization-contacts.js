@@ -190,6 +190,7 @@ export default async function handler(req, res) {
         contactType: props['Contact Type']?.select?.name || '',
         tags: props.Tags?.multi_select?.map(tag => tag.name) || [],
         notes: props.Notes?.rich_text?.[0]?.text?.content || '',
+        dietaryRestrictions: props['Dietary Restrictions']?.rich_text?.[0]?.text?.content || '',
         isAttending: false,
         isPrimaryContact: isPrimaryContact
       };

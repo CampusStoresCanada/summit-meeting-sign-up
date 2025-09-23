@@ -2014,11 +2014,14 @@
             teamList.innerHTML = '';
             
             // Add header outside the scrolling area (if not already there)
-            let existingHeader = teamListWrapper.querySelector('.attending-header');
+            let existingHeader = teamListWrapper.querySelector('.contact-headers');
             if (!existingHeader) {
                 const headerDiv = document.createElement('div');
-                headerDiv.className = 'attending-header';
-                headerDiv.textContent = 'Attending?';
+                headerDiv.className = 'contact-headers';
+                headerDiv.innerHTML = `
+                    <div class="header-primary">Primary Contact?</div>
+                    <div class="header-attending">Attending Conference?</div>
+                `;
                 teamListWrapper.insertBefore(headerDiv, teamList);
             }
             
@@ -2049,8 +2052,14 @@
             const phone = contact.workPhone || '';
             const formattedPhone = phone ? formatPhoneForDisplay(phone) : '';
             
+            // Get dietary restrictions from Notion contact data
+            const dietaryRestrictions = contact.dietaryRestrictions || '';
+
             contactDiv.innerHTML = `
                 <div class="contact-item-clickable" onclick="toggleAttendance('${contact.id}')"></div>
+                <div class="primary-contact-indicator">
+                    ${contact.isPrimaryContact ? '<span class="primary-crown" title="Primary Contact">👑</span>' : ''}
+                </div>
                 <div class="contact-checkbox">
                     <div class="checkbox-circle ${isAttending ? 'checked' : ''}"></div>
                 </div>
@@ -2059,6 +2068,7 @@
                     <div class="contact-title">${contact.roleTitle || ''}</div>
                     <div class="contact-email">${contact.workEmail || ''}</div>
                     <div class="contact-phone">${formattedPhone}</div>
+                    <div class="contact-dietary">${dietaryRestrictions}</div>
                 </div>
                 <button class="contact-edit" onclick="editContact('${contact.id}', ${index}); event.stopPropagation();">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

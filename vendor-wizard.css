@@ -1521,8 +1521,8 @@ body::before {
     margin-right: 3vw;
 }
 
-/* Primary Contact Indicator */
-.primary-contact-indicator {
+/* Primary Contact Selector */
+.primary-contact-selector {
     width: 1.5vw;
     height: 1.5vw;
     flex-shrink: 0;
@@ -1530,11 +1530,32 @@ body::before {
     align-items: center;
     justify-content: center;
     margin-top: 0.1vw;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.primary-contact-selector:hover {
+    background-color: #f0f0f0;
 }
 
 .primary-crown {
     font-size: 1.2vw;
     line-height: 1;
+}
+
+.primary-placeholder {
+    width: 1.2vw;
+    height: 1.2vw;
+    border: 2px dashed #ddd;
+    border-radius: 50%;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+}
+
+.primary-contact-selector:hover .primary-placeholder {
+    opacity: 1;
+    border-color: #ba003b;
 }
 
 /* Dietary Restrictions */
@@ -2535,14 +2556,19 @@ body::before {
         margin-right: 44px;
     }
 
-    /* Primary Contact Indicator Mobile */
-    .primary-contact-indicator {
+    /* Primary Contact Selector Mobile */
+    .primary-contact-selector {
         width: 24px;
         height: 24px;
     }
 
     .primary-crown {
         font-size: 16px;
+    }
+
+    .primary-placeholder {
+        width: 16px;
+        height: 16px;
     }
 
     /* Dietary Restrictions Mobile */

@@ -2056,12 +2056,8 @@
             const dietaryRestrictions = contact.dietaryRestrictions || '';
 
             contactDiv.innerHTML = `
-                <div class="contact-item-clickable" onclick="toggleAttendance('${contact.id}')"></div>
-                <div class="primary-contact-indicator">
-                    ${contact.isPrimaryContact ? '<span class="primary-crown" title="Primary Contact">👑</span>' : ''}
-                </div>
-                <div class="contact-checkbox">
-                    <div class="checkbox-circle ${isAttending ? 'checked' : ''}"></div>
+                <div class="primary-contact-selector" onclick="setPrimaryContact('${contact.id}'); event.stopPropagation();" title="Click to set as primary contact">
+                    ${contact.isPrimaryContact ? '<span class="primary-crown">👑</span>' : '<div class="primary-placeholder"></div>'}
                 </div>
                 <div class="contact-info">
                     <div class="contact-name">${contact.name}</div>
@@ -2076,6 +2072,9 @@
                         <path d="m14.5 5.5 4 4"/>
                     </svg>
                 </button>
+                <div class="contact-checkbox" onclick="toggleAttendance('${contact.id}'); event.stopPropagation();" title="Click to mark as attending">
+                    <div class="checkbox-circle ${isAttending ? 'checked' : ''}"></div>
+                </div>
             `;
             
             return contactDiv;
@@ -2095,7 +2094,7 @@
         function toggleAttendance(contactId) {
             const checkbox = document.querySelector(`[data-contact-id="${contactId}"] .checkbox-circle`);
             if (!checkbox) return;
-            
+
             if (teamState.attendingContacts.has(contactId)) {
                 teamState.attendingContacts.delete(contactId);
                 checkbox.classList.remove('checked');
@@ -2105,6 +2104,26 @@
                 checkbox.classList.add('checked');
                 console.log(`✅ Marked ${contactId} as attending`);
             }
+        }
+
+        function setPrimaryContact(contactId) {
+            // Update the contact data
+            organizationContacts.forEach(contact => {
+                contact.isPrimaryContact = (contact.id === contactId);
+            });
+
+            // Update the visual state - remove all crowns first
+            document.querySelectorAll('.primary-contact-selector').forEach(selector => {
+                selector.innerHTML = '<div class="primary-placeholder"></div>';
+            });
+
+            // Add crown to the selected contact
+            const selectedSelector = document.querySelector(`[data-contact-id="${contactId}"] .primary-contact-selector`);
+            if (selectedSelector) {
+                selectedSelector.innerHTML = '<span class="primary-crown">👑</span>';
+            }
+
+            console.log(`👑 Set ${contactId} as primary contact`);
         }
    
         function setupScrollbar() {

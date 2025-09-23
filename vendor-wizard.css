@@ -1897,9 +1897,14 @@ body::before {
 
 .modal-actions {
     display: flex;
-    gap: 0.8vw;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 1.5vw;
-    justify-content: flex-end;
+}
+
+.modal-actions-right {
+    display: flex;
+    gap: 0.8vw;
 }
 
 .modal-btn {
@@ -1931,6 +1936,17 @@ body::before {
 .modal-btn.secondary:hover {
     border-color: #999999;
     color: #333333;
+}
+
+.modal-btn.delete {
+    background: #ffffff;
+    color: #dc3545;
+    border: 2px solid #dc3545;
+}
+
+.modal-btn.delete:hover {
+    background: #dc3545;
+    color: #ffffff;
 }
 
 .modal-open .add-contact-section {

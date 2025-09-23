@@ -2288,6 +2288,10 @@
             document.getElementById('modalTitle').textContent = 'Current: ' + contact.name;
             updateModalLabels('Current');
             populateModalForm();
+
+            // Show delete button for edit mode
+            document.getElementById('deleteContactBtn').style.display = 'block';
+
             showContactModal();
             
             console.log('✏️ Opened edit modal for:', contact.name);
@@ -2309,6 +2313,10 @@
             document.getElementById('modalTitle').textContent = 'New contact: Name';
             updateModalLabels('New contact');
             populateModalForm();
+
+            // Hide delete button for new mode
+            document.getElementById('deleteContactBtn').style.display = 'none';
+
             showContactModal();
             
             console.log('➕ Opened new contact modal');
@@ -2474,6 +2482,68 @@
                     openNewContactModal();
                 });
             }
+        }
+
+        function confirmDeleteContact() {
+            if (!modalState.currentContact) return;
+
+            const contactName = modalState.currentContact.name;
+            const confirmMessage = `Are you sure you want to delete ${contactName}?\n\nThis will flag them for removal in Notion and remove them from this listing.`;
+
+            if (confirm(confirmMessage)) {
+                deleteContact();
+            }
+        }
+
+        function deleteContact() {
+            const contactId = modalState.currentContact.id;
+            const contactName = modalState.currentContact.name;
+
+            // Flag for deletion in teamState
+            if (!teamState.deletedContacts) {
+                teamState.deletedContacts = new Set();
+            }
+            teamState.deletedContacts.add(contactId);
+
+            // Remove from UI
+            const contactElement = document.querySelector(`[data-contact-id="${contactId}"]`);
+            if (contactElement) {
+                contactElement.remove();
+            }
+
+            // Remove from organizationContacts array
+            const contactIndex = organizationContacts.findIndex(c => c.id === contactId);
+            if (contactIndex !== -1) {
+                organizationContacts.splice(contactIndex, 1);
+            }
+
+            // Remove from teamState if they were new or edited
+            if (teamState.newContacts) {
+                teamState.newContacts = teamState.newContacts.filter(c => c.id !== contactId);
+            }
+            if (teamState.editedContacts && teamState.editedContacts[contactId]) {
+                delete teamState.editedContacts[contactId];
+            }
+
+            // Remove from attending list
+            teamState.attendingContacts.delete(contactId);
+
+            // If this was the primary contact, clear primary selection
+            if (modalState.currentContact.isPrimaryContact) {
+                organizationContacts.forEach(contact => {
+                    contact.isPrimaryContact = false;
+                });
+            }
+
+            console.log(`🗑️ Deleted contact: ${contactName}`);
+            hideContactModal();
+
+            // Update scrollbar
+            setTimeout(() => {
+                if (window.updateScrollbar) {
+                    window.updateScrollbar();
+                }
+            }, 100);
         }
         // ===========================================
         // STEP 4: PRIMARY CONTACT SELECTION - COMPLETE SECTION
@@ -2976,8 +3046,11 @@
             </form>
 
             <div class="modal-actions">
-                <button type="button" class="modal-btn secondary" onclick="cancelContactModal()">Cancel</button>
-                <button type="button" class="modal-btn primary" onclick="saveContactModal()">Save</button>
+                <button type="button" class="modal-btn delete" id="deleteContactBtn" onclick="confirmDeleteContact()" style="display: none;">DELETE</button>
+                <div class="modal-actions-right">
+                    <button type="button" class="modal-btn secondary" onclick="cancelContactModal()">Cancel</button>
+                    <button type="button" class="modal-btn primary" onclick="saveContactModal()">Save</button>
+                </div>
             </div>
         </div>
     </div>

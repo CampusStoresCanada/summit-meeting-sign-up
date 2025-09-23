@@ -301,55 +301,6 @@
                         </div>
                     </div>
 
-                    <!-- Contact Modal -->
-                    <div class="contact-modal" id="contactModal">
-                        <div class="modal-container">
-                            <div class="modal-header">
-                                <h3 class="modal-title" id="modalTitle">Edit Contact</h3>
-                            </div>
-                            <form class="modal-form" id="modalForm">
-                                <div class="modal-field">
-                                    <div class="modal-field-border unfocused" id="nameBorder">
-                                        <div class="modal-field-label unfocused" id="nameLabel">Name</div>
-                                        <input type="text" class="modal-field-input" id="nameInput" placeholder="Enter full name">
-                                    </div>
-                                </div>
-                                
-                                <div class="modal-field">
-                                    <div class="modal-field-border unfocused" id="titleBorder">
-                                        <div class="modal-field-label unfocused" id="titleLabel">Job title</div>
-                                        <input type="text" class="modal-field-input" id="titleInput" placeholder="Enter job title">
-                                    </div>
-                                </div>
-                                
-                                <div class="modal-field">
-                                    <div class="modal-field-border unfocused" id="emailBorder">
-                                        <div class="modal-field-label unfocused" id="emailLabel">Email</div>
-                                        <input type="email" class="modal-field-input" id="emailInput" placeholder="Enter email address">
-                                    </div>
-                                </div>
-                                
-                                <div class="modal-field">
-                                    <div class="modal-field-border unfocused" id="phoneBorder">
-                                        <div class="modal-field-label unfocused" id="phoneLabel">Phone</div>
-                                        <input type="tel" class="modal-field-input" id="phoneInput" placeholder="Enter phone number">
-                                    </div>
-                                </div>
-
-                                <div class="modal-field">
-                                    <div class="modal-field-border unfocused" id="dietaryBorder">
-                                        <div class="modal-field-label unfocused" id="dietaryLabel">Dietary restrictions</div>
-                                        <textarea class="modal-field-input" id="dietaryInput" placeholder="Enter dietary restrictions" rows="2"></textarea>
-                                    </div>
-                                </div>
-                            </form>
-                            
-                            <div class="modal-actions">
-                                <button type="button" class="modal-btn secondary" onclick="cancelContactModal()">Cancel</button>
-                                <button type="button" class="modal-btn primary" onclick="saveContactModal()">Save</button>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Navigation Buttons -->
                     <button class="previous-btn" onclick="previousStep()">
@@ -2980,5 +2931,56 @@
             document.getElementById('wizardContent').style.display = 'flex';
         }
     </script>
+
+    <!-- Contact Modal (moved outside step sections) -->
+    <div class="contact-modal" id="contactModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Edit Contact</h3>
+            </div>
+            <form class="modal-form" id="modalForm">
+                <div class="modal-field">
+                    <div class="modal-field-border unfocused" id="nameBorder">
+                        <div class="modal-field-label unfocused" id="nameLabel">Name</div>
+                        <input type="text" class="modal-field-input" id="nameInput" placeholder="Enter full name">
+                    </div>
+                </div>
+
+                <div class="modal-field">
+                    <div class="modal-field-border unfocused" id="titleBorder">
+                        <div class="modal-field-label unfocused" id="titleLabel">Job title</div>
+                        <input type="text" class="modal-field-input" id="titleInput" placeholder="Enter job title">
+                    </div>
+                </div>
+
+                <div class="modal-field">
+                    <div class="modal-field-border unfocused" id="emailBorder">
+                        <div class="modal-field-label unfocused" id="emailLabel">Email</div>
+                        <input type="email" class="modal-field-input" id="emailInput" placeholder="Enter email address">
+                    </div>
+                </div>
+
+                <div class="modal-field">
+                    <div class="modal-field-border unfocused" id="phoneBorder">
+                        <div class="modal-field-label unfocused" id="phoneLabel">Phone</div>
+                        <input type="tel" class="modal-field-input" id="phoneInput" placeholder="Enter phone number">
+                    </div>
+                </div>
+
+                <div class="modal-field">
+                    <div class="modal-field-border unfocused" id="dietaryBorder">
+                        <div class="modal-field-label unfocused" id="dietaryLabel">Dietary restrictions</div>
+                        <textarea class="modal-field-input" id="dietaryInput" placeholder="Enter dietary restrictions" rows="2"></textarea>
+                    </div>
+                </div>
+            </form>
+
+            <div class="modal-actions">
+                <button type="button" class="modal-btn secondary" onclick="cancelContactModal()">Cancel</button>
+                <button type="button" class="modal-btn primary" onclick="saveContactModal()">Save</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

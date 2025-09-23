@@ -335,6 +335,13 @@
                                         <input type="tel" class="modal-field-input" id="phoneInput" placeholder="Enter phone number">
                                     </div>
                                 </div>
+
+                                <div class="modal-field">
+                                    <div class="modal-field-border unfocused" id="dietaryBorder">
+                                        <div class="modal-field-label unfocused" id="dietaryLabel">Dietary restrictions</div>
+                                        <textarea class="modal-field-input" id="dietaryInput" placeholder="Enter dietary restrictions" rows="2"></textarea>
+                                    </div>
+                                </div>
                             </form>
                             
                             <div class="modal-actions">
@@ -2271,7 +2278,7 @@
         }
         
         function setupModalFieldHandlers() {
-            const fields = ['name', 'title', 'email', 'phone'];
+            const fields = ['name', 'title', 'email', 'phone', 'dietary'];
             
             fields.forEach(fieldName => {
                 const input = document.getElementById(`${fieldName}Input`);
@@ -2322,7 +2329,8 @@
                 name: contact.name || '',
                 title: contact.roleTitle || '',
                 email: contact.workEmail || '',
-                phone: contact.workPhone || ''
+                phone: contact.workPhone || '',
+                dietary: contact.dietaryRestrictions || ''
             };
             
             // Update modal content
@@ -2342,7 +2350,8 @@
                 name: '',
                 title: '',
                 email: '',
-                phone: ''
+                phone: '',
+                dietary: ''
             };
             
             // Update modal content
@@ -2377,8 +2386,8 @@
         }
         
         function populateModalForm() {
-            const fields = ['name', 'title', 'email', 'phone'];
-            
+            const fields = ['name', 'title', 'email', 'phone', 'dietary'];
+
             fields.forEach(fieldName => {
                 const input = document.getElementById(`${fieldName}Input`);
                 if (input) {
@@ -2456,6 +2465,7 @@
                 roleTitle: modalState.formData.title,
                 workEmail: modalState.formData.email,
                 workPhone: modalState.formData.phone,
+                dietaryRestrictions: modalState.formData.dietary,
                 isNew: true
             };
             
@@ -2471,17 +2481,19 @@
         function updateContactDisplay(contactId, updatedData) {
             const contactElement = document.querySelector(`[data-contact-id="${contactId}"]`);
             if (!contactElement) return;
-            
+
             // Update the display with new data
             const nameElement = contactElement.querySelector('.contact-name');
             const titleElement = contactElement.querySelector('.contact-title');
             const emailElement = contactElement.querySelector('.contact-email');
             const phoneElement = contactElement.querySelector('.contact-phone');
-            
+            const dietaryElement = contactElement.querySelector('.contact-dietary');
+
             if (nameElement) nameElement.textContent = updatedData.name;
             if (titleElement) titleElement.textContent = updatedData.title;
             if (emailElement) emailElement.textContent = updatedData.email;
             if (phoneElement) phoneElement.textContent = formatPhoneForDisplay(updatedData.phone);
+            if (dietaryElement) dietaryElement.textContent = updatedData.dietary || '';
         }
         
         function addNewContactToList(newContact) {

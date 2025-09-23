@@ -1547,10 +1547,10 @@ body::before {
 .primary-placeholder {
     width: 1.2vw;
     height: 1.2vw;
-    border: 2px dashed #ccc;
+    border: 2px solid #cccccc;
     border-radius: 50%;
-    opacity: 1;
-    transition: border-color 0.2s ease;
+    background: #ffffff;
+    transition: all 0.2s ease;
 }
 
 .primary-contact-selector:hover .primary-placeholder {
@@ -2568,6 +2568,7 @@ body::before {
     .primary-placeholder {
         width: 16px;
         height: 16px;
+        border-width: 2px;
     }
 
     /* Dietary Restrictions Mobile */

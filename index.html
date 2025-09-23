@@ -996,7 +996,7 @@
             const fieldWidthPercent = parseFloat(fieldWidth) / 100;
             const inputWidthVw = window.innerWidth * fieldWidthPercent;
             const borderWidth = inputWidthVw + (padding * 2);
-            const formHeight = 200; // Height for multiple fields
+            const formHeight = 220; // Height for multiple fields + buttons
 
             // Position form container
             formContainer.style.left = x + 'px';
@@ -1004,11 +1004,13 @@
             formContainer.style.width = fieldWidth;
             formContainer.style.height = formHeight + 'px';
 
-            // Position border
+            // Position border to match the original address display size but accommodate form
+            // Use the original height as minimum, but expand for form content
+            const borderHeight = Math.max(height + padding * 2, formHeight + padding * 2);
             border.style.left = (x - padding) + 'px';
             border.style.top = (y - padding) + 'px';
             border.style.width = borderWidth + 'px';
-            border.style.height = (formHeight + padding * 2) + 'px';
+            border.style.height = borderHeight + 'px';
 
             // Position label
             label.style.left = (x - padding + 12) + 'px';
@@ -1045,15 +1047,21 @@
 
                     // Add province options from vendorData
                     if (window.vendorData && window.vendorData.provinceOptions) {
+                        console.log('🌍 Adding province options to address modal:', window.vendorData.provinceOptions);
                         window.vendorData.provinceOptions.forEach(option => {
                             const optionElement = document.createElement('option');
                             optionElement.value = option.value;
                             optionElement.textContent = option.label;
                             fieldInput.appendChild(optionElement);
                         });
+                    } else {
+                        console.log('❌ No province options available for address modal');
                     }
 
-                    fieldInput.value = addressData[fieldKey] || '';
+                    // Set current province value
+                    const currentProvince = addressData[fieldKey] || '';
+                    fieldInput.value = currentProvince;
+                    console.log('🏠 Setting province value in address modal:', currentProvince);
                 } else {
                     fieldInput = document.createElement('input');
                     fieldInput.className = 'address-field-input';
@@ -1629,10 +1637,20 @@
             formState.website = data.organization?.website || '';
             formState.category = data.organization?.primaryCategory || '';
             formState.institutionSize = data.organization?.institutionSize || '';
+
+            // Store address data in both formats for compatibility
             formState.streetAddress = data.organization?.address?.streetAddress || '';
             formState.city = data.organization?.address?.city || '';
             formState.province = data.organization?.address?.province || '';
             formState.postalCode = data.organization?.address?.postalCode || '';
+
+            // Also store as address object for the new editing system
+            formState.address = {
+                streetAddress: formState.streetAddress,
+                city: formState.city,
+                province: formState.province,
+                postalCode: formState.postalCode
+            };
 
             updateFieldDisplay('institutionName', formState.institutionName);
             updateFieldDisplay('website', formState.website);
@@ -1641,10 +1659,18 @@
             // Update address block display
             updateAddressDisplay();
 
+            // Store vendor data globally for address modal access
+            window.vendorData = {
+                organization: data.organization,
+                boothNumber: data.boothNumber,
+                institutionSizeOptions: data.institutionSizeOptions,
+                provinceOptions: data.provinceOptions
+            };
+
             // Populate dropdowns and set current values
             populateInstitutionSizeDropdown(data.institutionSizeOptions, formState.institutionSize);
             populateProvinceDropdown(data.provinceOptions, formState.province);
-            
+
             window.formData = {
                 organization: data.organization,
                 boothNumber: data.boothNumber
@@ -1740,20 +1766,27 @@
             const provincePart = document.getElementById('provincePart');
             const postalCodePart = document.getElementById('postalCodePart');
 
+            // Get address data from either the address object or individual fields (for backward compatibility)
+            const addressData = formState.address || {};
+            const streetAddress = addressData.streetAddress || formState.streetAddress || 'Street address';
+            const city = addressData.city || formState.city || 'City';
+            const province = addressData.province || formState.province || 'Province';
+            const postalCode = addressData.postalCode || formState.postalCode || 'Postal Code';
+
             if (addressLine1) {
-                addressLine1.textContent = formState.streetAddress || 'Street address';
+                addressLine1.textContent = streetAddress;
             }
 
             if (cityPart) {
-                cityPart.textContent = formState.city || 'City';
+                cityPart.textContent = city;
             }
 
             if (provincePart) {
-                provincePart.textContent = formState.province || 'Province';
+                provincePart.textContent = province;
             }
 
             if (postalCodePart) {
-                postalCodePart.textContent = formState.postalCode || 'Postal Code';
+                postalCodePart.textContent = postalCode;
             }
         }
 

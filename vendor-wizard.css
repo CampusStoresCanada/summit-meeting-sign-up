@@ -1032,6 +1032,15 @@ body::before {
     color: #666;
 }
 
+/* Address field edit button positioning */
+.form-field[data-field="address"] .edit-btn {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    left: 38.8vw;
+    transform: translateY(-50%);
+}
+
 /* ===========================================
    STEP 2: CONFERENCE HIGHLIGHT
    =========================================== */
@@ -2219,6 +2228,13 @@ body::before {
         transform: none;
         margin-top: 8px;
         align-self: flex-start;
+    }
+
+    .form-field[data-field="address"] .edit-btn {
+        position: static;
+        transform: none;
+        margin-top: 8px;
+        left: auto;
     }
 
     .edit-btn {

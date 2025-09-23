@@ -2021,8 +2021,8 @@
                 headerDiv.innerHTML = `
                     <div class="header-primary">Primary Contact?</div>
                     <div class="header-spacer"></div>
-                    <div class="header-edit"></div>
                     <div class="header-attending">Attending Conference?</div>
+                    <div class="header-edit"></div>
                 `;
                 teamListWrapper.insertBefore(headerDiv, teamList);
             }
@@ -2068,15 +2068,15 @@
                     <div class="contact-phone">${formattedPhone}</div>
                     <div class="contact-dietary">${dietaryRestrictions}</div>
                 </div>
+                <div class="contact-checkbox" onclick="toggleAttendance('${contact.id}'); event.stopPropagation();" title="Click to mark as attending">
+                    <div class="checkbox-circle ${isAttending ? 'checked' : ''}"></div>
+                </div>
                 <button class="contact-edit" onclick="editContact('${contact.id}', ${index}); event.stopPropagation();">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
                         <path d="m14.5 5.5 4 4"/>
                     </svg>
                 </button>
-                <div class="contact-checkbox" onclick="toggleAttendance('${contact.id}'); event.stopPropagation();" title="Click to mark as attending">
-                    <div class="checkbox-circle ${isAttending ? 'checked' : ''}"></div>
-                </div>
             `;
             
             return contactDiv;

@@ -1519,17 +1519,18 @@ body::before {
 .header-spacer {
     flex: 1;
     min-width: 0;
+    max-width: 25vw;
+}
+
+.header-attending {
+    width: 8vw;
+    flex-shrink: 0;
+    text-align: center;
 }
 
 .header-edit {
     width: 2vw;
     flex-shrink: 0;
-}
-
-.header-attending {
-    width: 1.5vw;
-    flex-shrink: 0;
-    text-align: center;
 }
 
 /* Primary Contact Selector */
@@ -2562,12 +2563,12 @@ body::before {
         width: 24px;
     }
 
-    .header-edit {
-        width: 32px;
+    .header-attending {
+        width: 120px;
     }
 
-    .header-attending {
-        width: 24px;
+    .header-edit {
+        width: 32px;
     }
 
     /* Primary Contact Selector Mobile */

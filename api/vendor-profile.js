@@ -107,11 +107,11 @@ module.exports = async function handler(req, res) {
 
     // Translation map for Institution Size
     const institutionSizeLabels = {
-      'xsmall': 'XSmall (< 2,000 FTE)',
-      'small': 'Small (2,001 - 5,000 FTE)',
-      'medium': 'Medium (5,001 - 10,000 FTE)',
-      'large': 'Large (10,001 - 15,000 FTE)',
-      'xlarge': 'XLarge (> 15,001 FTE)'
+      'XSmall': 'XSmall (< 2,000 FTE)',
+      'Small': 'Small (2,001 - 5,000 FTE)',
+      'Medium': 'Medium (5,001 - 10,000 FTE)',
+      'Large': 'Large (10,001 - 15,000 FTE)',
+      'XLarge': 'XLarge (> 15,001 FTE)'
     };
 
     // Create options array for dropdown

@@ -2488,7 +2488,7 @@
             if (!modalState.currentContact) return;
 
             const contactName = modalState.currentContact.name;
-            const confirmMessage = `Are you sure you want to delete ${contactName}?\n\nThis will flag them for removal in Notion and remove them from this listing.`;
+            const confirmMessage = `Are you sure you want to delete ${contactName}?`;
 
             if (confirm(confirmMessage)) {
                 deleteContact();

@@ -1519,17 +1519,17 @@ body::before {
 .header-spacer {
     flex: 1;
     min-width: 0;
-    max-width: 25vw;
+    max-width: 20vw;
 }
 
 .header-attending {
-    width: 8vw;
+    width: 6vw;
     flex-shrink: 0;
     text-align: center;
 }
 
 .header-edit {
-    width: 2vw;
+    width: 3vw;
     flex-shrink: 0;
 }
 
@@ -2564,11 +2564,11 @@ body::before {
     }
 
     .header-attending {
-        width: 120px;
+        width: 100px;
     }
 
     .header-edit {
-        width: 32px;
+        width: 44px;
     }
 
     /* Primary Contact Selector Mobile */

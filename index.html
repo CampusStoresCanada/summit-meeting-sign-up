@@ -745,6 +745,12 @@
 
             const preview = generateInvoicePreview();
             previewElement.innerHTML = preview;
+
+            // Add click handler to preview
+            const invoicePreviewDiv = previewElement.querySelector('.invoice-preview');
+            if (invoicePreviewDiv) {
+                invoicePreviewDiv.onclick = openInvoiceModal;
+            }
         }
 
         function generateInvoicePreview() {
@@ -849,6 +855,228 @@
 
             preview += '</div>';
             return preview;
+        }
+
+        function openInvoiceModal() {
+            if (!formState.institutionSize) {
+                alert('Please complete Step 1 first to generate invoice preview.');
+                return;
+            }
+
+            const modal = createInvoiceModal();
+            document.body.appendChild(modal);
+            modal.classList.add('active');
+
+            console.log('📄 Invoice modal opened');
+        }
+
+        function createInvoiceModal() {
+            const modal = document.createElement('div');
+            modal.className = 'invoice-modal';
+            modal.id = 'invoiceModal';
+
+            const currentDate = new Date().toLocaleDateString('en-CA');
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + 30);
+            const dueDateFormatted = dueDate.toLocaleDateString('en-CA');
+
+            modal.innerHTML = `
+                <div class="invoice-modal-container">
+                    <div class="invoice-modal-content">
+                        <div class="invoice-document">
+                            ${generateFullInvoiceHTML(currentDate, dueDateFormatted)}
+                        </div>
+                        <div class="invoice-modal-actions">
+                            <button class="invoice-btn secondary" onclick="closeInvoiceModal()">Make Changes</button>
+                            <button class="invoice-btn primary" onclick="confirmInvoicePreview()">Proceed with Invoice</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return modal;
+        }
+
+        function generateFullInvoiceHTML(currentDate, dueDate) {
+            const membershipPricing = {
+                'XSmall': 420, 'Small': 525, 'Medium': 735, 'Large': 895, 'XLarge': 1000
+            };
+
+            const conferencePerPerson = 325;
+            const hstRate = 0.13;
+
+            const institutionSize = formState.institutionSize;
+            const billingDisplay = formState.billingDisplay;
+            const attendingCount = teamState.attendingContacts?.size || 0;
+
+            const membershipFee = membershipPricing[institutionSize] || 0;
+            const conferenceTotal = attendingCount * conferencePerPerson;
+            const conferenceHST = conferenceTotal * hstRate;
+            const subtotal = membershipFee + conferenceTotal;
+            const totalWithHST = membershipFee + conferenceTotal + conferenceHST;
+
+            // Get organization info from form state
+            const orgName = formState.institutionName || 'Organization Name';
+            const orgAddress = formState.address || '';
+
+            // Get primary contact
+            const primaryContact = organizationContacts.find(c => c.isPrimaryContact);
+            const contactName = primaryContact?.name || 'Primary Contact';
+
+            let lineItems = '';
+
+            if (billingDisplay === 'single-item') {
+                lineItems = `
+                    <tr>
+                        <td class="desc-col">2025-2026 CSC Membership</td>
+                        <td class="qty-col">1</td>
+                        <td class="price-col">C$${totalWithHST.toFixed(2)}</td>
+                        <td class="amount-col">C$${totalWithHST.toFixed(2)}</td>
+                    </tr>
+                `;
+            } else if (billingDisplay === 'membership-conference') {
+                lineItems = `
+                    <tr>
+                        <td class="desc-col">2025-2026 CSC Membership</td>
+                        <td class="qty-col">1</td>
+                        <td class="price-col">C$${membershipFee.toFixed(2)}</td>
+                        <td class="amount-col">C$${membershipFee.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td class="desc-col">Conference Registration</td>
+                        <td class="qty-col">${attendingCount}</td>
+                        <td class="price-col">C$${conferencePerPerson.toFixed(2)}</td>
+                        <td class="amount-col">C$${conferenceTotal.toFixed(2)}</td>
+                    </tr>
+                `;
+            } else if (billingDisplay === 'individual-line-items') {
+                lineItems = `
+                    <tr>
+                        <td class="desc-col">2025-2026 CSC Membership (${institutionSize})</td>
+                        <td class="qty-col">1</td>
+                        <td class="price-col">C$${membershipFee.toFixed(2)}</td>
+                        <td class="amount-col">C$${membershipFee.toFixed(2)}</td>
+                    </tr>
+                `;
+
+                const attendingContacts = organizationContacts.filter(contact =>
+                    teamState.attendingContacts.has(contact.id)
+                );
+
+                attendingContacts.forEach(contact => {
+                    lineItems += `
+                        <tr>
+                            <td class="desc-col">Conference Registration - ${contact.name}</td>
+                            <td class="qty-col">1</td>
+                            <td class="price-col">C$${conferencePerPerson.toFixed(2)}</td>
+                            <td class="amount-col">C$${conferencePerPerson.toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            return `
+                <div class="invoice-header">
+                    <div class="invoice-left">
+                        <div class="csc-logo">CSC</div>
+                        <div class="csc-info">
+                            <div>Campus Stores Canada</div>
+                            <div>PO Box 7157 Silver Springs</div>
+                            <div>Calgary, Alberta T3B 5K2</div>
+                            <div>Canada</div>
+                            <div>+1 888-288-4044</div>
+                            <div>info@campusstores.ca</div>
+                        </div>
+                    </div>
+                    <div class="invoice-right">
+                        <h1>Invoice</h1>
+                        <div class="preview-watermark">PREVIEW ONLY</div>
+                        <div class="invoice-details">
+                            <div>Invoice number: PREVIEW</div>
+                            <div>Date of Issue: ${currentDate}</div>
+                            <div>Date due: ${dueDate}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="invoice-addresses">
+                    <div class="bill-to">
+                        <h3>Bill to</h3>
+                        <div>${orgName}</div>
+                        <div>${contactName}</div>
+                        <div>${orgAddress}</div>
+                    </div>
+                </div>
+
+                <div class="amount-due">
+                    <strong>C$${totalWithHST.toFixed(2)} due ${dueDate}</strong>
+                </div>
+
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th class="desc-col">Description</th>
+                            <th class="qty-col">Qty</th>
+                            <th class="price-col">Unit price</th>
+                            <th class="amount-col">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${lineItems}
+                    </tbody>
+                </table>
+
+                <div class="invoice-totals">
+                    <div class="totals-row">
+                        <span>Subtotal</span>
+                        <span>C$${subtotal.toFixed(2)}</span>
+                    </div>
+                    ${conferenceHST > 0 ? `
+                        <div class="totals-row">
+                            <span>HST (13%)</span>
+                            <span>C$${conferenceHST.toFixed(2)}</span>
+                        </div>
+                    ` : ''}
+                    <div class="totals-row total-row">
+                        <span><strong>Total</strong></span>
+                        <span><strong>C$${totalWithHST.toFixed(2)}</strong></span>
+                    </div>
+                    <div class="totals-row amount-due-row">
+                        <span><strong>Amount due</strong></span>
+                        <span><strong>C$${totalWithHST.toFixed(2)}</strong></span>
+                    </div>
+                </div>
+
+                <div class="invoice-footer">
+                    <div class="csc-footer">
+                        Campus Stores Canada<br>
+                        PO Box 7157 Silver Springs, Calgary, AB, Canada T3B 5K2
+                    </div>
+                </div>
+            `;
+        }
+
+        function closeInvoiceModal() {
+            const modal = document.getElementById('invoiceModal');
+            if (modal) {
+                modal.remove();
+            }
+            console.log('📄 Invoice modal closed - returning to form');
+        }
+
+        function confirmInvoicePreview() {
+            // Mark invoice as confirmed
+            window.invoiceConfirmed = true;
+
+            // Enable next step button
+            const nextButton = document.querySelector('.next-btn');
+            if (nextButton) {
+                nextButton.disabled = false;
+                nextButton.classList.remove('disabled');
+            }
+
+            closeInvoiceModal();
+            console.log('✅ Invoice preview confirmed - proceeding enabled');
         }
 
         // Field configurations
@@ -1562,11 +1790,17 @@
                 saveField(activeField);
                 if (activeField) return;
             }
-            
+
             if (!validateAllFields()) {
                 return;
             }
-            
+
+            // Special check for step 3 (Billing) - require invoice confirmation
+            if (currentStep === 3 && !window.invoiceConfirmed) {
+                alert('Please review and confirm the invoice preview before proceeding.');
+                return;
+            }
+
             if (currentStep < totalSteps) {
                 currentStep++;
                 showStep(currentStep);

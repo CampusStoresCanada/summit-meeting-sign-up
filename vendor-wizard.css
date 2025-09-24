@@ -324,7 +324,7 @@ body::before {
    =========================================== */
 
 .form-container {
-    max-width: none;
+    max-width: 44vw;
     width: 100%;
 }
 
@@ -1973,9 +1973,12 @@ body::before {
     margin-top: 1vw;
     max-height: 20vw;
     overflow-y: auto;
+    overflow-x: hidden;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .invoice-preview:hover {

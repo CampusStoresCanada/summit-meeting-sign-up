@@ -130,6 +130,8 @@ body::before {
 .booth-section {
     width: 100%;
     margin-left: 4.9vw;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .conference-title {

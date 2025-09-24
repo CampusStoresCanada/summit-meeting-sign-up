@@ -1981,19 +1981,37 @@ body::before {
     box-shadow: 0 4px 12px rgba(186, 0, 59, 0.1);
 }
 
-.invoice-preview:hover::after {
-    content: "Click to review and proceed";
+.invoice-preview::before {
+    content: "PREVIEW ONLY";
     position: absolute;
-    top: -30px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    background: #333;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.8vw;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 4vw;
+    font-weight: bold;
+    color: rgba(220, 53, 69, 0.08);
+    z-index: 1;
+    pointer-events: none;
     white-space: nowrap;
-    z-index: 10;
+}
+
+.invoice-preview .hover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(186, 0, 59, 0.9);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2vw;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 5;
+    border-radius: 8px;
 }
 
 .invoice-line-item {
@@ -2124,16 +2142,9 @@ body::before {
 }
 
 .csc-logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: #ba003b;
-    width: 50px;
-    height: 50px;
-    border: 2px solid #ba003b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
 }
 
 .csc-info div {
@@ -2156,14 +2167,15 @@ body::before {
 
 .preview-watermark {
     position: absolute;
-    top: 0;
-    right: -20px;
-    transform: rotate(-15deg);
-    font-size: 48px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 120px;
     font-weight: bold;
-    color: rgba(220, 53, 69, 0.2);
+    color: rgba(220, 53, 69, 0.08);
     z-index: 1;
     pointer-events: none;
+    white-space: nowrap;
 }
 
 .invoice-details div {

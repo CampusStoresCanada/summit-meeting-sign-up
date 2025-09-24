@@ -746,10 +746,28 @@
             const preview = generateInvoicePreview();
             previewElement.innerHTML = preview;
 
-            // Add click handler to preview
+            // Add click handler and hover effects to preview
             const invoicePreviewDiv = previewElement.querySelector('.invoice-preview');
             if (invoicePreviewDiv) {
                 invoicePreviewDiv.onclick = openInvoiceModal;
+
+                let hoverTimeout;
+                const hoverOverlay = invoicePreviewDiv.querySelector('.hover-overlay');
+
+                invoicePreviewDiv.addEventListener('mouseenter', () => {
+                    hoverTimeout = setTimeout(() => {
+                        if (hoverOverlay) {
+                            hoverOverlay.style.opacity = '1';
+                        }
+                    }, 1000); // Show after 1 second
+                });
+
+                invoicePreviewDiv.addEventListener('mouseleave', () => {
+                    clearTimeout(hoverTimeout);
+                    if (hoverOverlay) {
+                        hoverOverlay.style.opacity = '0';
+                    }
+                });
             }
         }
 
@@ -779,7 +797,7 @@
             const totalWithHST = membershipFee + conferenceTotal + conferenceHST;
 
             // Generate preview based on billing display choice
-            let preview = '<div class="invoice-preview">';
+            let preview = '<div class="invoice-preview"><div class="hover-overlay">Click to confirm details</div>';
 
             if (!institutionSize) {
                 preview += '<div class="preview-placeholder">Complete Step 1 to see pricing</div>';
@@ -978,7 +996,7 @@
             return `
                 <div class="invoice-header">
                     <div class="invoice-left">
-                        <div class="csc-logo">CSC</div>
+                        <img src="https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1600096854522-HS7NUI12I1ML6SPJFLLY/Artboard+1.png?format=1500w" alt="Campus Stores Canada" class="csc-logo">
                         <div class="csc-info">
                             <div>Campus Stores Canada</div>
                             <div>PO Box 7157 Silver Springs</div>
@@ -1797,7 +1815,7 @@
 
             // Special check for step 3 (Billing) - require invoice confirmation
             if (currentStep === 3 && !window.invoiceConfirmed) {
-                alert('Please review and confirm the invoice preview before proceeding.');
+                openInvoiceModal();
                 return;
             }
 

@@ -99,8 +99,11 @@ body::before {
 }
 
 .logo-section {
-    margin-bottom: 6vw;
+    margin-bottom: 2vw;
     width: 100%;
+    min-height: 10vw;
+    display: flex;
+    align-items: flex-start;
 }
 
 .logo-and-title {
@@ -116,7 +119,9 @@ body::before {
     flex-direction: column;
     align-items: flex-end;
     gap: 0.5vw;
-    width: 100%;
+    width: 8vw;
+    position: relative;
+    right: calc(8vw - 2vw);
 }
 
 .csc-logo {
@@ -124,49 +129,28 @@ body::before {
     height: 5vw;
     max-width: 8vw;
     object-fit: contain;
+    flex-shrink: 0;
 }
 
 .organization-logo-container {
     display: flex;
     justify-content: flex-end;
-    min-height: 3.5vw;
+    min-height: 5vw;
+    width: 100%;
 }
 
 .organization-logo {
-    max-width: 3.5vw;
-    max-height: 3.5vw;
+    max-width: 5vw;
+    max-height: 5vw;
     width: auto;
     height: auto;
     object-fit: contain;
 }
 
-.booth-section {
-    width: 100%;
-    margin-left: 4.9vw;
-    text-align: center;
-}
-
-.conference-title {
-    font-family: 'davis-sans', sans-serif;
-    font-weight: 700;
-    font-size: 1.6vw;
-    color: #000000;
-    line-height: 1.15;
-    margin: 0;
-}
-
-.booth-number {
-    font-family: 'davis-sans', sans-serif;
-    font-weight: 700;
-    font-size: 2.1vw;
-    color: #000000;
-    margin: 0;
-    line-height: 1;
-}
 
 .organization-logo {
-    max-width: 3.5vw;
-    max-height: 3.5vw;
+    max-width: 5vw;
+    max-height: 5vw;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -2619,15 +2603,6 @@ body::before {
         font-weight: 600;
     }
 
-    .booth-section {
-        margin-left: 62px;
-        margin-top: 8px;
-    }
-
-    .booth-number {
-        font-size: 24px;
-        font-weight: 700;
-    }
 
     .step-navigation {
         display: none;

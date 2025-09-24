@@ -1373,11 +1373,11 @@
             const borderWidth = inputWidthVw + (padding * 2);
 
             // Calculate form height dynamically:
-            // 4 fields * 60px (label + input + margin) + 48px (button row + margins) + 20px extra padding
+            // 2 rows (street address + city/province/postal) * 60px + 48px (button row + margins) + 20px extra padding
             const fieldRowHeight = 60; // Estimated height per field row
             const buttonRowHeight = 48; // Height for button row
             const extraPadding = 20; // Extra padding for spacing
-            const formHeight = (4 * fieldRowHeight) + buttonRowHeight + extraPadding;
+            const formHeight = (2 * fieldRowHeight) + buttonRowHeight + extraPadding;
 
             // Position form container
             formContainer.style.left = x + 'px';

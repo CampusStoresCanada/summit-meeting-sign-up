@@ -123,8 +123,8 @@ body::before {
 
 .csc-logo {
     width: auto;
-    height: 5vw;
-    max-width: 8vw;
+    height: 7vw;
+    max-width: 12vw;
     object-fit: contain;
     flex-shrink: 0;
 }
@@ -1987,8 +1987,9 @@ body::before {
     padding: 1.5vw;
     background: #ffffff;
     margin-top: 1vw;
+    margin-left: -18px;
     max-height: 20vw;
-    max-width: 44vw;
+    width: 38vw;
     overflow-y: auto;
     overflow-x: hidden;
     cursor: pointer;
@@ -2162,7 +2163,8 @@ body::before {
     gap: 1rem;
 }
 
-.csc-logo {
+.invoice-preview .csc-logo,
+.invoice-document .csc-logo {
     width: 60px;
     height: 60px;
     object-fit: contain;

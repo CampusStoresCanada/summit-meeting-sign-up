@@ -1126,19 +1126,200 @@
             console.log('📄 Invoice modal closed - returning to form');
         }
 
-        function confirmInvoicePreview() {
+        async function confirmInvoicePreview() {
             // Mark invoice as confirmed
             window.invoiceConfirmed = true;
 
-            // Enable next step button
+            // Show sync progress
+            const modal = document.getElementById('invoiceModal');
+            if (modal) {
+                const actions = modal.querySelector('.invoice-modal-actions');
+                if (actions) {
+                    actions.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px;">
+                            <div style="width: 20px; height: 20px; border: 2px solid #ba003b; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            <span style="color: #666; font-size: 14px;">Saving your information...</span>
+                        </div>
+                    `;
+                }
+            }
+
+            try {
+                // Sync all changes to Notion
+                await syncMembershipRenewal();
+
+                // Enable next step button
+                const nextButton = document.querySelector('.next-btn');
+                if (nextButton) {
+                    nextButton.disabled = false;
+                    nextButton.classList.remove('disabled');
+                }
+
+                // Close modal and show success
+                closeInvoiceModal();
+                console.log('✅ Membership renewal data synced successfully');
+
+            } catch (error) {
+                console.error('❌ Sync failed:', error);
+
+                // Show error in modal
+                if (modal && actions) {
+                    actions.innerHTML = `
+                        <div style="text-align: center; padding: 16px;">
+                            <div style="color: #dc3545; margin-bottom: 12px; font-weight: 600;">⚠️ Sync Error</div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 16px;">
+                                Your data couldn't be saved automatically, but has been logged for manual processing.
+                            </div>
+                            <button class="invoice-btn primary" onclick="closeInvoiceModal(); proceedAnyway();">Continue Anyway</button>
+                            <button class="invoice-btn secondary" onclick="location.reload()">Refresh & Try Again</button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Sync all membership renewal data to Notion
+        async function syncMembershipRenewal() {
+            console.log('🚀 Starting membership renewal sync...');
+
+            // Gather all local changes
+            const syncData = {
+                organizationUpdates: gatherOrganizationUpdates(),
+                contactOperations: gatherContactOperations()
+            };
+
+            console.log('📦 Sync data prepared:', syncData);
+
+            // Send to batch sync API
+            const response = await fetch('/api/sync-membership-renewal', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    token: currentUserToken,
+                    syncData: syncData
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || result.hasErrors) {
+                console.error('❌ Sync failed or had errors:', result);
+                throw new Error(result.message || 'Sync failed');
+            }
+
+            console.log('✅ Sync completed successfully:', result);
+            return result;
+        }
+
+        // Gather organization changes from formState
+        function gatherOrganizationUpdates() {
+            const updates = {};
+
+            // Check if organization fields have changed from initial values
+            if (formState.institutionName && formState.institutionName !== window.initialFormState?.institutionName) {
+                updates.institutionName = formState.institutionName;
+            }
+
+            if (formState.website && formState.website !== window.initialFormState?.website) {
+                updates.website = formState.website;
+            }
+
+            if (formState.institutionSize && formState.institutionSize !== window.initialFormState?.institutionSize) {
+                updates.institutionSize = formState.institutionSize;
+            }
+
+            // Check address changes
+            const currentAddress = formState.address || {
+                streetAddress: formState.streetAddress,
+                city: formState.city,
+                province: formState.province,
+                postalCode: formState.postalCode
+            };
+
+            const initialAddress = window.initialFormState?.address || {
+                streetAddress: window.initialFormState?.streetAddress,
+                city: window.initialFormState?.city,
+                province: window.initialFormState?.province,
+                postalCode: window.initialFormState?.postalCode
+            };
+
+            if (JSON.stringify(currentAddress) !== JSON.stringify(initialAddress)) {
+                updates.address = currentAddress;
+            }
+
+            console.log('🏢 Organization updates:', updates);
+            return Object.keys(updates).length > 0 ? updates : null;
+        }
+
+        // Gather contact operations from teamState
+        function gatherContactOperations() {
+            const operations = {
+                create: [],
+                update: [],
+                delete: [],
+                conferenceTeam: []
+            };
+
+            // New contacts
+            if (teamState.newContacts && teamState.newContacts.length > 0) {
+                operations.create = teamState.newContacts.map(contact => ({
+                    name: contact.name,
+                    firstName: contact.firstName,
+                    workEmail: contact.workEmail,
+                    workPhone: contact.workPhone,
+                    roleTitle: contact.roleTitle,
+                    dietaryRestrictions: contact.dietaryRestrictions
+                }));
+            }
+
+            // Updated contacts
+            if (teamState.editedContacts) {
+                Object.keys(teamState.editedContacts).forEach(contactId => {
+                    const editedData = teamState.editedContacts[contactId];
+                    operations.update.push({
+                        originalId: contactId,
+                        name: editedData.name,
+                        workEmail: editedData.email,
+                        workPhone: editedData.phone,
+                        roleTitle: editedData.title,
+                        dietaryRestrictions: editedData.dietary
+                    });
+                });
+            }
+
+            // Deleted contacts
+            if (teamState.deletedContacts && teamState.deletedContacts.length > 0) {
+                operations.delete = [...teamState.deletedContacts];
+            }
+
+            // Conference team (attendance and primary contact status)
+            if (organizationContacts && organizationContacts.length > 0) {
+                organizationContacts.forEach(contact => {
+                    const isAttending = teamState.attendingContacts ? teamState.attendingContacts.has(contact.id) : false;
+                    const isPrimary = contact.isPrimaryContact || false;
+
+                    operations.conferenceTeam.push({
+                        id: contact.id,
+                        attending: isAttending,
+                        isPrimary: isPrimary
+                    });
+                });
+            }
+
+            console.log('👥 Contact operations:', operations);
+            return operations;
+        }
+
+        // Allow user to proceed despite sync errors
+        function proceedAnyway() {
             const nextButton = document.querySelector('.next-btn');
             if (nextButton) {
                 nextButton.disabled = false;
                 nextButton.classList.remove('disabled');
             }
-
-            closeInvoiceModal();
-            console.log('✅ Invoice preview confirmed - proceeding enabled');
+            console.log('⚠️ User chose to proceed despite sync errors');
         }
 
         // Field configurations
@@ -2133,6 +2314,10 @@
 
             // Update address block display
             updateAddressDisplay();
+
+            // Store initial form state for change detection
+            window.initialFormState = JSON.parse(JSON.stringify(formState));
+            console.log('💾 Initial form state stored for change detection');
 
             // Store vendor data globally for address modal access
             window.vendorData = {

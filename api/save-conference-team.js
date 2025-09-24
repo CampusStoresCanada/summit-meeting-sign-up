@@ -108,6 +108,13 @@ export default async function handler(req, res) {
             }
           };
 
+          // Add dietary restrictions if provided
+          if (newContact.dietaryRestrictions) {
+            contactData.properties["Dietary Restrictions"] = {
+              rich_text: [{ text: { content: newContact.dietaryRestrictions } }]
+            };
+          }
+
           const createResponse = await fetch('https://api.notion.com/v1/pages', {
             method: 'POST',
             headers: {
@@ -176,7 +183,13 @@ export default async function handler(req, res) {
               rich_text: [{ text: { content: updateContact.roleTitle } }]
             };
           }
-    
+
+          if (updateContact.dietaryRestrictions) {
+            updateData.properties["Dietary Restrictions"] = {
+              rich_text: [{ text: { content: updateContact.dietaryRestrictions } }]
+            };
+          }
+
           console.log(`📤 Sending to Notion:`, JSON.stringify(updateData, null, 2));
     
           const updateResponse = await fetch(`https://api.notion.com/v1/pages/${updateContact.originalId}`, {
@@ -267,7 +280,7 @@ export default async function handler(req, res) {
       const tagSystemDbId = process.env.NOTION_TAG_SYSTEM_DB_ID || '1f9a69bf0cfd8034b919f51b7c4f2c67';
       
       // Get the tags we need
-      const tagsToFind = ['26 Conference Exhibitor', 'Primary Contact', 'Secondary Contact'];
+      const tagsToFind = ['26 Conference Delegate', 'Primary Contact', 'Secondary Contact'];
       const tagIds = {};
       
       for (const tagName of tagsToFind) {
@@ -328,9 +341,9 @@ export default async function handler(req, res) {
           const managedTagIds = Object.values(tagIds);
           const keepTags = currentTags.filter(tag => !managedTagIds.includes(tag.id));
           
-          // Add conference exhibitor tag if attending
-          if (teamMember.attending && tagIds['26 Conference Exhibitor']) {
-            keepTags.push({ id: tagIds['26 Conference Exhibitor'] });
+          // Add conference delegate tag if attending
+          if (teamMember.attending && tagIds['26 Conference Delegate']) {
+            keepTags.push({ id: tagIds['26 Conference Delegate'] });
           }
           
           // Add role tag (Primary or Secondary Contact)

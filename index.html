@@ -679,6 +679,30 @@
             }
         }
 
+        function initializeBillingDropdowns() {
+            // Initialize billing display dropdown
+            const billingDropdown = document.getElementById('billingDisplayDropdown');
+            const billingDisplay = document.getElementById('billingDisplayDisplay');
+            const billingOptions = document.getElementById('billingDisplayOptions');
+            const billingText = document.getElementById('billingDisplayText');
+
+            if (billingDropdown && billingDisplay && billingOptions && billingText) {
+                console.log('✅ Initializing billing display dropdown');
+                initializeSpecificDropdown(billingDropdown, billingDisplay, billingOptions, billingText, 'billingDisplay');
+            }
+
+            // Initialize payment method dropdown
+            const paymentDropdown = document.getElementById('paymentMethodDropdown');
+            const paymentDisplay = document.getElementById('paymentMethodDisplay');
+            const paymentOptions = document.getElementById('paymentMethodOptions');
+            const paymentText = document.getElementById('paymentMethodText');
+
+            if (paymentDropdown && paymentDisplay && paymentOptions && paymentText) {
+                console.log('✅ Initializing payment method dropdown');
+                initializeSpecificDropdown(paymentDropdown, paymentDisplay, paymentOptions, paymentText, 'paymentMethod');
+            }
+        }
+
         // Field configurations
         const fieldConfigs = {
             // Step 1 fields (38vw width)
@@ -1761,7 +1785,8 @@
             updateFieldDisplay('highlightHeadline', formState.highlightHeadline);
             updateFieldDisplay('highlightDescription', formState.highlightDescription);
             updateFieldDisplay('highlightDeal', formState.highlightDeal);
-            console.log('🚀 Step 2 initialized with unified field system!');
+            initializeBillingDropdowns();
+            console.log('🚀 Step 2 initialized with unified field system and billing dropdowns!');
         }
         
         function initializeImageUpload() {

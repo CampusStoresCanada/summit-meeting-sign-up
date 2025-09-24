@@ -663,7 +663,7 @@
                 formState[fieldType] = value;
 
                 // For institution size, we need to show the label, not the value
-                if (fieldType === 'institutionSize') {
+                if (fieldType === 'institutionSize' || fieldType === 'billingDisplay' || fieldType === 'paymentMethod') {
                     const selectedOption = options.querySelector(`[data-value="${value}"]`);
                     if (selectedOption) {
                         text.textContent = selectedOption.textContent;

@@ -699,6 +699,132 @@
                 console.log('✅ Initializing payment method dropdown');
                 initializeSpecificDropdown(paymentDropdown, paymentDisplay, paymentOptions, paymentText, 'paymentMethod');
             }
+
+            // Initialize invoice preview
+            initializeInvoicePreview();
+        }
+
+        function initializeInvoicePreview() {
+            // Update preview whenever relevant data changes
+            updateInvoicePreview();
+
+            // Set up listeners for real-time updates
+            setupInvoicePreviewListeners();
+
+            console.log('✅ Invoice preview initialized');
+        }
+
+        function setupInvoicePreviewListeners() {
+            // Listen for dropdown changes
+            const originalSelectOption = window.selectOption;
+
+            // Override the existing selectOption function to trigger preview updates
+            // This will be called from within initializeSpecificDropdown
+            const updatePreviewFields = ['institutionSize', 'billingDisplay'];
+
+            // We'll add a global listener that watches for changes in form state
+            const checkForUpdates = setInterval(() => {
+                if (window.lastPreviewState !== JSON.stringify({
+                    institutionSize: formState.institutionSize,
+                    billingDisplay: formState.billingDisplay,
+                    attendingCount: teamState.attendingContacts?.size || 0
+                })) {
+                    updateInvoicePreview();
+                    window.lastPreviewState = JSON.stringify({
+                        institutionSize: formState.institutionSize,
+                        billingDisplay: formState.billingDisplay,
+                        attendingCount: teamState.attendingContacts?.size || 0
+                    });
+                }
+            }, 500);
+        }
+
+        function updateInvoicePreview() {
+            const previewElement = document.querySelector('[data-field="invoicePreview"] .field-display');
+            if (!previewElement) return;
+
+            const preview = generateInvoicePreview();
+            previewElement.innerHTML = preview;
+        }
+
+        function generateInvoicePreview() {
+            // Pricing structure
+            const membershipPricing = {
+                'XSmall': 420,
+                'Small': 525,
+                'Medium': 735,
+                'Large': 895,
+                'XLarge': 1000
+            };
+
+            const conferencePerPerson = 325;
+            const hstRate = 0.13; // Ontario HST
+
+            // Get current selections
+            const institutionSize = formState.institutionSize;
+            const billingDisplay = formState.billingDisplay;
+            const attendingCount = teamState.attendingContacts?.size || 0;
+
+            // Calculate amounts
+            const membershipFee = membershipPricing[institutionSize] || 0;
+            const conferenceTotal = attendingCount * conferencePerPerson;
+            const conferenceHST = conferenceTotal * hstRate;
+            const subtotal = membershipFee + conferenceTotal;
+            const totalWithHST = membershipFee + conferenceTotal + conferenceHST;
+
+            // Generate preview based on billing display choice
+            let preview = '<div class="invoice-preview">';
+
+            if (!institutionSize) {
+                preview += '<div class="preview-placeholder">Complete Step 1 to see pricing</div>';
+            } else if (billingDisplay === 'single-item') {
+                preview += `
+                    <div class="invoice-line-item">
+                        <span class="item-description">2025-2026 CSC Membership</span>
+                        <span class="item-amount">$${totalWithHST.toFixed(2)}</span>
+                    </div>
+                    <div class="invoice-total">
+                        <strong>Total: $${totalWithHST.toFixed(2)}</strong>
+                    </div>
+                `;
+            } else if (billingDisplay === 'membership-conference') {
+                preview += `
+                    <div class="invoice-line-item">
+                        <span class="item-description">Membership</span>
+                        <span class="item-amount">$${membershipFee.toFixed(2)}</span>
+                    </div>
+                    <div class="invoice-line-item">
+                        <span class="item-description">Conference Registration (${attendingCount} attendees)</span>
+                        <span class="item-amount">$${(conferenceTotal + conferenceHST).toFixed(2)}</span>
+                    </div>
+                    <div class="invoice-total">
+                        <strong>Total: $${totalWithHST.toFixed(2)}</strong>
+                    </div>
+                `;
+            } else if (billingDisplay === 'individual-line-items') {
+                preview += `
+                    <div class="invoice-line-item">
+                        <span class="item-description">2025-2026 CSC Membership (${institutionSize})</span>
+                        <span class="item-amount">$${membershipFee.toFixed(2)}</span>
+                    </div>
+                    <div class="invoice-line-item">
+                        <span class="item-description">Conference Registration (${attendingCount} × $${conferencePerPerson})</span>
+                        <span class="item-amount">$${conferenceTotal.toFixed(2)}</span>
+                    </div>
+                    <div class="invoice-line-item">
+                        <span class="item-description">HST (13% on Conference Registration)</span>
+                        <span class="item-amount">$${conferenceHST.toFixed(2)}</span>
+                    </div>
+                    <div class="invoice-total">
+                        <strong>Total: $${totalWithHST.toFixed(2)}</strong>
+                    </div>
+                `;
+            } else {
+                preview += '<div class="preview-placeholder">Select billing format to see preview</div>';
+            }
+
+            preview += '</div>';
+            return preview;
         }
 
         // Field configurations

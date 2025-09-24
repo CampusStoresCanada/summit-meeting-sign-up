@@ -25,7 +25,7 @@ body::before {
     right: 0;
     width: 20%;
     height: 100%;
-    background: url('https://images.squarespace-cdn.com/content/v1/5cf7db4cc0827b0001c9ff81/b115546f-0ea2-4efc-8401-79d0991119ce/Background+art.png?format=2500w') no-repeat right center;
+    background: url('https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1758568188414-ETHZE4FCV33WMFHJOJXW/unsplash-image-DNl3481Nyoc.jpg') no-repeat right center;
     background-size: cover;
     z-index: -1;
 }
@@ -112,9 +112,11 @@ body::before {
 }
 
 .logo {
-    width: 5vw;
+    width: auto;
     height: 5vw;
+    max-width: 8vw;
     flex-shrink: 1;
+    object-fit: contain;
 }
 
 .logo-text {

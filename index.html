@@ -55,8 +55,9 @@
             <!-- Sidebar -->
             <div class="sidebar">
                 <div class="logo-section">
-                    <div class="logo-and-title">
-                        <img src="https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1600096854522-HS7NUI12I1ML6SPJFLLY/Artboard+1.png?format=1500w" alt="Campus Stores Canada" class="logo">
+                    <div class="logo-container">
+                        <img src="https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1600096854522-HS7NUI12I1ML6SPJFLLY/Artboard+1.png?format=1500w" alt="Campus Stores Canada" class="csc-logo">
+                        <div id="organizationLogo" class="organization-logo-container"></div>
                     </div>
                     <div class="booth-section">
                         <div class="booth-number" id="boothNumber">Booth 501</div>
@@ -2013,12 +2014,12 @@
         function populateForm(data) {
             console.log('📝 Populating form with:', data);
             
-            // Display organization logo instead of booth number
-            const boothElement = document.getElementById('boothNumber');
+            // Display organization logo in the logo container
+            const organizationLogoContainer = document.getElementById('organizationLogo');
             if (data.organization?.logo) {
-                boothElement.innerHTML = `<img src="${data.organization.logo}" alt="${data.organization.name} Logo" class="organization-logo">`;
-            } else {
-                boothElement.textContent = data.organization?.name || 'Organization';
+                organizationLogoContainer.innerHTML = `<img src="${data.organization.logo}" alt="${data.organization.name} Logo" class="organization-logo">`;
+            } else if (data.organization?.name) {
+                organizationLogoContainer.innerHTML = `<div class="organization-name">${data.organization.name}</div>`;
             }
             
             formState.institutionName = data.organization?.name || '';

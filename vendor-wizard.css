@@ -111,27 +111,39 @@ body::before {
     margin-bottom: 2vw;
 }
 
-.logo {
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5vw;
+    width: 100%;
+}
+
+.csc-logo {
     width: auto;
     height: 5vw;
     max-width: 8vw;
-    flex-shrink: 1;
     object-fit: contain;
 }
 
-.logo-text {
-    flex: 1;
-    height: 5vw;
+.organization-logo-container {
     display: flex;
-    flex-direction: column;
-    justify-content: left;
+    justify-content: flex-end;
+    min-height: 3.5vw;
+}
+
+.organization-logo {
+    max-width: 3.5vw;
+    max-height: 3.5vw;
+    width: auto;
+    height: auto;
+    object-fit: contain;
 }
 
 .booth-section {
     width: 100%;
     margin-left: 4.9vw;
-    display: flex;
-    justify-content: flex-end;
+    text-align: center;
 }
 
 .conference-title {
@@ -949,7 +961,7 @@ body::before {
 }
 
 .address-field-row {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .address-field-label {
@@ -957,7 +969,7 @@ body::before {
     font-family: 'davis-sans', sans-serif;
     font-size: 0.9em;
     color: #666;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     font-weight: 500;
 }
 
@@ -982,7 +994,7 @@ body::before {
 }
 
 .address-button-row {
-    margin-top: 16px;
+    margin-top: 12px;
     display: flex;
     gap: 8px;
     justify-content: flex-end;
@@ -1974,12 +1986,12 @@ body::before {
     background: #ffffff;
     margin-top: 1vw;
     max-height: 20vw;
+    max-width: 44vw;
     overflow-y: auto;
     overflow-x: hidden;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
-    width: 100%;
     box-sizing: border-box;
 }
 

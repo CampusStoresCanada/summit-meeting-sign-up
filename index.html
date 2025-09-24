@@ -562,7 +562,52 @@
         }
         
         console.log('📱 Mobile-optimized vendor profile wizard loaded!');
-        
+
+        // ===========================================
+        // GLOBAL ESC KEY HANDLER
+        // ===========================================
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Close modals first (highest priority)
+                const contactModal = document.getElementById('contactModal');
+                const invoiceModal = document.getElementById('invoiceModal');
+                const cropModal = document.getElementById('cropModal');
+
+                if (contactModal && contactModal.classList.contains('active')) {
+                    cancelContactModal();
+                    return;
+                }
+
+                if (invoiceModal) {
+                    closeInvoiceModal();
+                    return;
+                }
+
+                if (cropModal && cropModal.style.display === 'flex') {
+                    cancelCrop();
+                    return;
+                }
+
+                // Close any open dropdowns
+                const openDropdowns = document.querySelectorAll('.dropdown-options[style*="block"]');
+                openDropdowns.forEach(dropdown => {
+                    dropdown.style.display = 'none';
+                    const dropdownDisplay = dropdown.parentElement.querySelector('.dropdown-display');
+                    if (dropdownDisplay) {
+                        dropdownDisplay.classList.remove('open');
+                    }
+                });
+
+                // If any dropdowns were closed, blur focus
+                if (openDropdowns.length > 0) {
+                    document.activeElement.blur();
+                }
+
+                console.log('🔐 ESC pressed - closed modals/dropdowns');
+            }
+        });
+
         // ===========================================
         // CUSTOM DROPDOWN FUNCTIONALITY - Updated for membership renewal
         // ===========================================

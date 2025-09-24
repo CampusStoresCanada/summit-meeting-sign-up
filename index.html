@@ -1397,73 +1397,117 @@
             label.style.top = (y - padding - 9) + 'px';
 
             // Create address form fields
-            const addressFields = ['streetAddress', 'city', 'province', 'postalCode'];
             const addressData = formState.address || {};
 
-            addressFields.forEach((fieldKey, index) => {
-                const fieldConfig = config.fields[fieldKey];
-                const fieldRow = document.createElement('div');
-                fieldRow.className = 'address-field-row';
-                fieldRow.style.marginBottom = '12px';
+            // Street Address field (full width)
+            const streetFieldConfig = config.fields.streetAddress;
+            const streetFieldRow = document.createElement('div');
+            streetFieldRow.className = 'address-field-row';
 
-                const fieldLabel = document.createElement('label');
-                fieldLabel.className = 'address-field-label';
-                fieldLabel.textContent = fieldConfig.label;
-                fieldLabel.style.display = 'block';
-                fieldLabel.style.marginBottom = '4px';
-                fieldLabel.style.fontSize = '0.9em';
-                fieldLabel.style.color = '#666';
+            const streetFieldLabel = document.createElement('label');
+            streetFieldLabel.className = 'address-field-label';
+            streetFieldLabel.textContent = streetFieldConfig.label;
 
-                let fieldInput;
-                if (fieldKey === 'province') {
-                    fieldInput = document.createElement('select');
-                    fieldInput.className = 'address-field-select';
+            const streetFieldInput = document.createElement('input');
+            streetFieldInput.className = 'address-field-input';
+            streetFieldInput.type = 'text';
+            streetFieldInput.placeholder = streetFieldConfig.placeholder;
+            streetFieldInput.value = addressData.streetAddress || '';
+            streetFieldInput.dataset.addressField = 'streetAddress';
 
-                    // Add default option
-                    const defaultOption = document.createElement('option');
-                    defaultOption.value = '';
-                    defaultOption.textContent = 'Select province';
-                    fieldInput.appendChild(defaultOption);
+            streetFieldRow.appendChild(streetFieldLabel);
+            streetFieldRow.appendChild(streetFieldInput);
+            formContainer.appendChild(streetFieldRow);
 
-                    // Add province options from vendorData
-                    if (window.vendorData && window.vendorData.provinceOptions) {
-                        console.log('🌍 Adding province options to address modal:', window.vendorData.provinceOptions);
-                        window.vendorData.provinceOptions.forEach(option => {
-                            const optionElement = document.createElement('option');
-                            optionElement.value = option.value;
-                            optionElement.textContent = option.label;
-                            fieldInput.appendChild(optionElement);
-                        });
-                    } else {
-                        console.log('❌ No province options available for address modal');
-                    }
+            // City/Province/Postal Code row
+            const locationFieldRow = document.createElement('div');
+            locationFieldRow.className = 'address-field-row address-location-row';
 
-                    // Set current province value
-                    const currentProvince = addressData[fieldKey] || '';
-                    fieldInput.value = currentProvince;
-                    console.log('🏠 Setting province value in address modal:', currentProvince);
-                } else {
-                    fieldInput = document.createElement('input');
-                    fieldInput.className = 'address-field-input';
-                    fieldInput.type = 'text';
-                    fieldInput.placeholder = fieldConfig.placeholder;
-                    fieldInput.value = addressData[fieldKey] || '';
-                    if (fieldConfig.maxLength) {
-                        fieldInput.maxLength = fieldConfig.maxLength;
-                    }
-                }
+            // City field
+            const cityFieldConfig = config.fields.city;
+            const cityContainer = document.createElement('div');
+            cityContainer.className = 'address-city-container';
 
-                fieldInput.dataset.addressField = fieldKey;
+            const cityFieldLabel = document.createElement('label');
+            cityFieldLabel.className = 'address-field-label';
+            cityFieldLabel.textContent = cityFieldConfig.label;
 
-                fieldRow.appendChild(fieldLabel);
-                fieldRow.appendChild(fieldInput);
-                formContainer.appendChild(fieldRow);
+            const cityFieldInput = document.createElement('input');
+            cityFieldInput.className = 'address-field-input';
+            cityFieldInput.type = 'text';
+            cityFieldInput.placeholder = cityFieldConfig.placeholder;
+            cityFieldInput.value = addressData.city || '';
+            cityFieldInput.dataset.addressField = 'city';
 
-                // Focus first field
-                if (index === 0) {
-                    requestAnimationFrame(() => fieldInput.focus());
-                }
-            });
+            cityContainer.appendChild(cityFieldLabel);
+            cityContainer.appendChild(cityFieldInput);
+
+            // Province field
+            const provinceFieldConfig = config.fields.province;
+            const provinceContainer = document.createElement('div');
+            provinceContainer.className = 'address-province-container';
+
+            const provinceFieldLabel = document.createElement('label');
+            provinceFieldLabel.className = 'address-field-label';
+            provinceFieldLabel.textContent = provinceFieldConfig.label;
+
+            const provinceFieldInput = document.createElement('select');
+            provinceFieldInput.className = 'address-field-select';
+            provinceFieldInput.dataset.addressField = 'province';
+
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select province';
+            provinceFieldInput.appendChild(defaultOption);
+
+            // Add province options from vendorData
+            if (window.vendorData && window.vendorData.provinceOptions) {
+                window.vendorData.provinceOptions.forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option.value;
+                    optionElement.textContent = option.label;
+                    provinceFieldInput.appendChild(optionElement);
+                });
+            }
+
+            // Set current province value
+            const currentProvince = addressData.province || '';
+            provinceFieldInput.value = currentProvince;
+
+            provinceContainer.appendChild(provinceFieldLabel);
+            provinceContainer.appendChild(provinceFieldInput);
+
+            // Postal Code field
+            const postalFieldConfig = config.fields.postalCode;
+            const postalContainer = document.createElement('div');
+            postalContainer.className = 'address-postal-container';
+
+            const postalFieldLabel = document.createElement('label');
+            postalFieldLabel.className = 'address-field-label';
+            postalFieldLabel.textContent = postalFieldConfig.label;
+
+            const postalFieldInput = document.createElement('input');
+            postalFieldInput.className = 'address-field-input';
+            postalFieldInput.type = 'text';
+            postalFieldInput.placeholder = postalFieldConfig.placeholder;
+            postalFieldInput.value = addressData.postalCode || '';
+            if (postalFieldConfig.maxLength) {
+                postalFieldInput.maxLength = postalFieldConfig.maxLength;
+            }
+            postalFieldInput.dataset.addressField = 'postalCode';
+
+            postalContainer.appendChild(postalFieldLabel);
+            postalContainer.appendChild(postalFieldInput);
+
+            // Add all containers to the location row
+            locationFieldRow.appendChild(cityContainer);
+            locationFieldRow.appendChild(provinceContainer);
+            locationFieldRow.appendChild(postalContainer);
+            formContainer.appendChild(locationFieldRow);
+
+            // Focus first field
+            requestAnimationFrame(() => streetFieldInput.focus());
 
             // Add save/cancel buttons
             const buttonRow = document.createElement('div');
@@ -2048,7 +2092,6 @@
             // Store vendor data globally for address modal access
             window.vendorData = {
                 organization: data.organization,
-                boothNumber: data.boothNumber,
                 institutionSizeOptions: data.institutionSizeOptions,
                 provinceOptions: data.provinceOptions
             };
@@ -2058,8 +2101,7 @@
             populateProvinceDropdown(data.provinceOptions, formState.province);
 
             window.formData = {
-                organization: data.organization,
-                boothNumber: data.boothNumber
+                organization: data.organization
             };
         }
 

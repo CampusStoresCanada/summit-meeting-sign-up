@@ -117,11 +117,8 @@ body::before {
 .logo-container {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
     gap: 0.5vw;
-    width: 8vw;
-    position: relative;
-    right: calc(8vw - 2vw);
 }
 
 .csc-logo {
@@ -134,9 +131,8 @@ body::before {
 
 .organization-logo-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
     min-height: 5vw;
-    width: 100%;
 }
 
 .organization-logo {
@@ -945,7 +941,7 @@ body::before {
 }
 
 .address-field-row {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
 .address-field-label {
@@ -953,7 +949,7 @@ body::before {
     font-family: 'davis-sans', sans-serif;
     font-size: 0.9em;
     color: #666;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
     font-weight: 500;
 }
 
@@ -977,8 +973,30 @@ body::before {
     box-shadow: 0 0 0 3px rgba(186, 0, 59, 0.1);
 }
 
+/* Address location row styling */
+.address-location-row {
+    display: flex;
+    gap: 12px;
+}
+
+.address-city-container {
+    flex: 2;
+    min-width: 120px;
+}
+
+.address-province-container {
+    flex: 2;
+    min-width: 180px; /* Ensure "Newfoundland and Labrador" fits */
+}
+
+.address-postal-container {
+    flex: 1;
+    min-width: 80px; /* Just enough for 7 characters */
+    max-width: 100px;
+}
+
 .address-button-row {
-    margin-top: 12px;
+    margin-top: 16px;
     display: flex;
     gap: 8px;
     justify-content: flex-end;

@@ -794,8 +794,14 @@
                         <span class="item-amount">$${membershipFee.toFixed(2)}</span>
                     </div>
                     <div class="invoice-line-item">
-                        <span class="item-description">Conference Registration (${attendingCount} attendees)</span>
-                        <span class="item-amount">$${(conferenceTotal + conferenceHST).toFixed(2)}</span>
+                        <span class="item-description">Conference Registration</span>
+                        <span class="item-amount">$${conferenceTotal.toFixed(2)}</span>
+                    </div>
+                    <div class="invoice-subtotal">
+                        Subtotal: $${subtotal.toFixed(2)}
+                    </div>
+                    <div class="invoice-tax">
+                        HST (13%): $${conferenceHST.toFixed(2)}
                     </div>
                     <div class="invoice-total">
                         <strong>Total: $${totalWithHST.toFixed(2)}</strong>
@@ -807,13 +813,31 @@
                         <span class="item-description">2025-2026 CSC Membership (${institutionSize})</span>
                         <span class="item-amount">$${membershipFee.toFixed(2)}</span>
                     </div>
-                    <div class="invoice-line-item">
-                        <span class="item-description">Conference Registration (${attendingCount} × $${conferencePerPerson})</span>
-                        <span class="item-amount">$${conferenceTotal.toFixed(2)}</span>
+                `;
+
+                // Add individual conference registrations for each attending contact
+                const attendingContacts = organizationContacts.filter(contact =>
+                    teamState.attendingContacts.has(contact.id)
+                );
+
+                attendingContacts.forEach(contact => {
+                    preview += `
+                        <div class="invoice-line-item">
+                            <span class="item-description">Conference Registration</span>
+                            <span class="item-amount">$${conferencePerPerson.toFixed(2)}</span>
+                        </div>
+                        <div class="invoice-line-subitem">
+                            ${contact.name}
+                        </div>
+                    `;
+                });
+
+                preview += `
+                    <div class="invoice-subtotal">
+                        Subtotal: $${subtotal.toFixed(2)}
                     </div>
-                    <div class="invoice-line-item">
-                        <span class="item-description">HST (13% on Conference Registration)</span>
-                        <span class="item-amount">$${conferenceHST.toFixed(2)}</span>
+                    <div class="invoice-tax">
+                        HST (13%): $${conferenceHST.toFixed(2)}
                     </div>
                     <div class="invoice-total">
                         <strong>Total: $${totalWithHST.toFixed(2)}</strong>

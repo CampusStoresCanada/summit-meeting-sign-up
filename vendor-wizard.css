@@ -1997,8 +1997,32 @@ body::before {
     min-width: 6vw;
 }
 
-.invoice-total {
+.invoice-line-subitem {
+    font-size: 0.9vw;
+    color: #666;
+    font-style: italic;
+    margin-left: 1vw;
+    margin-bottom: 0.5vw;
+}
+
+.invoice-subtotal {
     margin-top: 1vw;
+    padding: 0.5vw 0;
+    text-align: right;
+    font-size: 1vw;
+    color: #333;
+    border-top: 1px solid #e0e0e0;
+}
+
+.invoice-tax {
+    padding: 0.3vw 0;
+    text-align: right;
+    font-size: 1vw;
+    color: #333;
+}
+
+.invoice-total {
+    margin-top: 0.5vw;
     padding-top: 1vw;
     border-top: 2px solid #ba003b;
     text-align: right;

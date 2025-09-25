@@ -12,8 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
-    <!-- QuickBooks Payments SDK -->
-    <script src="https://js.payments.intuit.com/v1/sdk.js"></script>
+    <!-- QuickBooks Payments SDK - Currently in demo mode -->
+    <!-- <script src="https://js.payments.intuit.com/v1/sdk.js"></script> -->
     
     <!-- YOUR CUSTOM STYLESHEET -->
     <link rel="stylesheet" href="vendor-wizard.css">
@@ -2900,6 +2900,34 @@
 
         // Calculate conference costs with Board of Directors discounts
         function calculateConferenceCosts() {
+            // Safety checks for uninitialized variables
+            if (!teamState || !teamState.attendingContacts) {
+                console.log('⚠️ teamState not initialized, returning zero costs');
+                return {
+                    paidAttendees: 0,
+                    freeAttendees: 0,
+                    totalAttendees: 0,
+                    conferenceTotal: 0,
+                    conferenceHST: 0
+                };
+            }
+
+            if (!organizationContacts || organizationContacts.length === 0) {
+                console.log('⚠️ organizationContacts not loaded, using basic calculation');
+                const totalAttendees = teamState.attendingContacts.size || 0;
+                const conferencePerPerson = 325;
+                const conferenceTotal = totalAttendees * conferencePerPerson;
+                const conferenceHST = conferenceTotal * 0.13;
+
+                return {
+                    paidAttendees: totalAttendees,
+                    freeAttendees: 0,
+                    totalAttendees: totalAttendees,
+                    conferenceTotal,
+                    conferenceHST
+                };
+            }
+
             const attendingContactIds = Array.from(teamState.attendingContacts || []);
             let paidAttendees = 0;
             let freeAttendees = 0;
@@ -2913,6 +2941,9 @@
                     } else {
                         paidAttendees++;
                     }
+                } else {
+                    // Contact not found, assume paid
+                    paidAttendees++;
                 }
             });
 
@@ -3335,10 +3366,14 @@
             
             // Display organization logo in the logo container
             const organizationLogoContainer = document.getElementById('organizationLogo');
-            if (data.organization?.logo) {
-                organizationLogoContainer.innerHTML = `<img src="${data.organization.logo}" alt="${data.organization.name} Logo" class="organization-logo">`;
+            if (data.organization?.logo && data.organization.logo.startsWith('http')) {
+                console.log('🖼️ Setting organization logo:', data.organization.logo);
+                organizationLogoContainer.innerHTML = `<img src="${data.organization.logo}" alt="${data.organization.name || 'Organization'} Logo" class="organization-logo">`;
             } else if (data.organization?.name) {
+                console.log('📝 Using organization name as logo:', data.organization.name);
                 organizationLogoContainer.innerHTML = `<div class="organization-name">${data.organization.name}</div>`;
+            } else {
+                console.log('⚠️ No logo or name available for organization');
             }
             
             formState.institutionName = data.organization?.name || '';

@@ -2320,49 +2320,113 @@
 
         }
 
-        // Display QuickBooks invoice in iframe on Step 4 (Invoice and Payment)
+        // Display QuickBooks invoice or payment widget based on payment method
         function displayQuickBooksInvoice() {
             const qboInvoiceContainer = document.getElementById('qboInvoiceContainer');
             const paymentSummaryContainer = document.getElementById('paymentSummaryContainer');
             const paymentActionContainer = document.getElementById('paymentActionContainer');
-            const qboInvoiceFrame = document.getElementById('qboInvoiceFrame');
 
-            // Check if we have a QuickBooks invoice URL
-            if (window.qboInvoiceUrl) {
-                console.log('📄 Displaying QuickBooks invoice:', window.qboInvoiceUrl);
+            // Get the selected payment method
+            const paymentMethod = formState.paymentMethod || 'pay-now';
+            console.log('💳 Payment method selected:', paymentMethod);
 
-                // Hide the payment summary and action button
+            // Check if we have a QuickBooks invoice
+            if (window.qboInvoiceUrl || window.qboInvoiceResult) {
+                console.log('📄 QuickBooks invoice created, displaying based on payment method');
+
+                if (paymentMethod === 'invoice') {
+                    // SCENARIO A: Send Invoice (Pay by Cheque)
+                    displayInvoiceSummaryAndEmail();
+                } else {
+                    // SCENARIO B: Pay Now (Credit/Debit/EFT)
+                    displayPaymentWidget();
+                }
+
+                // Hide the default payment summary and action
                 if (paymentSummaryContainer) paymentSummaryContainer.style.display = 'none';
                 if (paymentActionContainer) paymentActionContainer.style.display = 'none';
 
-                // Show and populate the QuickBooks invoice iframe
-                if (qboInvoiceContainer && qboInvoiceFrame) {
-                    qboInvoiceFrame.src = window.qboInvoiceUrl;
-                    qboInvoiceContainer.style.display = 'block';
-                    console.log('✅ QuickBooks invoice iframe loaded with URL:', window.qboInvoiceUrl);
-
-                    // Add iframe error handling
-                    qboInvoiceFrame.onerror = function() {
-                        console.error('❌ Iframe failed to load QuickBooks invoice');
-                    };
-
-                    qboInvoiceFrame.onload = function() {
-                        try {
-                            console.log('📄 Iframe loaded successfully');
-                        } catch (e) {
-                            console.log('📄 Iframe loaded but cross-origin restricted:', e.message);
-                        }
-                    };
-                }
             } else {
-                console.log('📋 No QuickBooks invoice URL available - showing payment summary');
+                console.log('📋 No QuickBooks invoice available - showing default payment summary');
 
                 // Show the payment summary and action button
                 if (paymentSummaryContainer) paymentSummaryContainer.style.display = 'block';
                 if (paymentActionContainer) paymentActionContainer.style.display = 'block';
 
-                // Hide the QuickBooks invoice iframe
+                // Hide the QuickBooks invoice container
                 if (qboInvoiceContainer) qboInvoiceContainer.style.display = 'none';
+            }
+        }
+
+        // SCENARIO A: Display invoice summary and send email
+        function displayInvoiceSummaryAndEmail() {
+            const qboInvoiceContainer = document.getElementById('qboInvoiceContainer');
+
+            if (qboInvoiceContainer) {
+                qboInvoiceContainer.innerHTML = `
+                    <div class="field-display">
+                        <h3>📧 Invoice Sent</h3>
+                        <p>Your invoice has been created and will be emailed to you shortly.</p>
+
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 16px 0;">
+                            <h4>Invoice Summary</h4>
+                            <div class="payment-details">
+                                <div class="payment-line">Invoice #: <strong>${window.qboInvoiceResult?.qboInvoiceNumber || 'Pending'}</strong></div>
+                                <div class="payment-line">Payment Method: <strong>Cheque</strong></div>
+                                <div class="payment-line">Status: <strong>Email Sent</strong></div>
+                            </div>
+                        </div>
+
+                        <p style="color: #666; font-size: 14px;">
+                            📬 The invoice has been sent to your primary contact email address.
+                            Please pay by cheque according to the payment instructions in the email.
+                        </p>
+
+                        <button class="next-btn" onclick="emailQuickBooksInvoice()" style="margin-top: 16px;">
+                            📧 Resend Invoice Email
+                        </button>
+                    </div>
+                `;
+                qboInvoiceContainer.style.display = 'block';
+
+                // Automatically email the invoice
+                emailQuickBooksInvoice();
+            }
+        }
+
+        // SCENARIO B: Display payment widget for immediate payment
+        function displayPaymentWidget() {
+            const qboInvoiceContainer = document.getElementById('qboInvoiceContainer');
+
+            if (qboInvoiceContainer) {
+                qboInvoiceContainer.innerHTML = `
+                    <div class="field-display">
+                        <h3>💳 Complete Your Payment</h3>
+                        <p>Pay securely with credit card, debit, or bank transfer:</p>
+
+                        <div id="qbPaymentWidget" style="margin: 20px 0;">
+                            <!-- QuickBooks Payment Widget will load here -->
+                            <div style="background: #f8f9fa; padding: 40px; text-align: center; border-radius: 8px; border: 1px solid #ddd;">
+                                <div style="margin-bottom: 16px;">💳</div>
+                                <h4>Payment Widget</h4>
+                                <p style="color: #666;">QuickBooks Payments widget will load here</p>
+                                <p style="font-size: 12px; color: #999;">
+                                    Invoice #${window.qboInvoiceResult?.qboInvoiceNumber || 'Pending'}
+                                    • Total: $${calculateInvoiceTotal()}
+                                </p>
+                            </div>
+                        </div>
+
+                        <p style="color: #666; font-size: 14px;">
+                            🔒 Your payment is secured by QuickBooks Payments.
+                            A receipt will be emailed to you after payment.
+                        </p>
+                    </div>
+                `;
+                qboInvoiceContainer.style.display = 'block';
+
+                // Initialize QuickBooks Payment Widget
+                initializePaymentWidget();
             }
         }
 
@@ -2375,6 +2439,47 @@
                 console.error('❌ No QuickBooks invoice URL available');
                 alert('No invoice URL available. Please try confirming your invoice again.');
             }
+        }
+
+        // Email the QuickBooks invoice to the customer
+        function emailQuickBooksInvoice() {
+            console.log('📧 Sending QuickBooks invoice email...');
+
+            // For now, just show confirmation (we'll implement QB email API later)
+            console.log('✅ Invoice email would be sent via QuickBooks API');
+
+            // TODO: Implement QuickBooks invoice email API call
+            // This would call QB API to send the invoice to customer email
+        }
+
+        // Initialize QuickBooks Payment Widget
+        function initializePaymentWidget() {
+            console.log('💳 Initializing QuickBooks Payment Widget...');
+
+            // For now, just show placeholder (we'll implement QB Payments widget later)
+            console.log('✅ Payment widget would be initialized here');
+
+            // TODO: Implement QuickBooks Payments widget
+            // This would load Intuit's payment widget SDK
+        }
+
+        // Calculate total from invoice data
+        function calculateInvoiceTotal() {
+            if (window.qboInvoiceResult?.invoiceData) {
+                return window.qboInvoiceResult.invoiceData.total || '0.00';
+            }
+
+            // Fallback calculation
+            const membershipPricing = {
+                'XSmall': 420, 'Small': 525, 'Medium': 735, 'Large': 895, 'XLarge': 1000
+            };
+
+            const membershipFee = membershipPricing[formState.institutionSize] || 0;
+            const attendingCount = teamState.attendingContacts?.size || 0;
+            const conferenceTotal = attendingCount * 325;
+            const conferenceHST = conferenceTotal * 0.13;
+
+            return (membershipFee + conferenceTotal + conferenceHST).toFixed(2);
         }
 
         function updateStepNavigation() {

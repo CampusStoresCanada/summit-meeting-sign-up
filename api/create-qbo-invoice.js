@@ -55,7 +55,7 @@ export default async function handler(req, res) {
       baseUrl: qboBaseUrl
     });
 
-    console.log('👤 Customer ready:', customer.Name);
+    console.log('👤 Customer ready:', customer.DisplayName || customer.Name);
 
     // Step 2: Create invoice based on billing preference
     const invoice = await createInvoice(customer, invoiceData, billingPreferences, {
@@ -100,8 +100,8 @@ async function findOrCreateCustomer(organizationData, qboConfig) {
 
   console.log('🔍 Looking for customer:', organizationData.name);
 
-  // Search for existing customer by name
-  const query = `SELECT * FROM Customer WHERE Name='${organizationData.name.replace(/'/g, "\\'")}' MAXRESULTS 1`;
+  // Search for existing customer by name (use DisplayName field)
+  const query = `SELECT * FROM Customer WHERE DisplayName='${organizationData.name.replace(/'/g, "\\'")}' MAXRESULTS 1`;
   const searchUrl = `${baseUrl}/v3/company/${companyId}/query?query=${encodeURIComponent(query)}`;
 
   console.log('🔍 QBO Search URL:', searchUrl);
@@ -126,7 +126,7 @@ async function findOrCreateCustomer(organizationData, qboConfig) {
 
   if (searchData.QueryResponse?.Customer?.length > 0) {
     const existingCustomer = searchData.QueryResponse.Customer[0];
-    console.log('👤 Found existing customer:', existingCustomer.Name);
+    console.log('👤 Found existing customer:', existingCustomer.DisplayName || existingCustomer.Name);
 
     // Check if customer data needs updating
     const needsUpdate = checkCustomerNeedsUpdate(existingCustomer, organizationData);
@@ -214,7 +214,7 @@ async function createCustomer(organizationData, qboConfig) {
   const { accessToken, companyId, baseUrl } = qboConfig;
 
   const customerData = {
-    Name: organizationData.name,
+    DisplayName: organizationData.name,
     CompanyName: organizationData.name,
     PrimaryEmailAddr: organizationData.primaryContact?.workEmail ? {
       Address: organizationData.primaryContact.workEmail

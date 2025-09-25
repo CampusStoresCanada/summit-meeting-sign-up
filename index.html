@@ -2826,7 +2826,7 @@
             const formattedPhone = phone ? formatPhoneForDisplay(phone) : '';
             
             // Get dietary restrictions from Notion contact data
-            const dietaryRestrictions = contact.dietaryRestrictions || '';
+            const dietaryRestrictions = contact.dietaryRestrictions || 'Dietary Restrictions Unknown';
 
             contactDiv.innerHTML = `
                 <div class="primary-contact-selector" onclick="setPrimaryContact('${contact.id}'); event.stopPropagation();" title="Click to set as primary contact">

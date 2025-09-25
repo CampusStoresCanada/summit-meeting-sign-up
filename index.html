@@ -313,8 +313,25 @@
                     </div>
                 
                     <div class="form-container">
-                        <!-- Payment Summary -->
-                        <div class="form-field" data-field="paymentSummary">
+                        <!-- QuickBooks Invoice Display -->
+                        <div class="form-field" data-field="qboInvoice" id="qboInvoiceContainer" style="display: none;">
+                            <div class="field-display">
+                                <h3>Your Invoice</h3>
+                                <p>Complete your payment using the QuickBooks interface below:</p>
+                                <div class="qbo-invoice-frame">
+                                    <iframe id="qboInvoiceFrame"
+                                            src=""
+                                            width="100%"
+                                            height="600"
+                                            frameborder="0"
+                                            style="border: 1px solid #ddd; border-radius: 8px;">
+                                    </iframe>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Summary (shown before invoice is created) -->
+                        <div class="form-field" data-field="paymentSummary" id="paymentSummaryContainer">
                             <div class="field-display">
                                 <h3>Membership Summary</h3>
                                 <div class="payment-details">
@@ -324,8 +341,8 @@
                             </div>
                         </div>
 
-                        <!-- Payment Button -->
-                        <div class="form-field" data-field="paymentAction">
+                        <!-- Payment Button (shown before invoice is created) -->
+                        <div class="form-field" data-field="paymentAction" id="paymentActionContainer">
                             <button class="next-btn payment-btn" onclick="processPayment()">
                                 Payment Page
                                 <span>→</span>
@@ -1160,7 +1177,13 @@
                 }
 
                 // Create QuickBooks invoice
-                await createQuickBooksInvoice();
+                const qboResult = await createQuickBooksInvoice();
+
+                // Store invoice URL for Step 4 display
+                if (qboResult && qboResult.invoiceUrl) {
+                    window.qboInvoiceUrl = qboResult.invoiceUrl;
+                    console.log('📄 QuickBooks invoice URL stored:', qboResult.invoiceUrl);
+                }
 
                 // Enable next step button
                 const nextButton = document.querySelector('.next-btn');
@@ -2264,6 +2287,8 @@
                         populatePrimaryContactList();
                         console.log('🔄 Step 4 refreshed with updated attending list');
                     }
+                    // Always check for QuickBooks invoice when showing Step 4 (Invoice and Payment)
+                    displayQuickBooksInvoice();
                 }
                 if (stepNumber === 5 && !initializedSteps.has(5)) {
                     initializeStep5();
@@ -2273,8 +2298,41 @@
                     initializeStep6();
                     initializedSteps.add(6);
                 }
-            } 
-                
+            }
+
+        }
+
+        // Display QuickBooks invoice in iframe on Step 4 (Invoice and Payment)
+        function displayQuickBooksInvoice() {
+            const qboInvoiceContainer = document.getElementById('qboInvoiceContainer');
+            const paymentSummaryContainer = document.getElementById('paymentSummaryContainer');
+            const paymentActionContainer = document.getElementById('paymentActionContainer');
+            const qboInvoiceFrame = document.getElementById('qboInvoiceFrame');
+
+            // Check if we have a QuickBooks invoice URL
+            if (window.qboInvoiceUrl) {
+                console.log('📄 Displaying QuickBooks invoice:', window.qboInvoiceUrl);
+
+                // Hide the payment summary and action button
+                if (paymentSummaryContainer) paymentSummaryContainer.style.display = 'none';
+                if (paymentActionContainer) paymentActionContainer.style.display = 'none';
+
+                // Show and populate the QuickBooks invoice iframe
+                if (qboInvoiceContainer && qboInvoiceFrame) {
+                    qboInvoiceFrame.src = window.qboInvoiceUrl;
+                    qboInvoiceContainer.style.display = 'block';
+                    console.log('✅ QuickBooks invoice iframe loaded');
+                }
+            } else {
+                console.log('📋 No QuickBooks invoice URL available - showing payment summary');
+
+                // Show the payment summary and action button
+                if (paymentSummaryContainer) paymentSummaryContainer.style.display = 'block';
+                if (paymentActionContainer) paymentActionContainer.style.display = 'block';
+
+                // Hide the QuickBooks invoice iframe
+                if (qboInvoiceContainer) qboInvoiceContainer.style.display = 'none';
+            }
         }
 
         function updateStepNavigation() {

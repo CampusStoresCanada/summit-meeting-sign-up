@@ -101,7 +101,8 @@ async function findOrCreateCustomer(organizationData, qboConfig) {
   console.log('🔍 Looking for customer:', organizationData.name);
 
   // Search for existing customer by name
-  const searchUrl = `${baseUrl}/v3/company/${companyId}/query?query=SELECT * FROM Customer WHERE Name='${organizationData.name.replace(/'/g, "\\'")}' MAXRESULTS 1`;
+  const query = `SELECT * FROM Customer WHERE Name='${organizationData.name.replace(/'/g, "\\'")}' MAXRESULTS 1`;
+  const searchUrl = `${baseUrl}/v3/company/${companyId}/query?query=${encodeURIComponent(query)}`;
 
   const searchResponse = await fetch(searchUrl, {
     headers: {

@@ -205,8 +205,17 @@ async function updateCustomer(existingCustomer, organizationData, qboConfig) {
   }
 
   const updateResult = await updateResponse.json();
-  console.log('✅ Customer updated');
-  return updateResult.QueryResponse.Customer[0];
+  console.log('✅ Customer updated:', JSON.stringify(updateResult, null, 2));
+
+  // For update operations, the response structure is different
+  if (updateResult.QueryResponse?.Customer?.length > 0) {
+    return updateResult.QueryResponse.Customer[0];
+  } else if (updateResult.Customer) {
+    return updateResult.Customer;
+  } else {
+    console.error('❌ Unexpected update response structure:', updateResult);
+    throw new Error('Customer update response structure is unexpected');
+  }
 }
 
 // Create new customer
@@ -246,8 +255,17 @@ async function createCustomer(organizationData, qboConfig) {
   }
 
   const createResult = await createResponse.json();
-  console.log('✅ Customer created');
-  return createResult.QueryResponse.Customer[0];
+  console.log('✅ Customer created:', JSON.stringify(createResult, null, 2));
+
+  // For create operations, the response structure is different
+  if (createResult.QueryResponse?.Customer?.length > 0) {
+    return createResult.QueryResponse.Customer[0];
+  } else if (createResult.Customer) {
+    return createResult.Customer;
+  } else {
+    console.error('❌ Unexpected create response structure:', createResult);
+    throw new Error('Customer create response structure is unexpected');
+  }
 }
 
 // Create invoice with proper line items based on billing preference
@@ -287,7 +305,17 @@ async function createInvoice(customer, invoiceData, billingPreferences, qboConfi
   }
 
   const invoiceResult = await invoiceResponse.json();
-  return invoiceResult.QueryResponse.Invoice[0];
+  console.log('✅ Invoice created:', JSON.stringify(invoiceResult, null, 2));
+
+  // For invoice create operations, check different possible response structures
+  if (invoiceResult.QueryResponse?.Invoice?.length > 0) {
+    return invoiceResult.QueryResponse.Invoice[0];
+  } else if (invoiceResult.Invoice) {
+    return invoiceResult.Invoice;
+  } else {
+    console.error('❌ Unexpected invoice response structure:', invoiceResult);
+    throw new Error('Invoice create response structure is unexpected');
+  }
 }
 
 // Format line items based on billing display preference

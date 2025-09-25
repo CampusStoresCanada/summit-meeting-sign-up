@@ -288,13 +288,13 @@ function formatLineItems(invoiceData, billingPreferences) {
   const { membershipFee, conferenceTotal, conferenceHST, billingDisplay } = invoiceData;
 
   if (billingDisplay === 'single-item') {
-    // Single line item with total
+    // Single line item with total using the exact service item from QBO
     lines.push({
       Amount: membershipFee + conferenceTotal + conferenceHST,
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
-          value: "1", // You'll need to create/find service items in QBO
+          value: "19", // CSC Membership & Conference (ID: 19)
           name: "CSC Membership & Conference"
         },
         Qty: 1,
@@ -308,7 +308,7 @@ function formatLineItems(invoiceData, billingPreferences) {
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
-          value: "2", // Service item for membership
+          value: "20", // CSC Service (ID: 20)
           name: "CSC Membership"
         },
         Qty: 1,
@@ -322,7 +322,7 @@ function formatLineItems(invoiceData, billingPreferences) {
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
-          value: "3", // Service item for conference
+          value: "20", // CSC Service (ID: 20)
           name: "Conference Registration"
         },
         Qty: 1,
@@ -330,13 +330,13 @@ function formatLineItems(invoiceData, billingPreferences) {
       }
     });
   } else {
-    // Individual line items
+    // Individual line items - use CSC Service for all
     lines.push({
       Amount: membershipFee,
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
-          value: "2",
+          value: "20", // CSC Service (ID: 20)
           name: "CSC Membership"
         },
         Qty: 1,
@@ -349,7 +349,7 @@ function formatLineItems(invoiceData, billingPreferences) {
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
-          value: "3",
+          value: "20", // CSC Service (ID: 20)
           name: "Conference Registration"
         },
         Qty: invoiceData.attendingCount || 1,
@@ -363,7 +363,7 @@ function formatLineItems(invoiceData, billingPreferences) {
         DetailType: "SalesItemLineDetail",
         SalesItemLineDetail: {
           ItemRef: {
-            value: "4", // HST service item
+            value: "20", // CSC Service (ID: 20)
             name: "HST (13%)"
           },
           Qty: 1,

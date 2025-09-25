@@ -318,6 +318,16 @@
                             <div class="field-display">
                                 <h3>Your Invoice</h3>
                                 <p>Complete your payment using the QuickBooks interface below:</p>
+
+                                <!-- Fallback button for iframe issues -->
+                                <div id="qboFallbackButton" style="display: none; margin-bottom: 16px;">
+                                    <p style="color: #666; font-size: 14px;">Having trouble viewing the invoice below? Click here to open it in a new tab:</p>
+                                    <button id="openQboInvoice" class="next-btn" style="display: inline-block; margin: 0;">
+                                        Open QuickBooks Invoice
+                                        <span>↗</span>
+                                    </button>
+                                </div>
+
                                 <div class="qbo-invoice-frame">
                                     <iframe id="qboInvoiceFrame"
                                             src=""
@@ -326,6 +336,14 @@
                                             frameborder="0"
                                             style="border: 1px solid #ddd; border-radius: 8px;">
                                     </iframe>
+                                </div>
+
+                                <!-- Always show the fallback button -->
+                                <div style="margin-top: 12px; text-align: center;">
+                                    <button id="openQboInvoiceAlways" class="next-btn secondary" onclick="openQuickBooksInvoiceInNewTab()" style="display: inline-block;">
+                                        Open in New Tab
+                                        <span>↗</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -2321,7 +2339,20 @@
                 if (qboInvoiceContainer && qboInvoiceFrame) {
                     qboInvoiceFrame.src = window.qboInvoiceUrl;
                     qboInvoiceContainer.style.display = 'block';
-                    console.log('✅ QuickBooks invoice iframe loaded');
+                    console.log('✅ QuickBooks invoice iframe loaded with URL:', window.qboInvoiceUrl);
+
+                    // Add iframe error handling
+                    qboInvoiceFrame.onerror = function() {
+                        console.error('❌ Iframe failed to load QuickBooks invoice');
+                    };
+
+                    qboInvoiceFrame.onload = function() {
+                        try {
+                            console.log('📄 Iframe loaded successfully');
+                        } catch (e) {
+                            console.log('📄 Iframe loaded but cross-origin restricted:', e.message);
+                        }
+                    };
                 }
             } else {
                 console.log('📋 No QuickBooks invoice URL available - showing payment summary');
@@ -2332,6 +2363,17 @@
 
                 // Hide the QuickBooks invoice iframe
                 if (qboInvoiceContainer) qboInvoiceContainer.style.display = 'none';
+            }
+        }
+
+        // Open QuickBooks invoice in new tab (fallback for iframe issues)
+        function openQuickBooksInvoiceInNewTab() {
+            if (window.qboInvoiceUrl) {
+                console.log('🔗 Opening QuickBooks invoice in new tab:', window.qboInvoiceUrl);
+                window.open(window.qboInvoiceUrl, '_blank');
+            } else {
+                console.error('❌ No QuickBooks invoice URL available');
+                alert('No invoice URL available. Please try confirming your invoice again.');
             }
         }
 

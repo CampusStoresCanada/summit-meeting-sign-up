@@ -1132,8 +1132,9 @@
 
             // Show sync progress
             const modal = document.getElementById('invoiceModal');
+            let actions = null;
             if (modal) {
-                const actions = modal.querySelector('.invoice-modal-actions');
+                actions = modal.querySelector('.invoice-modal-actions');
                 if (actions) {
                     actions.innerHTML = `
                         <div style="display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px;">
@@ -1148,6 +1149,19 @@
                 // Sync all changes to Notion
                 await syncMembershipRenewal();
 
+                // Update progress message
+                if (modal && actions) {
+                    actions.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px;">
+                            <div style="width: 20px; height: 20px; border: 2px solid #ba003b; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            <span style="color: #666; font-size: 14px;">Creating QuickBooks invoice...</span>
+                        </div>
+                    `;
+                }
+
+                // Create QuickBooks invoice
+                await createQuickBooksInvoice();
+
                 // Enable next step button
                 const nextButton = document.querySelector('.next-btn');
                 if (nextButton) {
@@ -1157,7 +1171,7 @@
 
                 // Close modal and show success
                 closeInvoiceModal();
-                console.log('✅ Membership renewal data synced successfully');
+                console.log('✅ Membership renewal completed - Notion synced, QuickBooks invoice created');
 
             } catch (error) {
                 console.error('❌ Sync failed:', error);
@@ -1182,6 +1196,9 @@
         async function syncMembershipRenewal() {
             console.log('🚀 Starting membership renewal sync...');
 
+            // Get token from URL parameters
+            const token = new URLSearchParams(window.location.search).get('token');
+
             // Gather all local changes
             const syncData = {
                 organizationUpdates: gatherOrganizationUpdates(),
@@ -1197,7 +1214,7 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    token: currentUserToken,
+                    token: token,
                     syncData: syncData
                 })
             });
@@ -1310,6 +1327,106 @@
 
             console.log('👥 Contact operations:', operations);
             return operations;
+        }
+
+        // Create QuickBooks Online invoice
+        async function createQuickBooksInvoice() {
+            console.log('💰 Creating QuickBooks invoice...');
+
+            // Get token from URL parameters
+            const token = new URLSearchParams(window.location.search).get('token');
+
+            // Gather invoice data
+            const invoiceData = prepareInvoiceData();
+            const organizationData = prepareOrganizationData();
+            const billingPreferences = prepareBillingPreferences();
+
+            console.log('📊 Invoice data prepared for QBO:', {
+                organization: organizationData.name,
+                total: invoiceData.total,
+                billingDisplay: billingPreferences.billingDisplay
+            });
+
+            // Call QBO API
+            const response = await fetch('/api/create-qbo-invoice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    token: token,
+                    organizationData: organizationData,
+                    invoiceData: invoiceData,
+                    billingPreferences: billingPreferences
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                console.error('❌ QuickBooks invoice creation failed:', result);
+                throw new Error(result.message || 'QuickBooks invoice creation failed');
+            }
+
+            console.log('✅ QuickBooks invoice created:', result);
+
+            // Store QBO info for potential future use
+            window.qboInvoiceResult = result;
+
+            return result;
+        }
+
+        // Prepare invoice data for QuickBooks
+        function prepareInvoiceData() {
+            const membershipPricing = {
+                'XSmall': 420,
+                'Small': 525,
+                'Medium': 735,
+                'Large': 895,
+                'XLarge': 1000
+            };
+
+            const membershipFee = membershipPricing[formState.institutionSize] || 0;
+            const attendingCount = teamState.attendingContacts?.size || 0;
+            const conferenceRegistrationFee = 325;
+            const conferenceTotal = attendingCount * conferenceRegistrationFee;
+            const hstRate = 0.13;
+            const conferenceHST = conferenceTotal * hstRate;
+            const total = membershipFee + conferenceTotal + conferenceHST;
+
+            return {
+                membershipFee,
+                conferenceTotal,
+                conferenceHST,
+                attendingCount,
+                total,
+                institutionSize: formState.institutionSize
+            };
+        }
+
+        // Prepare organization data for QuickBooks
+        function prepareOrganizationData() {
+            // Get primary contact
+            const primaryContact = organizationContacts?.find(contact => contact.isPrimaryContact);
+
+            return {
+                name: formState.institutionName,
+                website: formState.website,
+                address: formState.address,
+                primaryContact: primaryContact ? {
+                    name: primaryContact.name,
+                    workEmail: primaryContact.workEmail,
+                    workPhone: primaryContact.workPhone
+                } : null
+            };
+        }
+
+        // Prepare billing preferences for QuickBooks
+        function prepareBillingPreferences() {
+            return {
+                billingDisplay: formState.billingDisplay || 'individual-line-items',
+                paymentMethod: formState.paymentMethod || 'pay-now'
+            };
         }
 
         // Allow user to proceed despite sync errors

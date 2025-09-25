@@ -1223,7 +1223,17 @@
 
             if (!response.ok || result.hasErrors) {
                 console.error('❌ Sync failed or had errors:', result);
-                throw new Error(result.message || 'Sync failed');
+                console.error('❌ Detailed errors:', JSON.stringify(result.errors || result, null, 2));
+
+                // Show specific error details if available
+                if (result.errors) {
+                    console.error('❌ Individual errors:');
+                    result.errors.forEach((error, index) => {
+                        console.error(`   ${index + 1}. ${error.operation}: ${error.error}`);
+                    });
+                }
+
+                throw new Error(result.message || 'Sync completed with errors');
             }
 
             console.log('✅ Sync completed successfully:', result);

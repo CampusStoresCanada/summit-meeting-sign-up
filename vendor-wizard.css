@@ -311,6 +311,7 @@ body::before {
     color: #808080;
     line-height: 1.4;
     margin: 0;
+    max-width: 30vw;
 }
 
 /* ===========================================

@@ -78,8 +78,30 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('💥 QuickBooks invoice creation failed:', error);
 
-    // Determine if it's an auth error
+    // Check if it's an auth error and try to refresh tokens
     const isAuthError = error.message?.includes('401') || error.message?.includes('Unauthorized');
+
+    if (isAuthError) {
+      console.log('🔄 Token expired, attempting automatic refresh...');
+
+      try {
+        // Attempt to refresh the access token
+        const newTokens = await refreshQuickBooksTokens();
+
+        if (newTokens) {
+          console.log('✅ Tokens refreshed successfully, retrying invoice creation...');
+
+          // Retry the invoice creation with new tokens
+          const retryResult = await retryInvoiceCreation(req.body, newTokens);
+
+          res.status(200).json(retryResult);
+          return;
+        }
+      } catch (refreshError) {
+        console.error('❌ Token refresh failed:', refreshError);
+      }
+    }
+
     const errorMessage = isAuthError
       ? 'Steve is an idiot and forgot to refresh the QuickBooks tokens. He will be in contact with you momentarily.'
       : 'Steve is an idiot and broke the QuickBooks integration. He will be in contact with you momentarily.';
@@ -410,4 +432,90 @@ function formatLineItems(invoiceData, billingPreferences) {
   }
 
   return lines;
+}
+
+// Automatically refresh QuickBooks tokens
+async function refreshQuickBooksTokens() {
+  const qboClientId = process.env.QBO_CLIENT_ID;
+  const qboClientSecret = process.env.QBO_CLIENT_SECRET;
+  const qboRefreshToken = process.env.QBO_REFRESH_TOKEN;
+
+  if (!qboClientId || !qboClientSecret || !qboRefreshToken) {
+    console.error('❌ Missing QuickBooks credentials for token refresh');
+    return null;
+  }
+
+  console.log('🔄 Refreshing QuickBooks access tokens...');
+
+  try {
+    const credentials = Buffer.from(`${qboClientId}:${qboClientSecret}`).toString('base64');
+
+    const tokenResponse = await fetch('https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${credentials}`,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: qboRefreshToken
+      })
+    });
+
+    if (!tokenResponse.ok) {
+      const errorText = await tokenResponse.text();
+      console.error('❌ Token refresh failed:', errorText);
+      return null;
+    }
+
+    const tokens = await tokenResponse.json();
+    console.log('✅ QuickBooks tokens refreshed successfully');
+
+    // Note: In production, you'd want to update these in your environment variables
+    // For now, we'll return them to use for the current request
+    return {
+      accessToken: tokens.access_token,
+      refreshToken: tokens.refresh_token || qboRefreshToken
+    };
+
+  } catch (error) {
+    console.error('❌ Token refresh error:', error);
+    return null;
+  }
+}
+
+// Retry invoice creation with fresh tokens
+async function retryInvoiceCreation(requestBody, newTokens) {
+  const {
+    token,
+    organizationData,
+    invoiceData,
+    billingPreferences
+  } = requestBody;
+
+  const qboConfig = {
+    accessToken: newTokens.accessToken,
+    companyId: process.env.QBO_COMPANY_ID,
+    baseUrl: process.env.QBO_BASE_URL || 'https://sandbox-quickbooks.api.intuit.com'
+  };
+
+  console.log('🔄 Retrying invoice creation with fresh tokens...');
+
+  // Step 1: Find or create customer
+  const customer = await findOrCreateCustomer(organizationData, qboConfig);
+  console.log('👤 Customer ready:', customer.DisplayName || customer.Name);
+
+  // Step 2: Create invoice
+  const invoice = await createInvoice(customer, invoiceData, billingPreferences, qboConfig);
+  console.log('📄 Invoice created on retry:', invoice.DocNumber);
+
+  return {
+    success: true,
+    message: 'Invoice created in QuickBooks Online (after token refresh)',
+    qboInvoiceId: invoice.Id,
+    qboInvoiceNumber: invoice.DocNumber,
+    qboCustomerId: customer.Id,
+    invoiceUrl: `${qboConfig.baseUrl.replace('api.intuit.com', 'qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
+    tokenRefreshed: true
+  };
 }

@@ -97,12 +97,15 @@ export default async function handler(req, res) {
     console.log('🏢 Found organization:', organizationName);
     console.log('🔍 Organization ID for relation:', organizationId);
     
-    // Step 2: Get the "Primary Contact" tag ID from Tag System
-    console.log('🏷️ Looking up Primary Contact tag...');
+    // Step 2: Get special tag IDs from Tag System
+    console.log('🏷️ Looking up special tags...');
     let primaryContactTagId = null;
-    
+    let boardOfDirectorsTagId = null;
+    let conferenceDelegateTagId = null;
+
     try {
-      const tagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
+      // Get Primary Contact tag
+      const primaryTagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${notionToken}`,
@@ -116,20 +119,65 @@ export default async function handler(req, res) {
           }
         })
       });
-      
-      if (tagResponse.ok) {
-        const tagData = await tagResponse.json();
-        if (tagData.results.length > 0) {
-          primaryContactTagId = tagData.results[0].id;
+
+      if (primaryTagResponse.ok) {
+        const primaryTagData = await primaryTagResponse.json();
+        if (primaryTagData.results.length > 0) {
+          primaryContactTagId = primaryTagData.results[0].id;
           console.log('✅ Found Primary Contact tag ID:', primaryContactTagId);
-        } else {
-          console.log('⚠️ No "Primary Contact" tag found in Tag System database');
         }
-      } else {
-        console.error('❌ Failed to query Tag System database:', tagResponse.status);
       }
+
+      // Get Board of Directors tag
+      const boardTagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionToken}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28'
+        },
+        body: JSON.stringify({
+          filter: {
+            property: 'Name',
+            title: { equals: 'Board of Directors' }
+          }
+        })
+      });
+
+      if (boardTagResponse.ok) {
+        const boardTagData = await boardTagResponse.json();
+        if (boardTagData.results.length > 0) {
+          boardOfDirectorsTagId = boardTagData.results[0].id;
+          console.log('✅ Found Board of Directors tag ID:', boardOfDirectorsTagId);
+        }
+      }
+
+      // Get Conference Delegate tag
+      const conferenceTagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionToken}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28'
+        },
+        body: JSON.stringify({
+          filter: {
+            property: 'Name',
+            title: { equals: '26 Conference Delegate' }
+          }
+        })
+      });
+
+      if (conferenceTagResponse.ok) {
+        const conferenceTagData = await conferenceTagResponse.json();
+        if (conferenceTagData.results.length > 0) {
+          conferenceDelegateTagId = conferenceTagData.results[0].id;
+          console.log('✅ Found Conference Delegate tag ID:', conferenceDelegateTagId);
+        }
+      }
+
     } catch (error) {
-      console.error('💥 Error finding Primary Contact tag:', error);
+      console.error('💥 Error finding special tags:', error);
     }
     
     // Step 3: Get contacts where Organization relation = this org ID
@@ -165,21 +213,37 @@ export default async function handler(req, res) {
     const contactsData = await contactsResponse.json();
     console.log(`📋 Found ${contactsData.results.length} contacts for ${organizationName}`);
     
-    // Step 4: Format the contacts data and check for Primary Contact tag
+    // Step 4: Format the contacts data and check for special tags
     const contacts = contactsData.results.map(contact => {
       const props = contact.properties;
-      
-      // Check if this contact has the Primary Contact tag
+
+      // Check special tags in Personal Tag relations
       let isPrimaryContact = false;
-      if (primaryContactTagId && props['Personal Tag']?.relation) {
-        // Check if any of the related tags match our Primary Contact tag ID
-        isPrimaryContact = props['Personal Tag'].relation.some(tag => tag.id === primaryContactTagId);
-        
-        if (isPrimaryContact) {
+      let isBoardOfDirectors = false;
+      let isConferenceDelegate = false;
+
+      if (props['Personal Tag']?.relation) {
+        const personalTagIds = props['Personal Tag'].relation.map(tag => tag.id);
+
+        // Check for Primary Contact tag
+        if (primaryContactTagId && personalTagIds.includes(primaryContactTagId)) {
+          isPrimaryContact = true;
           console.log(`👑 Found primary contact: ${props.Name?.title?.[0]?.text?.content}`);
         }
+
+        // Check for Board of Directors tag
+        if (boardOfDirectorsTagId && personalTagIds.includes(boardOfDirectorsTagId)) {
+          isBoardOfDirectors = true;
+          console.log(`🏛️ Found board member: ${props.Name?.title?.[0]?.text?.content}`);
+        }
+
+        // Check for Conference Delegate tag
+        if (conferenceDelegateTagId && personalTagIds.includes(conferenceDelegateTagId)) {
+          isConferenceDelegate = true;
+          console.log(`🎪 Found existing conference delegate: ${props.Name?.title?.[0]?.text?.content}`);
+        }
       }
-      
+
       return {
         id: contact.id,
         name: props.Name?.title?.[0]?.text?.content || 'Unknown Name',
@@ -191,8 +255,10 @@ export default async function handler(req, res) {
         tags: props.Tags?.multi_select?.map(tag => tag.name) || [],
         notes: props.Notes?.rich_text?.[0]?.text?.content || '',
         dietaryRestrictions: props['Dietary Restrictions']?.rich_text?.[0]?.text?.content || '',
-        isAttending: false,
-        isPrimaryContact: isPrimaryContact
+        isAttending: isConferenceDelegate, // Pre-fill if already a conference delegate
+        isPrimaryContact: isPrimaryContact,
+        isBoardOfDirectors: isBoardOfDirectors,
+        isConferenceDelegate: isConferenceDelegate
       };
     });
     
@@ -202,19 +268,26 @@ export default async function handler(req, res) {
       (contact.workEmail || contact.workPhone)
     );
     
-    // Count primary contacts for debugging
+    // Count special roles for debugging and frontend use
     const primaryContactsCount = validContacts.filter(c => c.isPrimaryContact).length;
+    const boardMembersCount = validContacts.filter(c => c.isBoardOfDirectors).length;
+    const conferenceDelegatesCount = validContacts.filter(c => c.isConferenceDelegate).length;
+
     console.log(`👑 Found ${primaryContactsCount} primary contacts`);
-    
+    console.log(`🏛️ Found ${boardMembersCount} board of directors members`);
+    console.log(`🎪 Found ${conferenceDelegatesCount} existing conference delegates`);
+
     console.log(`✅ Returning ${validContacts.length} valid contacts`);
-    
+
     res.status(200).json({
       success: true,
       organizationName: organizationName,
       contacts: validContacts,
       totalFound: contactsData.results.length,
       validContacts: validContacts.length,
-      primaryContactsFound: primaryContactsCount
+      primaryContactsFound: primaryContactsCount,
+      boardMembersFound: boardMembersCount,
+      conferenceDelegatesFound: conferenceDelegatesCount
     });
     
   } catch (error) {

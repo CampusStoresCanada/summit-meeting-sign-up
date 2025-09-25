@@ -104,6 +104,10 @@ async function findOrCreateCustomer(organizationData, qboConfig) {
   const query = `SELECT * FROM Customer WHERE Name='${organizationData.name.replace(/'/g, "\\'")}' MAXRESULTS 1`;
   const searchUrl = `${baseUrl}/v3/company/${companyId}/query?query=${encodeURIComponent(query)}`;
 
+  console.log('🔍 QBO Search URL:', searchUrl);
+  console.log('🔍 Original query:', query);
+  console.log('🔍 Company name:', organizationData.name);
+
   const searchResponse = await fetch(searchUrl, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
@@ -112,7 +116,10 @@ async function findOrCreateCustomer(organizationData, qboConfig) {
   });
 
   if (!searchResponse.ok) {
-    throw new Error(`Customer search failed: ${searchResponse.status} ${searchResponse.statusText}`);
+    const errorText = await searchResponse.text();
+    console.error('❌ QBO Search Error Response:', errorText);
+    console.error('❌ QBO Search Headers:', Object.fromEntries(searchResponse.headers));
+    throw new Error(`Customer search failed: ${searchResponse.status} ${searchResponse.statusText} - ${errorText}`);
   }
 
   const searchData = await searchResponse.json();

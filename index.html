@@ -2370,25 +2370,27 @@
             if (qboInvoiceContainer) {
                 qboInvoiceContainer.innerHTML = `
                     <div class="field-display">
-                        <h3>📄 Your Invoice</h3>
-                        <p>Here's your invoice. You can print it, download as PDF, or email it to your AP department.</p>
+                        <h3>📄 Your QuickBooks Invoice</h3>
+                        <p>Your invoice has been created in QuickBooks. You can view it directly or email it to your accounts payable department.</p>
 
                         <!-- Invoice Actions -->
                         <div style="margin: 16px 0; display: flex; gap: 12px; flex-wrap: wrap;">
-                            <button class="next-btn secondary" onclick="printInvoice()" style="display: inline-block;">
-                                🖨️ Print Invoice
+                            <button class="next-btn secondary" onclick="viewQuickBooksInvoice()" style="display: inline-block;">
+                                👁️ View in QuickBooks
                             </button>
-                            <button class="next-btn secondary" onclick="downloadInvoicePDF()" style="display: inline-block;">
-                                📥 Download PDF
+                            <button class="next-btn secondary" onclick="displayInvoicePDF()" style="display: inline-block;">
+                                📄 View PDF
                             </button>
                             <button class="next-btn" onclick="emailQuickBooksInvoice()" style="display: inline-block;">
                                 📧 Email Invoice
                             </button>
                         </div>
 
-                        <!-- Full Invoice Preview -->
-                        <div id="invoicePreview" style="background: white; border: 1px solid #ddd; border-radius: 8px; margin: 16px 0; padding: 20px;">
-                            ${generateInvoiceHTML()}
+                        <!-- QuickBooks Invoice PDF Display Area -->
+                        <div id="invoicePreview" style="background: white; border: 1px solid #ddd; border-radius: 8px; margin: 16px 0; padding: 20px; min-height: 200px; text-align: center; display: flex; align-items: center; justify-content: center;">
+                            <div style="color: #666;">
+                                📄 Click "View PDF" to display the official QuickBooks invoice
+                            </div>
                         </div>
 
                         <p style="color: #666; font-size: 14px; margin-top: 16px;">
@@ -2979,221 +2981,70 @@
             return (membershipFee + conferenceCosts.conferenceTotal + conferenceCosts.conferenceHST).toFixed(2);
         }
 
-        // Generate HTML for the invoice preview
-        function generateInvoiceHTML() {
-            const total = calculateInvoiceTotal();
-            const invoiceData = window.qboInvoiceResult?.invoiceData;
-            const organizationData = window.formData?.organization || formState;
 
-            const membershipPricing = {
-                'XSmall': 420, 'Small': 525, 'Medium': 735, 'Large': 895, 'XLarge': 1000
-            };
+        // View QuickBooks invoice in new tab
+        function viewQuickBooksInvoice() {
+            if (window.qboInvoiceResult && window.qboInvoiceResult.invoiceUrl) {
+                window.open(window.qboInvoiceResult.invoiceUrl, '_blank');
+            } else {
+                alert('Invoice URL not available. Please try creating the invoice again.');
+            }
+        }
 
-            const membershipFee = membershipPricing[formState.institutionSize] || 0;
-            const conferenceCosts = calculateConferenceCosts();
-            const { totalAttendees, paidAttendees, freeAttendees, conferenceTotal, conferenceHST } = conferenceCosts;
+        // Display QuickBooks invoice PDF
+        async function displayInvoicePDF() {
+            if (!window.qboInvoiceResult || !window.qboInvoiceResult.qboInvoiceId) {
+                alert('Invoice ID not available. Please try creating the invoice again.');
+                return;
+            }
 
-            const today = new Date();
-            const dueDate = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
+            const invoicePreview = document.getElementById('invoicePreview');
 
-            return `
-                <div style="max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif; line-height: 1.4;">
-                    <!-- Invoice Header -->
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #0066cc;">
-                        <div>
-                            <h1 style="color: #0066cc; margin: 0; font-size: 28px;">INVOICE</h1>
-                            <p style="margin: 5px 0; font-size: 16px; color: #666;">
-                                Invoice #: <strong>${window.qboInvoiceResult?.qboInvoiceNumber || 'INV-' + Date.now()}</strong>
-                            </p>
-                        </div>
-                        <div style="text-align: right;">
-                            <img src="https://csc-ca.com/wp-content/uploads/2023/09/CSC-logo-horizontal-300x99.png"
-                                 alt="CSC Logo" style="max-width: 200px; height: auto;">
-                            <div style="margin-top: 10px; color: #666; font-size: 14px;">
-                                <strong>Campus Stores Canada</strong><br>
-                                Membership Renewal System
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Invoice Details -->
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
-                        <div style="flex: 1; padding-right: 20px;">
-                            <h3 style="color: #333; margin-bottom: 10px; font-size: 16px;">Bill To:</h3>
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
-                                <strong>${organizationData.name || formState.institutionName}</strong><br>
-                                ${organizationData.address?.streetAddress || formState.streetAddress || ''}<br>
-                                ${organizationData.address?.city || formState.city || ''},
-                                ${organizationData.address?.province || formState.province || ''}
-                                ${organizationData.address?.postalCode || formState.postalCode || ''}<br>
-                                <br>
-                                Contact: ${organizationData.primaryContact?.firstName || ''} ${organizationData.primaryContact?.lastName || ''}<br>
-                                Email: ${organizationData.primaryContact?.workEmail || ''}
-                            </div>
-                        </div>
-                        <div style="flex: 1;">
-                            <h3 style="color: #333; margin-bottom: 10px; font-size: 16px;">Invoice Details:</h3>
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                    <span>Invoice Date:</span>
-                                    <strong>${today.toLocaleDateString()}</strong>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                    <span>Due Date:</span>
-                                    <strong>${dueDate.toLocaleDateString()}</strong>
-                                </div>
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span>Payment Terms:</span>
-                                    <strong>Net 30</strong>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Line Items -->
-                    <div style="margin-bottom: 30px;">
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                            <thead>
-                                <tr style="background: #0066cc; color: white;">
-                                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Description</th>
-                                    <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Qty</th>
-                                    <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">Rate</th>
-                                    <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>CSC Membership (${formState.institutionSize})</strong><br>
-                                        <small style="color: #666;">Campus Stores Canada Annual Membership</small>
-                                    </td>
-                                    <td style="padding: 12px; text-align: center; border: 1px solid #ddd;">1</td>
-                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">$${membershipFee.toFixed(2)}</td>
-                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">$${membershipFee.toFixed(2)}</td>
-                                </tr>
-                                ${totalAttendees > 0 ? `
-                                <tr>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>Conference Registration</strong><br>
-                                        <small style="color: #666;">
-                                            CSC Annual Conference (${totalAttendees} attendee${totalAttendees > 1 ? 's' : ''})<br>
-                                            ${freeAttendees > 0 ? `<em style="color: #0066cc;">${paidAttendees} paid, ${freeAttendees} complimentary (Board of Directors)</em>` : ''}
-                                        </small>
-                                    </td>
-                                    <td style="padding: 12px; text-align: center; border: 1px solid #ddd;">${paidAttendees}</td>
-                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">$325.00</td>
-                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">$${conferenceTotal.toFixed(2)}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 12px; border: 1px solid #ddd;">
-                                        <strong>HST (13%)</strong><br>
-                                        <small style="color: #666;">Harmonized Sales Tax on Conference Registration</small>
-                                    </td>
-                                    <td style="padding: 12px; text-align: center; border: 1px solid #ddd;">1</td>
-                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">$${conferenceHST.toFixed(2)}</td>
-                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">$${conferenceHST.toFixed(2)}</td>
-                                </tr>
-                                ` : ''}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Totals -->
-                    <div style="display: flex; justify-content: flex-end; margin-bottom: 30px;">
-                        <div style="width: 300px; background: #f8f9fa; padding: 20px; border-radius: 5px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
-                                <span>Subtotal:</span>
-                                <strong>$${(membershipFee + conferenceTotal).toFixed(2)}</strong>
-                            </div>
-                            ${totalAttendees > 0 ? `
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
-                                <span>HST (13%):</span>
-                                <strong>$${conferenceHST.toFixed(2)}</strong>
-                            </div>
-                            ` : ''}
-                            <div style="display: flex; justify-content: space-between; font-size: 18px; color: #0066cc;">
-                                <span><strong>Total Amount:</strong></span>
-                                <strong>$${total}</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Payment Instructions -->
-                    <div style="background: #e3f2fd; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
-                        <h3 style="color: #0066cc; margin-top: 0;">Payment Instructions</h3>
-                        <p style="margin-bottom: 10px;">Please remit payment within 30 days of invoice date.</p>
-                        <p style="margin-bottom: 10px;"><strong>Payment by Cheque:</strong> Make cheques payable to "Campus Stores Canada"</p>
-                        <p style="margin: 0;"><strong>Questions?</strong> Contact us at membership@campusstores.ca</p>
-                    </div>
-
-                    <!-- Footer -->
-                    <div style="text-align: center; color: #666; font-size: 12px; border-top: 1px solid #ddd; padding-top: 20px;">
-                        <p>Thank you for your continued membership with Campus Stores Canada!</p>
-                        <p>This invoice was generated automatically by the CSC Membership Renewal System.</p>
-                    </div>
+            // Show loading state
+            invoicePreview.innerHTML = `
+                <div style="color: #666; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                    <div class="spinner"></div>
+                    <span>Loading QuickBooks invoice PDF...</span>
                 </div>
             `;
-        }
 
-        // Print the invoice
-        function printInvoice() {
-            const invoiceHTML = generateInvoiceHTML();
-            const printWindow = window.open('', '_blank');
-            const invoiceNumber = window.qboInvoiceResult?.qboInvoiceNumber || 'INV-' + Date.now();
+            try {
+                console.log('📄 Fetching QuickBooks invoice PDF...');
 
-            // Use string concatenation instead of template literal to avoid conflicts
-            printWindow.document.write(
-                '<!DOCTYPE html>' +
-                '<html>' +
-                '<head>' +
-                '<title>CSC Invoice - ' + invoiceNumber + '</title>' +
-                '<style>' +
-                'body { margin: 0; padding: 20px; }' +
-                '@media print {' +
-                'body { margin: 0; padding: 10px; }' +
-                '}' +
-                '</style>' +
-                '</head>' +
-                '<body>' +
-                invoiceHTML +
-                '</body>' +
-                '</html>'
-            );
-            printWindow.document.close();
-            printWindow.focus();
-            printWindow.print();
-        }
+                const response = await fetch(`/api/get-qbo-invoice-pdf?invoiceId=${window.qboInvoiceResult.qboInvoiceId}`);
+                const result = await response.json();
 
-        // Download invoice as PDF (using browser's PDF generation)
-        function downloadInvoicePDF() {
-            const invoiceHTML = generateInvoiceHTML();
-            const printWindow = window.open('', '_blank');
-            const invoiceNumber = window.qboInvoiceResult?.qboInvoiceNumber || 'INV-' + Date.now();
+                if (result.success && result.pdfData) {
+                    console.log('✅ PDF loaded successfully');
 
-            // Use string concatenation instead of template literal to avoid conflicts
-            printWindow.document.write(
-                '<!DOCTYPE html>' +
-                '<html>' +
-                '<head>' +
-                '<title>CSC Invoice - ' + invoiceNumber + '</title>' +
-                '<style>' +
-                'body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }' +
-                '@page { margin: 0.5in; }' +
-                '</style>' +
-                '</head>' +
-                '<body>' +
-                invoiceHTML +
-                '<script>' +
-                'window.onload = function() {' +
-                'setTimeout(function() {' +
-                'window.print();' +
-                '}, 500);' +
-                '};' +
-                '</script>' +
-                '</body>' +
-                '</html>'
-            );
-            printWindow.document.close();
+                    // Display the PDF in an embedded viewer
+                    invoicePreview.innerHTML = `
+                        <iframe
+                            src="${result.pdfData}"
+                            style="width: 100%; height: 600px; border: none; border-radius: 4px;"
+                            title="QuickBooks Invoice PDF">
+                        </iframe>
+                    `;
+                } else {
+                    throw new Error(result.message || 'Failed to load PDF');
+                }
+            } catch (error) {
+                console.error('❌ Error loading PDF:', error);
+
+                invoicePreview.innerHTML = `
+                    <div style="color: #dc3545; text-align: center; padding: 40px;">
+                        <div style="font-size: 24px; margin-bottom: 8px;">⚠️</div>
+                        <div style="font-weight: bold; margin-bottom: 8px;">PDF Load Failed</div>
+                        <div style="font-size: 14px; margin-bottom: 16px;">${error.message}</div>
+                        <button class="next-btn secondary" onclick="displayInvoicePDF()" style="display: inline-block;">
+                            🔄 Retry
+                        </button>
+                        <button class="next-btn secondary" onclick="viewQuickBooksInvoice()" style="display: inline-block;">
+                            👁️ View in QuickBooks
+                        </button>
+                    </div>
+                `;
+            }
         }
 
         function updateStepNavigation() {

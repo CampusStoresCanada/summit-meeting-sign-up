@@ -2648,8 +2648,11 @@
                 const total = parseFloat(calculateInvoiceTotal());
                 const organizationData = window.formData?.organization || formState;
 
-                // Initialize QuickBooks Payments SDK
-                if (typeof Payments !== 'undefined') {
+                // Use QuickBooks Payments API directly (no SDK needed)
+                console.log('💳 Initializing QuickBooks Payments API integration...');
+
+                // Always proceed with API integration (no SDK dependency)
+                if (true) {
                     console.log('✅ QuickBooks Payments SDK is loaded');
 
                     // Configuration for the payment widget
@@ -2770,8 +2773,8 @@
                         </div>
                     `;
 
-                    // Initialize the secure payment fields using QuickBooks Payments SDK
-                    initializeSecurePaymentFields();
+                    // Set up payment form for direct API integration
+                    setupPaymentForm();
 
                 } else {
                     console.error('❌ QuickBooks Payments SDK not loaded');
@@ -2827,6 +2830,70 @@
             }
         }
 
+        // Set up payment form for QuickBooks Payments API integration
+        function setupPaymentForm() {
+            console.log('🔐 Setting up payment form for QB Payments API...');
+
+            try {
+                // Enable the actual form fields for direct input (no SDK needed)
+                const cardNumberField = document.getElementById('cardNumber');
+                const expiryField = document.getElementById('expirationDate');
+                const cvvField = document.getElementById('cvv');
+
+                if (cardNumberField) {
+                    cardNumberField.innerHTML = '<input type="text" id="cardNumberInput" placeholder="1234 5678 9012 3456" style="width: 100%; border: none; outline: none; background: transparent; font-size: 16px;" maxlength="19">';
+                }
+                if (expiryField) {
+                    expiryField.innerHTML = '<input type="text" id="expiryInput" placeholder="MM/YY" style="width: 100%; border: none; outline: none; background: transparent; font-size: 16px;" maxlength="5">';
+                }
+                if (cvvField) {
+                    cvvField.innerHTML = '<input type="text" id="cvvInput" placeholder="123" style="width: 100%; border: none; outline: none; background: transparent; font-size: 16px;" maxlength="4">';
+                }
+
+                // Add input formatting for better UX
+                setupInputFormatting();
+
+                console.log('✅ Payment form fields are ready for QB Payments API');
+
+            } catch (error) {
+                console.error('❌ Payment form setup failed:', error);
+            }
+        }
+
+        // Set up input formatting for credit card fields
+        function setupInputFormatting() {
+            // Format card number input
+            const cardNumberInput = document.getElementById('cardNumberInput');
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+                    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                    if (formattedValue.length > 19) formattedValue = formattedValue.substring(0, 19);
+                    e.target.value = formattedValue;
+                });
+            }
+
+            // Format expiry input
+            const expiryInput = document.getElementById('expiryInput');
+            if (expiryInput) {
+                expiryInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.substring(0,2) + '/' + value.substring(2,4);
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            // CVV input - numbers only
+            const cvvInput = document.getElementById('cvvInput');
+            if (cvvInput) {
+                cvvInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                });
+            }
+        }
+
         // Process the payment
         function processPayment() {
             console.log('💰 Processing payment...');
@@ -2837,21 +2904,158 @@
                 payButton.innerHTML = '⏳ Processing Payment...';
             }
 
-            // In a real implementation, this would:
-            // 1. Validate the payment form
-            // 2. Tokenize the card data using QB Payments
-            // 3. Submit the payment to QB Payments API
-            // 4. Handle the response and show success/error
+            // Implement real QuickBooks Payments API integration
+            processQuickBooksPayment();
+        }
 
-            // For demo purposes, simulate payment processing
-            setTimeout(() => {
-                console.log('✅ Payment processing simulation complete');
-                showPaymentSuccess();
-            }, 3000);
+        // Process payment using QuickBooks Payments API
+        async function processQuickBooksPayment() {
+            try {
+                console.log('💳 Processing payment through QuickBooks Payments API...');
+
+                // 1. Validate the payment form
+                const cardData = validateAndCollectCardData();
+                if (!cardData.isValid) {
+                    showPaymentError(cardData.error);
+                    resetPaymentButton();
+                    return;
+                }
+
+                // 2. Create payment token and charge the card
+                const paymentResult = await createQuickBooksPayment(cardData);
+
+                if (paymentResult.success) {
+                    console.log('✅ Payment processed successfully:', paymentResult);
+                    showPaymentSuccess(paymentResult);
+                } else {
+                    console.error('❌ Payment failed:', paymentResult.error);
+                    showPaymentError(paymentResult.error);
+                    resetPaymentButton();
+                }
+
+            } catch (error) {
+                console.error('💥 Payment processing error:', error);
+                showPaymentError('Payment processing failed. Please try again.');
+                resetPaymentButton();
+            }
+        }
+
+        // Validate and collect card data from form
+        function validateAndCollectCardData() {
+            const cardNumber = document.getElementById('cardNumberInput')?.value?.replace(/\s/g, '') || '';
+            const expiry = document.getElementById('expiryInput')?.value || '';
+            const cvv = document.getElementById('cvvInput')?.value || '';
+            const postalCode = document.getElementById('postalCode')?.value || '';
+
+            // Basic validation
+            if (!cardNumber || cardNumber.length < 13) {
+                return { isValid: false, error: 'Please enter a valid card number' };
+            }
+
+            if (!expiry || !/^\d{2}\/\d{2}$/.test(expiry)) {
+                return { isValid: false, error: 'Please enter a valid expiry date (MM/YY)' };
+            }
+
+            if (!cvv || cvv.length < 3) {
+                return { isValid: false, error: 'Please enter a valid CVV' };
+            }
+
+            if (!postalCode) {
+                return { isValid: false, error: 'Please enter your postal code' };
+            }
+
+            const [month, year] = expiry.split('/');
+
+            return {
+                isValid: true,
+                cardNumber: cardNumber,
+                expiryMonth: month,
+                expiryYear: '20' + year,
+                cvv: cvv,
+                postalCode: postalCode
+            };
+        }
+
+        // Create payment using QuickBooks Payments API
+        async function createQuickBooksPayment(cardData) {
+            const organizationData = window.formData?.organization || formState;
+            const amount = parseFloat(calculateInvoiceTotal());
+
+            const paymentData = {
+                amount: amount,
+                currency: 'CAD',
+                card: {
+                    number: cardData.cardNumber,
+                    expMonth: cardData.expiryMonth,
+                    expYear: cardData.expiryYear,
+                    cvc: cardData.cvv,
+                    name: `${organizationData.primaryContact?.firstName || ''} ${organizationData.primaryContact?.lastName || ''}`.trim() || 'CSC Member',
+                    address: {
+                        postalCode: cardData.postalCode,
+                        streetAddress: organizationData.address?.streetAddress || formState.streetAddress || '',
+                        city: organizationData.address?.city || formState.city || '',
+                        region: organizationData.address?.province || formState.province || '',
+                        country: 'CA'
+                    }
+                },
+                context: {
+                    mobile: false,
+                    isEcommerce: true
+                }
+            };
+
+            try {
+                // Call our backend API to process the QuickBooks payment
+                // This API endpoint will handle the QuickBooks Payments integration
+                const response = await fetch('/api/process-qb-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        paymentData,
+                        organizationName: organizationData.name || formState.institutionName,
+                        invoiceId: window.qboInvoiceResult?.qboInvoiceId || null,
+                        invoiceNumber: window.qboInvoiceResult?.qboInvoiceNumber || null
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    return {
+                        success: true,
+                        transactionId: result.transactionId,
+                        amount: amount,
+                        currency: 'CAD'
+                    };
+                } else {
+                    return {
+                        success: false,
+                        error: result.message || result.error || 'Payment processing failed'
+                    };
+                }
+
+            } catch (error) {
+                console.error('❌ QuickBooks payment API error:', error);
+                return {
+                    success: false,
+                    error: 'Unable to process payment. Please try again.'
+                };
+            }
+        }
+
+        // Reset payment button to original state
+        function resetPaymentButton() {
+            const payButton = document.getElementById('payNowButton');
+            if (payButton) {
+                payButton.disabled = false;
+                payButton.innerHTML = `💳 Pay $${parseFloat(calculateInvoiceTotal()).toFixed(2)} CAD`;
+            }
         }
 
         // Show payment success
-        function showPaymentSuccess() {
+        function showPaymentSuccess(paymentResult = null) {
             const widgetContainer = document.getElementById('qbPaymentWidget');
             if (widgetContainer) {
                 widgetContainer.innerHTML = `

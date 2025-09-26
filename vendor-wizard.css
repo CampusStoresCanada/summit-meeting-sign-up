@@ -53,11 +53,11 @@ body::before {
     .contact-modal {
         z-index: 2200 !important;
     }
-    
+
     .crop-modal {
         z-index: 2200 !important;
     }
-    
+
     /* Add extra space for upload containers */
     .image-upload-container {
         margin-bottom: 100px;
@@ -3477,4 +3477,84 @@ body::before {
    .video-container {
         height: 40vh; /* Shorter on mobile so it fits better */
     }
+}
+
+/* Payment form styling */
+.payment-input-field {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: max(1.0vw, 14px);
+    font-family: 'davis-sans', sans-serif;
+    background: #ffffff;
+    font-weight: 400;
+}
+
+.payment-info-box {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    color: #856404;
+    font-size: max(0.8vw, 12px);
+    font-family: 'davis-sans', sans-serif;
+}
+
+.payment-summary-box {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border-left: 4px solid #0066cc;
+}
+
+.payment-summary-title {
+    margin: 0 0 12px 0;
+    color: #0066cc;
+    font-size: max(1.1vw, 16px);
+    font-family: 'davis-sans', sans-serif;
+    font-weight: 600;
+}
+
+.payment-summary-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: max(0.9vw, 14px);
+    font-family: 'davis-sans', sans-serif;
+}
+
+.payment-summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: max(1.0vw, 16px);
+    color: #0066cc;
+    border-top: 1px solid #ddd;
+    padding-top: 12px;
+    margin-top: 12px;
+    font-family: 'davis-sans', sans-serif;
+}
+
+.payment-security-box {
+    margin-top: 15px;
+    padding: 12px;
+    background: #e8f5e8;
+    border-radius: 6px;
+    border: 1px solid #4caf50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.payment-security-icon {
+    color: #4caf50;
+    font-size: 16px;
+}
+
+.payment-security-text {
+    color: #2e7d32;
+    font-size: max(0.8vw, 12px);
+    font-family: 'davis-sans', sans-serif;
 }

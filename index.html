@@ -2698,19 +2698,21 @@
 
                     // Create payment form HTML
                     widgetContainer.innerHTML = `
-                        <div style="background: white; padding: 1.5vw; border-radius: 8px; border: 1px solid #ddd;">
-                            <h4 style="margin-top: 0; margin-bottom: 1vw; color: #333; font-size: 1.8vw; font-family: 'davis-sans', sans-serif; font-weight: 700;">💳 Payment Information</h4>
+                        <div class="form-container">
+                            <div class="step-header">
+                                <h3 class="step-title-main">💳 Payment Information</h3>
+                            </div>
 
                             <!-- Test Mode Notice -->
-                            <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 1vw; border-radius: 6px; margin-bottom: 1.5vw; color: #856404; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">
+                            <div class="payment-info-box">
                                 <strong>🧪 Test Mode:</strong> For testing, use card <strong>4111111111111111</strong>, any future expiry date (e.g., 12/28), and any 3-digit CVV.
                             </div>
 
                             <!-- Payment Method Selection -->
-                            <div style="margin-bottom: 1.5vw;">
-                                <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Payment Method</label>
+                            <div class="form-field">
+                                <label class="field-label">Payment Method</label>
                                 <div class="custom-dropdown" id="paymentMethodDropdown">
-                                    <div class="dropdown-display" id="paymentMethodDisplay" style="padding: 1vw 1.5vw; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 1.0vw;">
+                                    <div class="dropdown-display" id="paymentMethodDisplay">
                                         💳 Credit or Debit Card
                                     </div>
                                     <div class="dropdown-options" id="paymentMethodOptions" style="display: none;">
@@ -2723,42 +2725,42 @@
                             <!-- Payment Form Fields -->
                             <div id="qbPaymentForm">
                                 <div id="cardPaymentFields">
-                                    <div style="margin-bottom: 1vw;">
-                                        <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Card Number</label>
-                                        <div id="cardNumber" style="padding: 1vw; border: 2px solid #e0e0e0; border-radius: 4px; background: #ffffff; font-size: 1.0vw;">
+                                    <div class="form-field">
+                                        <label class="field-label">Card Number</label>
+                                        <div id="cardNumber" class="payment-input-field">
                                             <!-- QB Payments will inject secure card field here -->
                                         </div>
                                     </div>
 
-                                    <div style="display: flex; gap: 1vw; margin-bottom: 1vw;">
-                                        <div style="flex: 1;">
-                                            <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Expiry Date</label>
-                                            <div id="expirationDate" style="padding: 1vw; border: 2px solid #e0e0e0; border-radius: 4px; background: #ffffff; font-size: 1.0vw;">
+                                    <div style="display: flex; gap: 1.5vw; margin-bottom: 1.5vw;">
+                                        <div class="form-field" style="flex: 1; margin-bottom: 0;">
+                                            <label class="field-label">Expiry Date</label>
+                                            <div id="expirationDate" class="payment-input-field">
                                                 <!-- QB Payments will inject secure expiry field here -->
                                             </div>
                                         </div>
-                                        <div style="flex: 1;">
-                                            <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">CVV</label>
-                                            <div id="cvv" style="padding: 1vw; border: 2px solid #e0e0e0; border-radius: 4px; background: #ffffff; font-size: 1.0vw;">
+                                        <div class="form-field" style="flex: 1; margin-bottom: 0;">
+                                            <label class="field-label">CVV</label>
+                                            <div id="cvv" class="payment-input-field">
                                                 <!-- QB Payments will inject secure CVV field here -->
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div style="margin-bottom: 1vw;">
-                                        <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Postal Code</label>
+                                    <div class="form-field">
+                                        <label class="field-label">Postal Code</label>
                                         <input type="text" id="postalCode"
                                                value="${organizationData.address?.postalCode || formState.postalCode || ''}"
-                                               style="width: 100%; padding: 1vw; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 1.0vw; font-family: 'davis-sans', sans-serif; background: #ffffff;"
+                                               class="payment-input-field"
                                                placeholder="A1A 1A1" maxlength="7">
                                     </div>
                                 </div>
 
                                 <div id="achPaymentFields" style="display: none;">
-                                    <div style="margin-bottom: 1vw;">
-                                        <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Bank Account Type</label>
+                                    <div class="form-field">
+                                        <label class="field-label">Bank Account Type</label>
                                         <div class="custom-dropdown" id="accountTypeDropdown">
-                                            <div class="dropdown-display" id="accountTypeDisplay" style="padding: 1vw 1.5vw; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 1.0vw;">
+                                            <div class="dropdown-display" id="accountTypeDisplay">
                                                 🏦 Checking Account
                                             </div>
                                             <div class="dropdown-options" id="accountTypeOptions" style="display: none;">
@@ -2768,39 +2770,37 @@
                                         </div>
                                     </div>
 
-                                    <div style="margin-bottom: 1vw;">
-                                        <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Routing Number</label>
+                                    <div class="form-field">
+                                        <label class="field-label">Routing Number</label>
                                         <input type="text" id="routingNumber"
-                                               style="width: 100%; padding: 1vw; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 1.0vw; font-family: 'davis-sans', sans-serif; background: #ffffff;"
+                                               class="payment-input-field"
                                                placeholder="123456789" maxlength="9">
                                     </div>
 
-                                    <div style="margin-bottom: 1vw;">
-                                        <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Account Number</label>
+                                    <div class="form-field">
+                                        <label class="field-label">Account Number</label>
                                         <input type="text" id="accountNumber"
-                                               style="width: 100%; padding: 1vw; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 1.0vw; font-family: 'davis-sans', sans-serif; background: #ffffff;"
+                                               class="payment-input-field"
                                                placeholder="Enter account number">
                                     </div>
 
-                                    <div style="background: #e3f2fd; padding: 1vw; border-radius: 6px; margin-bottom: 1vw; border-left: 4px solid #2196f3;">
-                                        <div style="font-size: 1.0vw; color: #1976d2; font-family: 'davis-sans', sans-serif;">
-                                            <strong>🔒 ACH Bank Transfer:</strong> Processing takes 3-5 business days. Fee: 1% (minimum $1).
-                                        </div>
+                                    <div style="background: #e3f2fd; padding: 12px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #2196f3; font-size: max(0.8vw, 12px); color: #1976d2; font-family: 'davis-sans', sans-serif;">
+                                        <strong>🔒 ACH Bank Transfer:</strong> Processing takes 3-5 business days. Fee: 1% (minimum $1).
                                     </div>
                                 </div>
 
                                 <!-- Payment Summary -->
-                                <div style="background: #f8f9fa; padding: 1.2vw; border-radius: 6px; margin-bottom: 1.5vw; border-left: 4px solid #0066cc;">
-                                    <h5 style="margin: 0 0 1vw 0; color: #0066cc; font-size: 1.2vw; font-family: 'davis-sans', sans-serif; font-weight: 700;">Payment Summary</h5>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5vw; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">
+                                <div class="payment-summary-box">
+                                    <h5 class="payment-summary-title">Payment Summary</h5>
+                                    <div class="payment-summary-line">
                                         <span>Invoice:</span>
                                         <strong>${window.qboInvoiceResult?.qboInvoiceNumber || 'Pending'}</strong>
                                     </div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5vw; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">
+                                    <div class="payment-summary-line">
                                         <span>Organization:</span>
                                         <strong>${organizationData.name || formState.institutionName}</strong>
                                     </div>
-                                    <div style="display: flex; justify-content: space-between; font-size: 1.2vw; color: #0066cc; border-top: 1px solid #ddd; padding-top: 0.8vw; margin-top: 0.8vw; font-family: 'davis-sans', sans-serif;">
+                                    <div class="payment-summary-total">
                                         <span><strong>Total Amount:</strong></span>
                                         <strong>CAD $${total.toFixed(2)}</strong>
                                     </div>
@@ -2810,18 +2810,16 @@
                                 <button id="payNowButton"
                                         onclick="processPayment()"
                                         class="next-btn"
-                                        style="width: 100%; margin-bottom: 1vw;">
+                                        style="width: 100%; margin-bottom: 20px;">
                                     💳 Pay $${total.toFixed(2)} CAD
                                 </button>
 
                                 <!-- Security Notice -->
-                                <div style="margin-top: 1vw; padding: 1vw; background: #e8f5e8; border-radius: 6px; border: 1px solid #4caf50;">
-                                    <div style="display: flex; align-items: center; gap: 0.5vw;">
-                                        <span style="color: #4caf50; font-size: 1.2vw;">🔒</span>
-                                        <div style="color: #2e7d32; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">
-                                            <strong>Secure Payment:</strong> Your payment is processed securely by QuickBooks Payments.
-                                            All details are encrypted and never stored on our servers.
-                                        </div>
+                                <div class="payment-security-box">
+                                    <span class="payment-security-icon">🔒</span>
+                                    <div class="payment-security-text">
+                                        <strong>Secure Payment:</strong> Your payment is processed securely by QuickBooks Payments.
+                                        All details are encrypted and never stored on our servers.
                                     </div>
                                 </div>
                             </div>

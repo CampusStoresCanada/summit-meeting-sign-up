@@ -1000,55 +1000,6 @@
             return modal;
         }
 
-                </div>
-
-                <div class="amount-due">
-                    <strong>C$${totalWithHST.toFixed(2)} due ${dueDate}</strong>
-                </div>
-
-                <table class="invoice-table">
-                    <thead>
-                        <tr>
-                            <th class="desc-col">Description</th>
-                            <th class="qty-col">Qty</th>
-                            <th class="price-col">Unit price</th>
-                            <th class="amount-col">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${lineItems}
-                    </tbody>
-                </table>
-
-                <div class="invoice-totals">
-                    <div class="totals-row">
-                        <span>Subtotal</span>
-                        <span>C$${subtotal.toFixed(2)}</span>
-                    </div>
-                    ${conferenceHST > 0 ? `
-                        <div class="totals-row">
-                            <span>HST (13%)</span>
-                            <span>C$${conferenceHST.toFixed(2)}</span>
-                        </div>
-                    ` : ''}
-                    <div class="totals-row total-row">
-                        <span><strong>Total</strong></span>
-                        <span><strong>C$${totalWithHST.toFixed(2)}</strong></span>
-                    </div>
-                    <div class="totals-row amount-due-row">
-                        <span><strong>Amount due</strong></span>
-                        <span><strong>C$${totalWithHST.toFixed(2)}</strong></span>
-                    </div>
-                </div>
-
-                <div class="invoice-footer">
-                    <div class="csc-footer">
-                        Campus Stores Canada<br>
-                        PO Box 7157 Silver Springs, Calgary, AB, Canada T3B 5K2
-                    </div>
-                </div>
-            `;
-        }
 
         function generateFullInvoiceHTML(currentDate, dueDate) {
             const membershipPricing = {

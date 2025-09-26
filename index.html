@@ -2404,19 +2404,6 @@
             if (qboInvoiceContainer) {
                 qboInvoiceContainer.innerHTML = `
                     <div class="field-display">
-                        <h3>💳 Complete Your Payment</h3>
-                        <p>Pay securely with credit card, debit, or bank transfer:</p>
-
-                        <!-- Invoice Summary -->
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 16px 0;">
-                            <h4>Payment Summary</h4>
-                            <div class="payment-details">
-                                <div class="payment-line">Invoice #: <strong>${window.qboInvoiceResult?.qboInvoiceNumber || 'Pending'}</strong></div>
-                                <div class="payment-line">Amount Due: <strong>$${calculateInvoiceTotal()}</strong></div>
-                                <div class="payment-line">Payment Method: <strong>Credit/Debit Card</strong></div>
-                            </div>
-                        </div>
-
                         <!-- QuickBooks Payment Widget Container -->
                         <div id="qbPaymentWidget" style="margin: 20px 0; min-height: 400px;">
                             <!-- QuickBooks Payment Widget will load here -->
@@ -2426,11 +2413,6 @@
                                 <p style="color: #666;">Initializing secure payment processing</p>
                             </div>
                         </div>
-
-                        <p style="color: #666; font-size: 14px;">
-                            🔒 Your payment is secured by QuickBooks Payments.
-                            A receipt will be emailed to you after payment.
-                        </p>
                     </div>
                 `;
                 qboInvoiceContainer.style.display = 'block';
@@ -2788,20 +2770,11 @@
                                 </div>
 
                                 <!-- Payment Summary -->
-                                <div class="payment-summary-box">
-                                    <h5 class="payment-summary-title">Payment Summary</h5>
-                                    <div class="payment-summary-line">
-                                        <span>Invoice:</span>
-                                        <strong>${window.qboInvoiceResult?.qboInvoiceNumber || 'Pending'}</strong>
-                                    </div>
-                                    <div class="payment-summary-line">
-                                        <span>Organization:</span>
-                                        <strong>${organizationData.name || formState.institutionName}</strong>
-                                    </div>
-                                    <div class="payment-summary-total">
-                                        <span><strong>Total Amount:</strong></span>
-                                        <strong>CAD $${total.toFixed(2)}</strong>
-                                    </div>
+                                <div class="payment-summary-box step-subtitle">
+                                    Payment Summary<br>
+                                    Invoice: <strong>${window.qboInvoiceResult?.qboInvoiceNumber || 'Pending'}</strong><br>
+                                    Organization: <strong>${organizationData.name || formState.institutionName}</strong><br>
+                                    <strong>Total Amount: CAD $${total.toFixed(2)}</strong>
                                 </div>
 
                                 <!-- Payment Button -->

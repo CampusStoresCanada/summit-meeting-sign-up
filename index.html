@@ -1000,6 +1000,56 @@
             return modal;
         }
 
+                </div>
+
+                <div class="amount-due">
+                    <strong>C$${totalWithHST.toFixed(2)} due ${dueDate}</strong>
+                </div>
+
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th class="desc-col">Description</th>
+                            <th class="qty-col">Qty</th>
+                            <th class="price-col">Unit price</th>
+                            <th class="amount-col">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${lineItems}
+                    </tbody>
+                </table>
+
+                <div class="invoice-totals">
+                    <div class="totals-row">
+                        <span>Subtotal</span>
+                        <span>C$${subtotal.toFixed(2)}</span>
+                    </div>
+                    ${conferenceHST > 0 ? `
+                        <div class="totals-row">
+                            <span>HST (13%)</span>
+                            <span>C$${conferenceHST.toFixed(2)}</span>
+                        </div>
+                    ` : ''}
+                    <div class="totals-row total-row">
+                        <span><strong>Total</strong></span>
+                        <span><strong>C$${totalWithHST.toFixed(2)}</strong></span>
+                    </div>
+                    <div class="totals-row amount-due-row">
+                        <span><strong>Amount due</strong></span>
+                        <span><strong>C$${totalWithHST.toFixed(2)}</strong></span>
+                    </div>
+                </div>
+
+                <div class="invoice-footer">
+                    <div class="csc-footer">
+                        Campus Stores Canada<br>
+                        PO Box 7157 Silver Springs, Calgary, AB, Canada T3B 5K2
+                    </div>
+                </div>
+            `;
+        }
+
         function generateFullInvoiceHTML(currentDate, dueDate) {
             const membershipPricing = {
                 'XSmall': 420, 'Small': 525, 'Medium': 735, 'Large': 895, 'XLarge': 1000
@@ -1047,113 +1097,104 @@
                     </tr>
                     <tr>
                         <td class="desc-col">Conference Registration</td>
-                        <td class="qty-col">${attendingCount}</td>
+                        <td class="qty-col">${totalAttendees}</td>
                         <td class="price-col">C$${conferencePerPerson.toFixed(2)}</td>
                         <td class="amount-col">C$${conferenceTotal.toFixed(2)}</td>
                     </tr>
+                    ${conferenceHST > 0 ? `
+                    <tr>
+                        <td class="desc-col">HST (13%)</td>
+                        <td class="qty-col">1</td>
+                        <td class="price-col">C$${conferenceHST.toFixed(2)}</td>
+                        <td class="amount-col">C$${conferenceHST.toFixed(2)}</td>
+                    </tr>
+                    ` : ''}
                 `;
-            } else if (billingDisplay === 'individual-line-items') {
+            } else {
+                // Default line items structure for 'itemized' or other formats
                 lineItems = `
                     <tr>
-                        <td class="desc-col">2025-2026 CSC Membership (${institutionSize})</td>
+                        <td class="desc-col">2025-2026 CSC Membership</td>
                         <td class="qty-col">1</td>
                         <td class="price-col">C$${membershipFee.toFixed(2)}</td>
                         <td class="amount-col">C$${membershipFee.toFixed(2)}</td>
                     </tr>
+                    ${totalAttendees > 0 ? `
+                    <tr>
+                        <td class="desc-col">Conference Registration</td>
+                        <td class="qty-col">${totalAttendees}</td>
+                        <td class="price-col">C$${conferencePerPerson.toFixed(2)}</td>
+                        <td class="amount-col">C$${conferenceTotal.toFixed(2)}</td>
+                    </tr>
+                    ${conferenceHST > 0 ? `
+                    <tr>
+                        <td class="desc-col">HST (13%)</td>
+                        <td class="qty-col">1</td>
+                        <td class="price-col">C$${conferenceHST.toFixed(2)}</td>
+                        <td class="amount-col">C$${conferenceHST.toFixed(2)}</td>
+                    </tr>
+                    ` : ''}
+                    ` : ''}
                 `;
-
-                const attendingContacts = organizationContacts.filter(contact =>
-                    teamState.attendingContacts.has(contact.id)
-                );
-
-                attendingContacts.forEach(contact => {
-                    lineItems += `
-                        <tr>
-                            <td class="desc-col">Conference Registration - ${contact.name}</td>
-                            <td class="qty-col">1</td>
-                            <td class="price-col">C$${conferencePerPerson.toFixed(2)}</td>
-                            <td class="amount-col">C$${conferencePerPerson.toFixed(2)}</td>
-                        </tr>
-                    `;
-                });
             }
 
             return `
-                <div class="invoice-header">
-                    <div class="invoice-left">
-                        <img src="https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1600096854522-HS7NUI12I1ML6SPJFLLY/Artboard+1.png?format=1500w" alt="Campus Stores Canada" class="csc-logo">
-                        <div class="csc-info">
-                            <div>Campus Stores Canada</div>
-                            <div>PO Box 7157 Silver Springs</div>
-                            <div>Calgary, Alberta T3B 5K2</div>
-                            <div>Canada</div>
-                            <div>+1 888-288-4044</div>
-                            <div>info@campusstores.ca</div>
+                <div class="invoice-container">
+                    <div class="invoice-header">
+                        <div class="csc-logo">
+                            <img src="https://csc-ca.com/wp-content/uploads/2023/09/CSC-logo-horizontal-300x99.png" alt="Campus Stores Canada" />
+                        </div>
+                        <div class="invoice-title">
+                            <h1>INVOICE</h1>
+                            <div class="invoice-number">Invoice #: ${Date.now()}</div>
+                            <div class="invoice-date">Date: ${currentDate}</div>
                         </div>
                     </div>
-                    <div class="invoice-right">
-                        <h1>Invoice</h1>
-                        <div class="preview-watermark">PREVIEW ONLY</div>
-                        <div class="invoice-details">
-                            <div>Invoice number: PREVIEW</div>
-                            <div>Date of Issue: ${currentDate}</div>
-                            <div>Date due: ${dueDate}</div>
+
+                    <div class="invoice-details">
+                        <div class="bill-to">
+                            <h3>Bill To:</h3>
+                            <div class="customer-info">
+                                <strong>${orgName}</strong><br>
+                                ${orgAddress}<br>
+                                Attn: ${contactName}
+                            </div>
+                        </div>
+                        <div class="invoice-info">
+                            <div class="due-date">Due: ${dueDate}</div>
+                            <div class="payment-terms">Terms: Net 30</div>
                         </div>
                     </div>
-                </div>
 
-                <div class="invoice-addresses">
-                    <div class="bill-to">
-                        <h3>Bill to</h3>
-                        <div>${orgName}</div>
-                        <div>${contactName}</div>
-                        <div>${orgAddress}</div>
-                    </div>
-                </div>
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th class="desc-col">Description</th>
+                                <th class="qty-col">Qty</th>
+                                <th class="price-col">Price</th>
+                                <th class="amount-col">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${lineItems}
+                        </tbody>
+                    </table>
 
-                <div class="amount-due">
-                    <strong>C$${totalWithHST.toFixed(2)} due ${dueDate}</strong>
-                </div>
-
-                <table class="invoice-table">
-                    <thead>
-                        <tr>
-                            <th class="desc-col">Description</th>
-                            <th class="qty-col">Qty</th>
-                            <th class="price-col">Unit price</th>
-                            <th class="amount-col">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${lineItems}
-                    </tbody>
-                </table>
-
-                <div class="invoice-totals">
-                    <div class="totals-row">
-                        <span>Subtotal</span>
-                        <span>C$${subtotal.toFixed(2)}</span>
-                    </div>
-                    ${conferenceHST > 0 ? `
-                        <div class="totals-row">
-                            <span>HST (13%)</span>
-                            <span>C$${conferenceHST.toFixed(2)}</span>
+                    <div class="invoice-total">
+                        <div class="total-line">
+                            <strong>Total: C$${totalWithHST.toFixed(2)}</strong>
                         </div>
-                    ` : ''}
-                    <div class="totals-row total-row">
-                        <span><strong>Total</strong></span>
-                        <span><strong>C$${totalWithHST.toFixed(2)}</strong></span>
                     </div>
-                    <div class="totals-row amount-due-row">
-                        <span><strong>Amount due</strong></span>
-                        <span><strong>C$${totalWithHST.toFixed(2)}</strong></span>
-                    </div>
-                </div>
 
-                <div class="invoice-footer">
-                    <div class="csc-footer">
-                        Campus Stores Canada<br>
-                        PO Box 7157 Silver Springs, Calgary, AB, Canada T3B 5K2
+                    <div class="amount-due">
+                        <strong>C$${totalWithHST.toFixed(2)} due ${dueDate}</strong>
+                    </div>
+
+                    <div class="invoice-footer">
+                        <div class="csc-footer">
+                            Campus Stores Canada<br>
+                            PO Box 7157 Silver Springs, Calgary, AB, Canada T3B 5K2
+                        </div>
                     </div>
                 </div>
             `;

@@ -3513,9 +3513,9 @@ body::before {
 .payment-summary-title {
     margin: 0 0 12px 0;
     color: #0066cc;
-    font-size: max(1.1vw, 16px);
+    font-size: max(1.0vw, 14px);
     font-family: 'davis-sans', sans-serif;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .payment-summary-line {

@@ -1195,7 +1195,18 @@
                 // Open QuickBooks invoice in new tab immediately
                 if (window.qboInvoiceUrl) {
                     console.log('🔗 Opening QuickBooks invoice in new tab:', window.qboInvoiceUrl);
+
+                    // Also log debug info if available
+                    if (qboResult && qboResult.debug) {
+                        console.log('🔍 QB Invoice Debug Info:', qboResult.debug);
+                    }
+                    if (qboResult && qboResult.alternativeUrls) {
+                        console.log('🔗 Alternative QB URLs:', qboResult.alternativeUrls);
+                    }
+
                     window.open(window.qboInvoiceUrl, '_blank');
+                } else {
+                    console.error('❌ No QuickBooks invoice URL available');
                 }
 
                 // Show "processing" message while Notion sync continues in background
@@ -4971,21 +4982,41 @@
 
         // Show processing message while Notion sync happens in background
         function showProcessingMessage() {
-            const step4Section = document.getElementById('step4Section');
-            if (step4Section) {
-                step4Section.innerHTML = `
-                    <div class="form-container">
-                        <div style="text-align: center; padding: 40px;">
-                            <div style="width: 40px; height: 40px; border: 3px solid #ba003b; border-top: 3px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-                            <h3 style="color: #333; margin-bottom: 16px;">Processing Your Registration...</h3>
-                            <p style="color: #666; font-size: 16px; line-height: 1.5;">
-                                Your QuickBooks invoice has been opened in a new tab.<br>
-                                We're now saving your membership details to our system.
-                            </p>
-                        </div>
+            // Make it full screen and prominent
+            const body = document.body;
+
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'uploadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.95);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+
+            overlay.innerHTML = `
+                <div style="text-align: center; max-width: 500px; padding: 40px;">
+                    <div style="width: 60px; height: 60px; border: 4px solid #ba003b; border-top: 4px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 30px;"></div>
+                    <h2 style="color: #333; margin-bottom: 20px; font-family: 'davis-sans', sans-serif;">🚀 Uploading Your Registration...</h2>
+                    <p style="color: #666; font-size: 18px; line-height: 1.6; margin-bottom: 20px;">
+                        <strong>Your QuickBooks invoice is ready!</strong><br>
+                        Check your new tab to complete payment.
+                    </p>
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 16px; border-radius: 8px; color: #856404;">
+                        <strong>⚠️ Please don't close this page!</strong><br>
+                        We're saving your information to our system. This will complete automatically in a few moments.
                     </div>
-                `;
-            }
+                </div>
+            `;
+
+            body.appendChild(overlay);
         }
 
         // Background Notion sync (async, doesn't block)
@@ -5007,6 +5038,12 @@
 
         // Show final "thanks" completion message
         function showCompletionMessage(hasError = false) {
+            // Remove the uploading overlay
+            const overlay = document.getElementById('uploadingOverlay');
+            if (overlay) {
+                overlay.remove();
+            }
+
             const step4Section = document.getElementById('step4Section');
             if (step4Section) {
                 const errorMessage = hasError ? `

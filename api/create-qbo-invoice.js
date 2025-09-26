@@ -66,13 +66,33 @@ export default async function handler(req, res) {
 
     console.log('📄 Invoice created:', invoice.DocNumber);
 
+    // Try multiple potential URL formats for QB invoice access
+    const baseUrlForUI = qboBaseUrl.includes('sandbox')
+      ? 'https://sandbox-quickbooks.api.intuit.com'
+      : 'https://quickbooks.api.intuit.com';
+
+    const possibleUrls = [
+      `${baseUrlForUI.replace('api.intuit.com', 'qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
+      `${baseUrlForUI.replace('sandbox-quickbooks.api.intuit.com', 'sandbox.qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
+      `https://c${process.env.QBO_COMPANY_ID}.sandbox.qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
+      `https://qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
+    ];
+
+    console.log('📋 Generated possible invoice URLs:', possibleUrls);
+
     res.status(200).json({
       success: true,
       message: 'Invoice created in QuickBooks Online',
       qboInvoiceId: invoice.Id,
       qboInvoiceNumber: invoice.DocNumber,
       qboCustomerId: customer.Id,
-      invoiceUrl: `${qboBaseUrl.replace('api.intuit.com', 'qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`
+      invoiceUrl: possibleUrls[0], // Use first URL as primary
+      alternativeUrls: possibleUrls, // Provide alternatives for debugging
+      debug: {
+        invoiceId: invoice.Id,
+        companyId: process.env.QBO_COMPANY_ID,
+        baseUrl: qboBaseUrl
+      }
     });
 
   } catch (error) {
@@ -509,13 +529,26 @@ async function retryInvoiceCreation(requestBody, newTokens) {
   const invoice = await createInvoice(customer, invoiceData, billingPreferences, qboConfig);
   console.log('📄 Invoice created on retry:', invoice.DocNumber);
 
+  // Try multiple potential URL formats for QB invoice access
+  const baseUrlForUI = qboConfig.baseUrl.includes('sandbox')
+    ? 'https://sandbox-quickbooks.api.intuit.com'
+    : 'https://quickbooks.api.intuit.com';
+
+  const possibleUrls = [
+    `${baseUrlForUI.replace('api.intuit.com', 'qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
+    `${baseUrlForUI.replace('sandbox-quickbooks.api.intuit.com', 'sandbox.qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
+    `https://c${process.env.QBO_COMPANY_ID}.sandbox.qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
+    `https://qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
+  ];
+
   return {
     success: true,
     message: 'Invoice created in QuickBooks Online (after token refresh)',
     qboInvoiceId: invoice.Id,
     qboInvoiceNumber: invoice.DocNumber,
     qboCustomerId: customer.Id,
-    invoiceUrl: `${qboConfig.baseUrl.replace('api.intuit.com', 'qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
+    invoiceUrl: possibleUrls[0], // Use first URL as primary
+    alternativeUrls: possibleUrls,
     tokenRefreshed: true
   };
 }

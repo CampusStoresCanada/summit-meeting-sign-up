@@ -3366,9 +3366,18 @@
             
             // Display organization logo in the logo container
             const organizationLogoContainer = document.getElementById('organizationLogo');
+
+            // Debug: Log the exact logo value we're getting
+            console.log('🔍 Logo value from API:', JSON.stringify(data.organization?.logo));
+            console.log('🔍 Logo type:', typeof data.organization?.logo);
+
             if (data.organization?.logo && data.organization.logo.startsWith('http')) {
                 console.log('🖼️ Setting organization logo:', data.organization.logo);
                 organizationLogoContainer.innerHTML = `<img src="${data.organization.logo}" alt="${data.organization.name || 'Organization'} Logo" class="organization-logo">`;
+            } else if (data.organization?.logo && data.organization.logo.includes('${')) {
+                console.warn('⚠️ Logo contains template literal syntax:', data.organization.logo);
+                console.warn('⚠️ This suggests the Notion Logo field has literal template syntax instead of a URL');
+                organizationLogoContainer.innerHTML = `<div class="organization-name">${data.organization.name || 'Organization'}</div>`;
             } else if (data.organization?.name) {
                 console.log('📝 Using organization name as logo:', data.organization.name);
                 organizationLogoContainer.innerHTML = `<div class="organization-name">${data.organization.name}</div>`;

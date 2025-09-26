@@ -3139,23 +3139,26 @@
         function printInvoice() {
             const invoiceHTML = generateInvoiceHTML();
             const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>CSC Invoice - ${window.qboInvoiceResult?.qboInvoiceNumber || 'INV-' + Date.now()}</title>
-                    <style>
-                        body { margin: 0; padding: 20px; }
-                        @media print {
-                            body { margin: 0; padding: 10px; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${invoiceHTML}
-                </body>
-                </html>
-            `);
+            const invoiceNumber = window.qboInvoiceResult?.qboInvoiceNumber || 'INV-' + Date.now();
+
+            // Use string concatenation instead of template literal to avoid conflicts
+            printWindow.document.write(
+                '<!DOCTYPE html>' +
+                '<html>' +
+                '<head>' +
+                '<title>CSC Invoice - ' + invoiceNumber + '</title>' +
+                '<style>' +
+                'body { margin: 0; padding: 20px; }' +
+                '@media print {' +
+                'body { margin: 0; padding: 10px; }' +
+                '}' +
+                '</style>' +
+                '</head>' +
+                '<body>' +
+                invoiceHTML +
+                '</body>' +
+                '</html>'
+            );
             printWindow.document.close();
             printWindow.focus();
             printWindow.print();
@@ -3165,28 +3168,31 @@
         function downloadInvoicePDF() {
             const invoiceHTML = generateInvoiceHTML();
             const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>CSC Invoice - ${window.qboInvoiceResult?.qboInvoiceNumber || 'INV-' + Date.now()}</title>
-                    <style>
-                        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
-                        @page { margin: 0.5in; }
-                    </style>
-                </head>
-                <body>
-                    ${invoiceHTML}
-                    <script>
-                        window.onload = function() {
-                            setTimeout(function() {
-                                window.print();
-                            }, 500);
-                        };
-                    </script>
-                </body>
-                </html>
-            `);
+            const invoiceNumber = window.qboInvoiceResult?.qboInvoiceNumber || 'INV-' + Date.now();
+
+            // Use string concatenation instead of template literal to avoid conflicts
+            printWindow.document.write(
+                '<!DOCTYPE html>' +
+                '<html>' +
+                '<head>' +
+                '<title>CSC Invoice - ' + invoiceNumber + '</title>' +
+                '<style>' +
+                'body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }' +
+                '@page { margin: 0.5in; }' +
+                '</style>' +
+                '</head>' +
+                '<body>' +
+                invoiceHTML +
+                '<script>' +
+                'window.onload = function() {' +
+                'setTimeout(function() {' +
+                'window.print();' +
+                '}, 500);' +
+                '};' +
+                '</script>' +
+                '</body>' +
+                '</html>'
+            );
             printWindow.document.close();
         }
 

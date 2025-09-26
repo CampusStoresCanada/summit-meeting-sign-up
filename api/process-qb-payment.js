@@ -29,51 +29,82 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { paymentData, organizationName, invoiceId, invoiceNumber } = req.body;
+    const { paymentData, organizationName, invoiceId, invoiceNumber, paymentMethod } = req.body;
 
-    if (!paymentData || !paymentData.amount || !paymentData.card) {
+    if (!paymentData || !paymentData.amount) {
       res.status(400).json({ error: 'Missing required payment data' });
+      return;
+    }
+
+    // Validate payment method specific data
+    if (paymentMethod === 'ach' && !paymentData.bankAccount) {
+      res.status(400).json({ error: 'Missing bank account data for ACH payment' });
+      return;
+    } else if (paymentMethod !== 'ach' && !paymentData.card) {
+      res.status(400).json({ error: 'Missing card data for card payment' });
       return;
     }
 
     console.log('💳 Processing QuickBooks payment for:', organizationName);
     console.log('💰 Amount:', paymentData.amount, paymentData.currency);
+    console.log('🔧 Payment Method:', paymentMethod || 'card');
 
-    // Step 1: Create a payment token (card tokenization)
-    console.log('🔐 Step 1: Creating payment token...');
-    const tokenResult = await createPaymentToken(paymentData.card, qboAccessToken);
+    let paymentResult;
 
-    if (!tokenResult.success) {
-      throw new Error(tokenResult.error);
+    if (paymentMethod === 'ach') {
+      // Process ACH payment
+      console.log('🏦 Processing ACH bank transfer...');
+      paymentResult = await processACHPayment(
+        paymentData.bankAccount,
+        paymentData.amount,
+        paymentData.currency,
+        organizationName,
+        invoiceNumber,
+        qboAccessToken,
+        qboCompanyId,
+        qbPaymentsBaseUrl
+      );
+    } else {
+      // Process card payment
+      console.log('💳 Processing credit/debit card payment...');
+
+      // Step 1: Create a payment token (card tokenization)
+      console.log('🔐 Step 1: Creating payment token...');
+      const tokenResult = await createPaymentToken(paymentData.card, qboAccessToken);
+
+      if (!tokenResult.success) {
+        throw new Error(tokenResult.error);
+      }
+
+      // Step 2: Create the charge using the token
+      console.log('💰 Step 2: Creating charge...');
+      paymentResult = await createPaymentCharge(
+        tokenResult.token,
+        paymentData.amount,
+        paymentData.currency,
+        organizationName,
+        invoiceNumber,
+        qboAccessToken,
+        qboCompanyId,
+        qbPaymentsBaseUrl
+      );
     }
 
-    // Step 2: Create the charge using the token
-    console.log('💰 Step 2: Creating charge...');
-    const chargeResult = await createPaymentCharge(
-      tokenResult.token,
-      paymentData.amount,
-      paymentData.currency,
-      organizationName,
-      invoiceNumber,
-      qboAccessToken,
-      qboCompanyId,
-      qbPaymentsBaseUrl
-    );
-
-    if (!chargeResult.success) {
-      throw new Error(chargeResult.error);
+    if (!paymentResult.success) {
+      throw new Error(paymentResult.error);
     }
 
-    console.log('✅ Payment processed successfully:', chargeResult.transactionId);
+    console.log('✅ Payment processed successfully:', paymentResult.transactionId);
 
     // Success response
     res.status(200).json({
       success: true,
       message: 'Payment processed successfully',
-      transactionId: chargeResult.transactionId,
+      transactionId: paymentResult.transactionId,
       amount: paymentData.amount,
       currency: paymentData.currency,
-      organizationName: organizationName
+      organizationName: organizationName,
+      paymentMethod: paymentMethod || 'card'
     });
 
   } catch (error) {
@@ -313,4 +344,119 @@ async function retryPaymentProcessing(requestBody, newTokens) {
     organizationName: organizationName,
     tokenRefreshed: true
   };
+}
+
+// Process ACH bank transfer payment
+async function processACHPayment(bankAccount, amount, currency, description, invoiceNumber, accessToken, companyId, baseUrl) {
+  try {
+    console.log('🏦 Processing ACH bank transfer...');
+
+    // Step 1: Create bank account token for ACH
+    const tokenResult = await createBankAccountToken(bankAccount, accessToken, baseUrl);
+
+    if (!tokenResult.success) {
+      return {
+        success: false,
+        error: tokenResult.error
+      };
+    }
+
+    // Step 2: Create ACH debit using the bank account token
+    const achPayload = {
+      amount: amount,
+      currency: currency,
+      token: tokenResult.token,
+      context: {
+        mobile: false,
+        isEcommerce: true
+      },
+      description: `CSC Membership - ${description}`,
+      invoice: invoiceNumber || undefined
+    };
+
+    const achResponse = await fetch(`${baseUrl}/quickbooks/v4/payments/charges`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(achPayload)
+    });
+
+    if (!achResponse.ok) {
+      const errorText = await achResponse.text();
+      console.error('❌ ACH payment failed:', errorText);
+      return {
+        success: false,
+        error: `ACH payment failed: ${achResponse.status} ${achResponse.statusText}`
+      };
+    }
+
+    const achResult = await achResponse.json();
+    console.log('✅ ACH payment created successfully');
+
+    return {
+      success: true,
+      transactionId: achResult.id,
+      status: achResult.status,
+      amount: achResult.amount,
+      currency: achResult.currency
+    };
+
+  } catch (error) {
+    console.error('❌ ACH payment error:', error);
+    return {
+      success: false,
+      error: 'Failed to process ACH payment'
+    };
+  }
+}
+
+// Create bank account token for ACH payments
+async function createBankAccountToken(bankAccount, accessToken, baseUrl) {
+  try {
+    const tokenPayload = {
+      bankAccount: {
+        routingNumber: bankAccount.routingNumber,
+        accountNumber: bankAccount.accountNumber,
+        accountType: bankAccount.accountType, // 'checking' or 'savings'
+        name: bankAccount.name
+      }
+    };
+
+    const tokenResponse = await fetch(`${baseUrl}/quickbooks/v4/payments/tokens`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(tokenPayload)
+    });
+
+    if (!tokenResponse.ok) {
+      const errorText = await tokenResponse.text();
+      console.error('❌ Bank account token creation failed:', errorText);
+      return {
+        success: false,
+        error: `Bank account token creation failed: ${tokenResponse.status} ${tokenResponse.statusText}`
+      };
+    }
+
+    const tokenResult = await tokenResponse.json();
+    console.log('✅ Bank account token created successfully');
+
+    return {
+      success: true,
+      token: tokenResult.value
+    };
+
+  } catch (error) {
+    console.error('❌ Bank account token creation error:', error);
+    return {
+      success: false,
+      error: 'Failed to create bank account token'
+    };
+  }
 }

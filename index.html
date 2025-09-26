@@ -2698,53 +2698,109 @@
 
                     // Create payment form HTML
                     widgetContainer.innerHTML = `
-                        <div style="background: white; padding: 30px; border-radius: 8px; border: 1px solid #ddd;">
-                            <h4 style="margin-top: 0; margin-bottom: 20px; color: #333;">💳 Payment Information</h4>
+                        <div style="background: white; padding: 1.5vw; border-radius: 8px; border: 1px solid #ddd;">
+                            <h4 style="margin-top: 0; margin-bottom: 1vw; color: #333; font-size: 1.8vw; font-family: 'davis-sans', sans-serif; font-weight: 700;">💳 Payment Information</h4>
+
+                            <!-- Test Mode Notice -->
+                            <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 1vw; border-radius: 6px; margin-bottom: 1.5vw; color: #856404; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">
+                                <strong>🧪 Test Mode:</strong> For testing, use card <strong>4111111111111111</strong>, any future expiry date (e.g., 12/28), and any 3-digit CVV.
+                            </div>
+
+                            <!-- Payment Method Selection -->
+                            <div style="margin-bottom: 1.5vw;">
+                                <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Payment Method</label>
+                                <div class="custom-dropdown" id="paymentMethodDropdown">
+                                    <div class="dropdown-display" id="paymentMethodDisplay" style="padding: 1vw 1.5vw; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 1.0vw;">
+                                        💳 Credit or Debit Card
+                                    </div>
+                                    <div class="dropdown-options" id="paymentMethodOptions" style="display: none;">
+                                        <div class="dropdown-option" data-value="card">💳 Credit or Debit Card</div>
+                                        <div class="dropdown-option" data-value="ach">🏦 Bank Transfer (ACH)</div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <!-- Payment Form Fields -->
                             <div id="qbPaymentForm">
-                                <div style="margin-bottom: 20px;">
-                                    <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Card Number</label>
-                                    <div id="cardNumber" style="padding: 12px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;">
-                                        <!-- QB Payments will inject secure card field here -->
+                                <div id="cardPaymentFields">
+                                    <div style="margin-bottom: 1vw;">
+                                        <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Card Number</label>
+                                        <div id="cardNumber" style="padding: 1vw; border: 2px solid #e0e0e0; border-radius: 4px; background: #ffffff; font-size: 1.0vw;">
+                                            <!-- QB Payments will inject secure card field here -->
+                                        </div>
+                                    </div>
+
+                                    <div style="display: flex; gap: 1vw; margin-bottom: 1vw;">
+                                        <div style="flex: 1;">
+                                            <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Expiry Date</label>
+                                            <div id="expirationDate" style="padding: 1vw; border: 2px solid #e0e0e0; border-radius: 4px; background: #ffffff; font-size: 1.0vw;">
+                                                <!-- QB Payments will inject secure expiry field here -->
+                                            </div>
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">CVV</label>
+                                            <div id="cvv" style="padding: 1vw; border: 2px solid #e0e0e0; border-radius: 4px; background: #ffffff; font-size: 1.0vw;">
+                                                <!-- QB Payments will inject secure CVV field here -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-bottom: 1vw;">
+                                        <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Postal Code</label>
+                                        <input type="text" id="postalCode"
+                                               value="${organizationData.address?.postalCode || formState.postalCode || ''}"
+                                               style="width: 100%; padding: 1vw; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 1.0vw; font-family: 'davis-sans', sans-serif; background: #ffffff;"
+                                               placeholder="A1A 1A1" maxlength="7">
                                     </div>
                                 </div>
 
-                                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                                    <div style="flex: 1;">
-                                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Expiry Date</label>
-                                        <div id="expirationDate" style="padding: 12px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;">
-                                            <!-- QB Payments will inject secure expiry field here -->
+                                <div id="achPaymentFields" style="display: none;">
+                                    <div style="margin-bottom: 1vw;">
+                                        <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Bank Account Type</label>
+                                        <div class="custom-dropdown" id="accountTypeDropdown">
+                                            <div class="dropdown-display" id="accountTypeDisplay" style="padding: 1vw 1.5vw; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 1.0vw;">
+                                                🏦 Checking Account
+                                            </div>
+                                            <div class="dropdown-options" id="accountTypeOptions" style="display: none;">
+                                                <div class="dropdown-option" data-value="checking">🏦 Checking Account</div>
+                                                <div class="dropdown-option" data-value="savings">💰 Savings Account</div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div style="flex: 1;">
-                                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">CVV</label>
-                                        <div id="cvv" style="padding: 12px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;">
-                                            <!-- QB Payments will inject secure CVV field here -->
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div style="margin-bottom: 20px;">
-                                    <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Postal Code</label>
-                                    <input type="text" id="postalCode"
-                                           value="${organizationData.address?.postalCode || formState.postalCode || ''}"
-                                           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;"
-                                           placeholder="A1A 1A1" maxlength="7">
+                                    <div style="margin-bottom: 1vw;">
+                                        <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Routing Number</label>
+                                        <input type="text" id="routingNumber"
+                                               style="width: 100%; padding: 1vw; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 1.0vw; font-family: 'davis-sans', sans-serif; background: #ffffff;"
+                                               placeholder="123456789" maxlength="9">
+                                    </div>
+
+                                    <div style="margin-bottom: 1vw;">
+                                        <label style="display: block; margin-bottom: 0.5vw; font-weight: 600; color: #333; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">Account Number</label>
+                                        <input type="text" id="accountNumber"
+                                               style="width: 100%; padding: 1vw; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 1.0vw; font-family: 'davis-sans', sans-serif; background: #ffffff;"
+                                               placeholder="Enter account number">
+                                    </div>
+
+                                    <div style="background: #e3f2fd; padding: 1vw; border-radius: 6px; margin-bottom: 1vw; border-left: 4px solid #2196f3;">
+                                        <div style="font-size: 1.0vw; color: #1976d2; font-family: 'davis-sans', sans-serif;">
+                                            <strong>🔒 ACH Bank Transfer:</strong> Processing takes 3-5 business days. Fee: 1% (minimum $1).
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Payment Summary -->
-                                <div style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 25px; border-left: 4px solid #0066cc;">
-                                    <h5 style="margin: 0 0 15px 0; color: #0066cc;">Payment Summary</h5>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <div style="background: #f8f9fa; padding: 1.2vw; border-radius: 6px; margin-bottom: 1.5vw; border-left: 4px solid #0066cc;">
+                                    <h5 style="margin: 0 0 1vw 0; color: #0066cc; font-size: 1.2vw; font-family: 'davis-sans', sans-serif; font-weight: 700;">Payment Summary</h5>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5vw; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">
                                         <span>Invoice:</span>
                                         <strong>${window.qboInvoiceResult?.qboInvoiceNumber || 'Pending'}</strong>
                                     </div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5vw; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">
                                         <span>Organization:</span>
                                         <strong>${organizationData.name || formState.institutionName}</strong>
                                     </div>
-                                    <div style="display: flex; justify-content: space-between; font-size: 18px; color: #0066cc; border-top: 1px solid #ddd; padding-top: 12px; margin-top: 12px;">
+                                    <div style="display: flex; justify-content: space-between; font-size: 1.2vw; color: #0066cc; border-top: 1px solid #ddd; padding-top: 0.8vw; margin-top: 0.8vw; font-family: 'davis-sans', sans-serif;">
                                         <span><strong>Total Amount:</strong></span>
                                         <strong>CAD $${total.toFixed(2)}</strong>
                                     </div>
@@ -2753,20 +2809,19 @@
                                 <!-- Payment Button -->
                                 <button id="payNowButton"
                                         onclick="processPayment()"
-                                        style="width: 100%; padding: 15px; background: #0066cc; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background-color 0.3s;"
-                                        onmouseover="this.style.backgroundColor='#0052a3'"
-                                        onmouseout="this.style.backgroundColor='#0066cc'">
+                                        class="next-btn"
+                                        style="width: 100%; margin-bottom: 1vw;">
                                     💳 Pay $${total.toFixed(2)} CAD
                                 </button>
 
                                 <!-- Security Notice -->
-                                <div style="margin-top: 15px; padding: 12px; background: #e8f5e8; border-radius: 6px; border: 1px solid #4caf50;">
-                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                        <span style="color: #4caf50; font-size: 18px;">🔒</span>
-                                        <small style="color: #2e7d32;">
+                                <div style="margin-top: 1vw; padding: 1vw; background: #e8f5e8; border-radius: 6px; border: 1px solid #4caf50;">
+                                    <div style="display: flex; align-items: center; gap: 0.5vw;">
+                                        <span style="color: #4caf50; font-size: 1.2vw;">🔒</span>
+                                        <div style="color: #2e7d32; font-size: 1.0vw; font-family: 'davis-sans', sans-serif;">
                                             <strong>Secure Payment:</strong> Your payment is processed securely by QuickBooks Payments.
-                                            Card details are encrypted and never stored on our servers.
-                                        </small>
+                                            All details are encrypted and never stored on our servers.
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2775,6 +2830,9 @@
 
                     // Set up payment form for direct API integration
                     setupPaymentForm();
+
+                    // Set up payment method dropdown
+                    setupPaymentMethodDropdown();
 
                 } else {
                     console.error('❌ QuickBooks Payments SDK not loaded');
@@ -2906,6 +2964,96 @@
 
             // Implement real QuickBooks Payments API integration
             processQuickBooksPayment();
+        }
+
+        // Set up payment method dropdown functionality
+        function setupPaymentMethodDropdown() {
+            const dropdown = document.getElementById('paymentMethodDropdown');
+            const display = document.getElementById('paymentMethodDisplay');
+            const options = document.getElementById('paymentMethodOptions');
+
+            if (dropdown && display && options) {
+                // Add click handler for dropdown
+                display.addEventListener('click', function() {
+                    const isOpen = options.style.display === 'block';
+                    options.style.display = isOpen ? 'none' : 'block';
+                });
+
+                // Add click handlers for options
+                options.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('dropdown-option')) {
+                        const value = e.target.getAttribute('data-value');
+                        const text = e.target.textContent;
+
+                        display.textContent = text;
+                        options.style.display = 'none';
+
+                        // Switch payment method
+                        switchPaymentMethod(value);
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!dropdown.contains(e.target)) {
+                        options.style.display = 'none';
+                    }
+                });
+            }
+
+            // Set up account type dropdown too
+            setTimeout(() => {
+                setupAccountTypeDropdown();
+            }, 100);
+        }
+
+        // Set up account type dropdown for ACH payments
+        function setupAccountTypeDropdown() {
+            const dropdown = document.getElementById('accountTypeDropdown');
+            const display = document.getElementById('accountTypeDisplay');
+            const options = document.getElementById('accountTypeOptions');
+
+            if (dropdown && display && options) {
+                display.addEventListener('click', function() {
+                    const isOpen = options.style.display === 'block';
+                    options.style.display = isOpen ? 'none' : 'block';
+                });
+
+                options.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('dropdown-option')) {
+                        const text = e.target.textContent;
+                        display.textContent = text;
+                        options.style.display = 'none';
+                    }
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!dropdown.contains(e.target)) {
+                        options.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        // Switch between payment methods
+        function switchPaymentMethod(method) {
+            const cardFields = document.getElementById('cardPaymentFields');
+            const achFields = document.getElementById('achPaymentFields');
+            const payButton = document.getElementById('payNowButton');
+
+            if (method === 'card') {
+                cardFields.style.display = 'block';
+                achFields.style.display = 'none';
+                if (payButton) {
+                    payButton.innerHTML = `💳 Pay $${parseFloat(calculateInvoiceTotal()).toFixed(2)} CAD`;
+                }
+            } else if (method === 'ach') {
+                cardFields.style.display = 'none';
+                achFields.style.display = 'block';
+                if (payButton) {
+                    payButton.innerHTML = `🏦 Pay $${parseFloat(calculateInvoiceTotal()).toFixed(2)} CAD via Bank Transfer`;
+                }
+            }
         }
 
         // Process payment using QuickBooks Payments API

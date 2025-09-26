@@ -275,21 +275,6 @@
                             </div>
                         </div>
 
-                        <!-- Payment method -->
-                        <div class="form-field" data-field="paymentMethod">
-                            <div class="custom-dropdown" id="paymentMethodDropdown">
-                                <div class="dropdown-display" id="paymentMethodDisplay">
-                                    <span id="paymentMethodText">Pay now with receipt or pay by cheque?</span>
-                                    <svg class="dropdown-arrow" viewBox="0 0 19.87 12.22">
-                                        <path d="M19.68.11c-.21-.17-.52-.15-.7.07l-9.03,10.77-.02-.02-.02.02L.88.18C.7-.04.39-.06.18.11-.04.29-.06.61.11.82l9.42,11.22c.1.12.24.18.38.18h.04c.14,0,.28-.06.38-.18L19.75.82c.17-.21.15-.53-.07-.71Z" fill="#999999"/>
-                                    </svg>
-                                </div>
-                                <div class="dropdown-options" id="paymentMethodOptions" style="display: none;">
-                                    <div class="dropdown-option" data-value="pay-now">Pay Now (Credit/Debit/EFT)</div>
-                                    <div class="dropdown-option" data-value="invoice">Send Invoice (Pay by Cheque)</div>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- Invoice Preview -->
                         <div class="form-field" data-field="invoicePreview">
@@ -304,7 +289,7 @@
                         Previous step
                     </button>
                     <button class="next-btn" onclick="nextStep()">
-                        Next step
+                        Confirm Details
                         <span>→</span>
                     </button>
                 </div>
@@ -979,9 +964,8 @@
             dueDate.setDate(dueDate.getDate() + 30);
             const dueDateFormatted = dueDate.toLocaleDateString('en-CA');
 
-            // Determine button text based on payment method
-            const paymentMethod = formState.paymentMethod || 'pay-now';
-            const buttonText = paymentMethod === 'send-invoice' ? 'Proceed to Invoice' : 'Proceed to Payment';
+            // Always use "Proceed to Invoice" since we removed payment method choice
+            const buttonText = 'Proceed to Invoice';
 
             modal.innerHTML = `
                 <div class="invoice-modal-container">
@@ -1179,9 +1163,6 @@
             }
 
             try {
-                // Sync all changes to Notion
-                await syncMembershipRenewal();
-
                 // Update progress message
                 if (modal && actions) {
                     actions.innerHTML = `
@@ -1192,7 +1173,7 @@
                     `;
                 }
 
-                // Create QuickBooks invoice
+                // Create QuickBooks invoice (Notion sync will happen in background)
                 const qboResult = await createQuickBooksInvoice();
 
                 // Store invoice URL for Step 4 display
@@ -1208,9 +1189,22 @@
                     nextButton.classList.remove('disabled');
                 }
 
-                // Close modal and show success
+                // Close modal
                 closeInvoiceModal();
-                console.log('✅ Membership renewal completed - Notion synced, QuickBooks invoice created');
+
+                // Open QuickBooks invoice in new tab immediately
+                if (window.qboInvoiceUrl) {
+                    console.log('🔗 Opening QuickBooks invoice in new tab:', window.qboInvoiceUrl);
+                    window.open(window.qboInvoiceUrl, '_blank');
+                }
+
+                // Show "processing" message while Notion sync continues in background
+                showProcessingMessage();
+
+                // Start background Notion sync (don't await it)
+                backgroundNotionSync();
+
+                console.log('✅ QuickBooks invoice created and opened in new tab');
 
             } catch (error) {
                 console.error('❌ Sync failed:', error);
@@ -2678,130 +2672,48 @@
                         loaderElement.style.display = 'none';
                     }
 
-                    // Create payment form HTML
+                    // Create payment options HTML
                     widgetContainer.innerHTML = `
                         <div class="form-container">
-                            <h4 class="step-subtitle">💳 Payment Information</h4>
+                            <h4 class="step-subtitle">💳 Complete Your Payment</h4>
 
-                            <!-- Test Mode Notice -->
-                            <div class="payment-info-box">
-                                <strong>🧪 Test Mode:</strong> For testing, use card <strong>4111111111111111</strong>, any future expiry date (e.g., 12/28), and any 3-digit CVV.
+                            <!-- Payment Summary -->
+                            <div class="payment-summary-box step-subtitle">
+                                Payment Summary<br>
+                                Invoice: <strong>${window.qboInvoiceResult?.qboInvoiceNumber || 'Pending'}</strong><br>
+                                Organization: <strong>${organizationData.name || formState.institutionName}</strong><br>
+                                <strong>Total Amount: CAD $${total.toFixed(2)}</strong>
                             </div>
 
-                            <!-- Payment Method Selection -->
-                            <div class="form-field">
-                                <label class="field-label">Payment Method</label>
-                                <div class="custom-dropdown" id="paymentMethodDropdown">
-                                    <div class="dropdown-display" id="paymentMethodDisplay">
-                                        💳 Credit or Debit Card
-                                    </div>
-                                    <div class="dropdown-options" id="paymentMethodOptions" style="display: none;">
-                                        <div class="dropdown-option" data-value="card">💳 Credit or Debit Card</div>
-                                        <div class="dropdown-option" data-value="ach">🏦 Bank Transfer (ACH)</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Payment Form Fields -->
-                            <div id="qbPaymentForm">
-                                <div id="cardPaymentFields">
-                                    <div class="form-field">
-                                        <label class="field-label">Card Number</label>
-                                        <div id="cardNumber" class="payment-input-field">
-                                            <!-- QB Payments will inject secure card field here -->
-                                        </div>
-                                    </div>
-
-                                    <div style="display: flex; gap: 1.5vw; margin-bottom: 1.5vw;">
-                                        <div class="form-field" style="flex: 1; margin-bottom: 0;">
-                                            <label class="field-label">Expiry Date</label>
-                                            <div id="expirationDate" class="payment-input-field">
-                                                <!-- QB Payments will inject secure expiry field here -->
-                                            </div>
-                                        </div>
-                                        <div class="form-field" style="flex: 1; margin-bottom: 0;">
-                                            <label class="field-label">CVV</label>
-                                            <div id="cvv" class="payment-input-field">
-                                                <!-- QB Payments will inject secure CVV field here -->
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-field">
-                                        <label class="field-label">Postal Code</label>
-                                        <input type="text" id="postalCode"
-                                               value="${organizationData.address?.postalCode || formState.postalCode || ''}"
-                                               class="payment-input-field"
-                                               placeholder="A1A 1A1" maxlength="7">
-                                    </div>
-                                </div>
-
-                                <div id="achPaymentFields" style="display: none;">
-                                    <div class="form-field">
-                                        <label class="field-label">Bank Account Type</label>
-                                        <div class="custom-dropdown" id="accountTypeDropdown">
-                                            <div class="dropdown-display" id="accountTypeDisplay">
-                                                🏦 Checking Account
-                                            </div>
-                                            <div class="dropdown-options" id="accountTypeOptions" style="display: none;">
-                                                <div class="dropdown-option" data-value="checking">🏦 Checking Account</div>
-                                                <div class="dropdown-option" data-value="savings">💰 Savings Account</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-field">
-                                        <label class="field-label">Routing Number</label>
-                                        <input type="text" id="routingNumber"
-                                               class="payment-input-field"
-                                               placeholder="123456789" maxlength="9">
-                                    </div>
-
-                                    <div class="form-field">
-                                        <label class="field-label">Account Number</label>
-                                        <input type="text" id="accountNumber"
-                                               class="payment-input-field"
-                                               placeholder="Enter account number">
-                                    </div>
-
-                                    <div style="background: #e3f2fd; padding: 12px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #2196f3; font-size: max(0.8vw, 12px); color: #1976d2; font-family: 'davis-sans', sans-serif;">
-                                        <strong>🔒 ACH Bank Transfer:</strong> Processing takes 3-5 business days. Fee: 1% (minimum $1).
-                                    </div>
-                                </div>
-
-                                <!-- Payment Summary -->
-                                <div class="payment-summary-box step-subtitle">
-                                    Payment Summary<br>
-                                    Invoice: <strong>${window.qboInvoiceResult?.qboInvoiceNumber || 'Pending'}</strong><br>
-                                    Organization: <strong>${organizationData.name || formState.institutionName}</strong><br>
-                                    <strong>Total Amount: CAD $${total.toFixed(2)}</strong>
-                                </div>
-
-                                <!-- Payment Button -->
+                            <!-- Payment Options -->
+                            <div style="display: flex; gap: 20px; margin-bottom: 20px;">
                                 <button id="payNowButton"
-                                        onclick="processPayment()"
+                                        onclick="payNowOnQuickBooks()"
                                         class="next-btn"
-                                        style="width: 100%; margin-bottom: 20px;">
-                                    💳 Pay $${total.toFixed(2)} CAD
+                                        style="flex: 1;">
+                                    💳 Pay Now
                                 </button>
 
-                                <!-- Security Notice -->
-                                <div class="payment-security-box">
-                                    <span class="payment-security-icon">🔒</span>
-                                    <div class="payment-security-text">
-                                        <strong>Secure Payment:</strong> Your payment is processed securely by QuickBooks Payments.
-                                        All details are encrypted and never stored on our servers.
-                                    </div>
+                                <button id="payLaterButton"
+                                        onclick="choosePayLater()"
+                                        class="next-btn"
+                                        style="flex: 1; background: #6c757d;">
+                                    📄 Pay Later
+                                </button>
+                            </div>
+
+                            <!-- Security Notice -->
+                            <div class="payment-security-box">
+                                <span class="payment-security-icon">🔒</span>
+                                <div class="payment-security-text">
+                                    <strong>Secure Payment:</strong> Payments are processed securely by QuickBooks.
+                                    Invoice and payment records are automatically tracked.
                                 </div>
                             </div>
                         </div>
                     `;
 
-                    // Set up payment form for direct API integration
-                    setupPaymentForm();
-
-                    // Set up payment method dropdown
-                    setupPaymentMethodDropdown();
+                    // Payment option functions are defined below
 
                 } else {
                     console.error('❌ QuickBooks Payments SDK not loaded');
@@ -5016,6 +4928,119 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Payment option functions for QB invoice redirect flow
+
+        // Pay Now - redirect to QuickBooks invoice
+        function payNowOnQuickBooks() {
+            console.log('💳 Redirecting to QuickBooks payment...');
+
+            if (window.qboInvoiceUrl) {
+                console.log('🔗 Opening QuickBooks invoice:', window.qboInvoiceUrl);
+                window.location.href = window.qboInvoiceUrl;
+            } else {
+                console.error('❌ No QuickBooks invoice URL available');
+                alert('Invoice not ready. Please try refreshing the page.');
+            }
+        }
+
+        // Pay Later - show completion message
+        function choosePayLater() {
+            console.log('📄 User chose to pay later');
+
+            // Show completion message
+            const widgetContainer = document.getElementById('qbPaymentWidget');
+            if (widgetContainer) {
+                widgetContainer.innerHTML = `
+                    <div class="form-container">
+                        <div class="success">
+                            <h3>✅ Registration Complete!</h3>
+                            <p>Your membership registration has been submitted and an invoice has been created.</p>
+                            <p><strong>Invoice #:</strong> ${window.qboInvoiceResult?.qboInvoiceNumber || 'Pending'}</p>
+                            <p>You can pay this invoice later by logging into your QuickBooks account or waiting for the emailed invoice.</p>
+
+                            <button onclick="window.location.reload()" class="next-btn" style="margin-top: 20px;">
+                                Start New Registration
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Show processing message while Notion sync happens in background
+        function showProcessingMessage() {
+            const step4Section = document.getElementById('step4Section');
+            if (step4Section) {
+                step4Section.innerHTML = `
+                    <div class="form-container">
+                        <div style="text-align: center; padding: 40px;">
+                            <div style="width: 40px; height: 40px; border: 3px solid #ba003b; border-top: 3px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                            <h3 style="color: #333; margin-bottom: 16px;">Processing Your Registration...</h3>
+                            <p style="color: #666; font-size: 16px; line-height: 1.5;">
+                                Your QuickBooks invoice has been opened in a new tab.<br>
+                                We're now saving your membership details to our system.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Background Notion sync (async, doesn't block)
+        async function backgroundNotionSync() {
+            try {
+                console.log('🚀 Starting background Notion sync...');
+
+                // Call the existing sync function
+                await syncMembershipRenewal();
+
+                console.log('✅ Background Notion sync completed');
+                showCompletionMessage();
+
+            } catch (error) {
+                console.error('❌ Background Notion sync failed:', error);
+                showCompletionMessage(true); // Show with error message
+            }
+        }
+
+        // Show final "thanks" completion message
+        function showCompletionMessage(hasError = false) {
+            const step4Section = document.getElementById('step4Section');
+            if (step4Section) {
+                const errorMessage = hasError ? `
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 12px; border-radius: 6px; margin-top: 20px; color: #856404;">
+                        <strong>⚠️ Note:</strong> Your registration was saved but there may have been a sync issue. Our team will follow up if needed.
+                    </div>
+                ` : '';
+
+                step4Section.innerHTML = `
+                    <div class="form-container">
+                        <div class="success">
+                            <h3>🎉 Registration Complete!</h3>
+                            <p>Thank you for renewing your CSC membership! Your information has been processed and your invoice is ready for payment.</p>
+
+                            <div style="background: #e8f5e8; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #4caf50;">
+                                <h4 style="margin: 0 0 12px 0; color: #2e7d32;">What's Next?</h4>
+                                <p style="margin: 0; color: #2e7d32;">
+                                    • Your QuickBooks invoice is open in another tab<br>
+                                    • Click "Pay Online" to complete your payment<br>
+                                    • You'll receive a receipt via email once payment is processed
+                                </p>
+                            </div>
+
+                            ${errorMessage}
+
+                            <button onclick="window.location.reload()" class="next-btn" style="margin-top: 20px;">
+                                Start New Registration
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    </script>
 
 </body>
 </html>

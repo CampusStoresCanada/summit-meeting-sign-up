@@ -72,10 +72,11 @@ export default async function handler(req, res) {
       : 'https://quickbooks.api.intuit.com';
 
     const possibleUrls = [
-      `${baseUrlForUI.replace('api.intuit.com', 'qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
-      `${baseUrlForUI.replace('sandbox-quickbooks.api.intuit.com', 'sandbox.qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
-      `https://c${process.env.QBO_COMPANY_ID}.sandbox.qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
+      `https://c${process.env.QBO_COMPANY_ID}.qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
+      `https://sandbox-qbo.qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
       `https://qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
+      `${baseUrlForUI.replace('sandbox-quickbooks.api.intuit.com', 'sandbox-qbo.qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
+      `${baseUrlForUI.replace('api.intuit.com', 'qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
     ];
 
     console.log('📋 Generated possible invoice URLs:', possibleUrls);
@@ -461,7 +462,11 @@ async function refreshQuickBooksTokens() {
   const qboRefreshToken = process.env.QBO_REFRESH_TOKEN;
 
   if (!qboClientId || !qboClientSecret || !qboRefreshToken) {
-    console.error('❌ Missing QuickBooks credentials for token refresh');
+    console.error('❌ Missing QuickBooks credentials for token refresh:', {
+      clientId: qboClientId ? 'SET' : 'MISSING',
+      clientSecret: qboClientSecret ? 'SET' : 'MISSING',
+      refreshToken: qboRefreshToken ? 'SET' : 'MISSING'
+    });
     return null;
   }
 
@@ -535,10 +540,11 @@ async function retryInvoiceCreation(requestBody, newTokens) {
     : 'https://quickbooks.api.intuit.com';
 
   const possibleUrls = [
-    `${baseUrlForUI.replace('api.intuit.com', 'qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
-    `${baseUrlForUI.replace('sandbox-quickbooks.api.intuit.com', 'sandbox.qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
-    `https://c${process.env.QBO_COMPANY_ID}.sandbox.qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
+    `https://c${process.env.QBO_COMPANY_ID}.qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
+    `https://sandbox-qbo.qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
     `https://qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
+    `${baseUrlForUI.replace('sandbox-quickbooks.api.intuit.com', 'sandbox-qbo.qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
+    `${baseUrlForUI.replace('api.intuit.com', 'qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
   ];
 
   return {

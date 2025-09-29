@@ -5044,38 +5044,18 @@
                 overlay.remove();
             }
 
-            const step4Section = document.getElementById('step4Section');
-            if (step4Section) {
-                const errorMessage = hasError ? `
-                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 12px; border-radius: 6px; margin-top: 20px; color: #856404;">
-                        <strong>⚠️ Note:</strong> Your registration was saved but there may have been a sync issue. Our team will follow up if needed.
-                    </div>
-                ` : '';
+            // Show step 6 (the actual success/completion step)
+            showStep(6);
 
-                step4Section.innerHTML = `
-                    <div class="form-container">
-                        <div class="success">
-                            <h3>🎉 Registration Complete!</h3>
-                            <p>Thank you for renewing your CSC membership! Your information has been processed and your invoice is ready for payment.</p>
-
-                            <div style="background: #e8f5e8; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #4caf50;">
-                                <h4 style="margin: 0 0 12px 0; color: #2e7d32;">What's Next?</h4>
-                                <p style="margin: 0; color: #2e7d32;">
-                                    • Your QuickBooks invoice is open in another tab<br>
-                                    • Click "Pay Online" to complete your payment<br>
-                                    • You'll receive a receipt via email once payment is processed
-                                </p>
-                            </div>
-
-                            ${errorMessage}
-
-                            <button onclick="window.location.reload()" class="next-btn" style="margin-top: 20px;">
-                                Start New Registration
-                            </button>
-                        </div>
-                    </div>
-                `;
+            // Show appropriate content based on whether there was an error
+            if (hasError) {
+                document.getElementById('errorContent').style.display = 'block';
+                document.getElementById('successContent').style.display = 'none';
+            } else {
+                document.getElementById('successContent').style.display = 'block';
+                document.getElementById('errorContent').style.display = 'none';
             }
+
         }
     </script>
 

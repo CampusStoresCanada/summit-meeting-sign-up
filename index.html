@@ -1177,9 +1177,10 @@
                 const qboResult = await createQuickBooksInvoice();
 
                 // Store invoice URL for Step 4 display
-                if (qboResult && qboResult.invoiceUrl) {
-                    window.qboInvoiceUrl = qboResult.invoiceUrl;
-                    console.log('📄 QuickBooks invoice URL stored:', qboResult.invoiceUrl);
+                if (qboResult && (qboResult.paymentLink || qboResult.invoiceUrl)) {
+                    window.qboInvoiceUrl = qboResult.paymentLink || qboResult.invoiceUrl;
+                    console.log('📄 QuickBooks URL stored:', window.qboInvoiceUrl);
+                    console.log('🔍 Payment link available:', !!qboResult.paymentLink);
                 }
 
                 // Enable next step button

@@ -79,6 +79,15 @@ export default async function handler(req, res) {
       `${baseUrlForUI.replace('api.intuit.com', 'qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
     ];
 
+    console.log('🔗 Fetching invoice payment link from QuickBooks...');
+
+    // Get the invoice payment link using the invoiceLink parameter
+    const invoicePaymentLink = await getInvoicePaymentLink(invoice.Id, {
+      accessToken,
+      companyId,
+      baseUrl
+    });
+
     console.log('📋 Generated possible invoice URLs:', possibleUrls);
 
     res.status(200).json({
@@ -87,12 +96,14 @@ export default async function handler(req, res) {
       qboInvoiceId: invoice.Id,
       qboInvoiceNumber: invoice.DocNumber,
       qboCustomerId: customer.Id,
-      invoiceUrl: possibleUrls[0], // Use first URL as primary
-      alternativeUrls: possibleUrls, // Provide alternatives for debugging
+      invoiceUrl: invoicePaymentLink, // Only use payment link from QuickBooks
+      paymentLink: invoicePaymentLink, // Direct payment link from QuickBooks
+      alternativeUrls: invoicePaymentLink ? [] : possibleUrls, // Only show alternatives if no payment link
       debug: {
         invoiceId: invoice.Id,
         companyId: process.env.QBO_COMPANY_ID,
-        baseUrl: qboBaseUrl
+        baseUrl: qboBaseUrl,
+        hasPaymentLink: !!invoicePaymentLink
       }
     });
 
@@ -547,14 +558,61 @@ async function retryInvoiceCreation(requestBody, newTokens) {
     `${baseUrlForUI.replace('api.intuit.com', 'qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
   ];
 
+  // Get the invoice payment link using the invoiceLink parameter
+  const invoicePaymentLink = await getInvoicePaymentLink(invoice.Id, {
+    accessToken: newTokens.accessToken,
+    companyId: process.env.QBO_COMPANY_ID,
+    baseUrl: baseUrlForUI
+  });
+
   return {
     success: true,
     message: 'Invoice created in QuickBooks Online (after token refresh)',
     qboInvoiceId: invoice.Id,
     qboInvoiceNumber: invoice.DocNumber,
     qboCustomerId: customer.Id,
-    invoiceUrl: possibleUrls[0], // Use first URL as primary
-    alternativeUrls: possibleUrls,
+    invoiceUrl: invoicePaymentLink, // Only use payment link from QuickBooks
+    paymentLink: invoicePaymentLink, // Direct payment link from QuickBooks
+    alternativeUrls: invoicePaymentLink ? [] : possibleUrls, // Only show alternatives if no payment link
     tokenRefreshed: true
   };
+}
+
+// Get invoice payment link from QuickBooks API
+async function getInvoicePaymentLink(invoiceId, qboConfig) {
+  const { accessToken, companyId, baseUrl } = qboConfig;
+
+  try {
+    console.log('🔗 Requesting invoice payment link for ID:', invoiceId);
+
+    // Make request with include=invoiceLink parameter to get payment link
+    const response = await fetch(`${baseUrl}/v3/company/${companyId}/invoice/${invoiceId}?minorversion=65&include=invoiceLink`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      console.error('❌ Failed to get invoice payment link:', response.status, response.statusText);
+      return null;
+    }
+
+    const result = await response.json();
+    const invoice = result.QueryResponse?.Invoice?.[0] || result.Invoice;
+
+    if (invoice?.InvoiceLink) {
+      console.log('✅ Got invoice payment link:', invoice.InvoiceLink);
+      return invoice.InvoiceLink;
+    } else {
+      console.log('⚠️ No payment link found in invoice response');
+      console.log('Response structure:', JSON.stringify(result, null, 2));
+      return null;
+    }
+
+  } catch (error) {
+    console.error('❌ Error fetching invoice payment link:', error);
+    return null;
+  }
 }

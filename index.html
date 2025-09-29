@@ -3220,10 +3220,11 @@
 
         // View QuickBooks invoice in new tab
         function viewQuickBooksInvoice() {
-            if (window.qboInvoiceResult && window.qboInvoiceResult.invoiceUrl) {
-                window.open(window.qboInvoiceResult.invoiceUrl, '_blank');
+            if (window.qboInvoiceResult && window.qboInvoiceResult.paymentLink) {
+                console.log('🔗 Opening QB payment link:', window.qboInvoiceResult.paymentLink);
+                window.open(window.qboInvoiceResult.paymentLink, '_blank');
             } else {
-                alert('Invoice URL not available. Please try creating the invoice again.');
+                alert('Payment link not available from QuickBooks. Please check that the invoice has an email address and credit card payments are enabled.');
             }
         }
 

@@ -600,14 +600,17 @@ async function getInvoicePaymentLink(invoiceId, qboConfig) {
     }
 
     const result = await response.json();
+    console.log('📋 Full QB payment link response:', JSON.stringify(result, null, 2));
+
     const invoice = result.QueryResponse?.Invoice?.[0] || result.Invoice;
+    console.log('📋 Parsed invoice object:', JSON.stringify(invoice, null, 2));
 
     if (invoice?.InvoiceLink) {
       console.log('✅ Got invoice payment link:', invoice.InvoiceLink);
       return invoice.InvoiceLink;
     } else {
-      console.log('⚠️ No payment link found in invoice response');
-      console.log('Response structure:', JSON.stringify(result, null, 2));
+      console.log('⚠️ No InvoiceLink field found in invoice response');
+      console.log('Available invoice fields:', Object.keys(invoice || {}));
       return null;
     }
 

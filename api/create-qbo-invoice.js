@@ -83,9 +83,9 @@ export default async function handler(req, res) {
 
     // Get the invoice payment link using the invoiceLink parameter
     const invoicePaymentLink = await getInvoicePaymentLink(invoice.Id, {
-      accessToken,
-      companyId,
-      baseUrl
+      accessToken: qboAccessToken,
+      companyId: qboCompanyId,
+      baseUrl: qboBaseUrl
     });
 
     console.log('📋 Generated possible invoice URLs:', possibleUrls);

@@ -153,6 +153,8 @@ async function findOrCreateCustomer(organizationData, qboConfig) {
   const { accessToken, companyId, baseUrl } = qboConfig;
 
   console.log('🔍 Looking for customer:', organizationData.name);
+  console.log('📧 Primary contact email:', organizationData.primaryContact?.workEmail);
+  console.log('👥 Organization data:', JSON.stringify(organizationData, null, 2));
 
   // Search for existing customer by name (use DisplayName field)
   const query = `SELECT * FROM Customer WHERE DisplayName='${organizationData.name.replace(/'/g, "\\'")}' MAXRESULTS 1`;
@@ -225,6 +227,8 @@ function checkCustomerNeedsUpdate(existingCustomer, organizationData) {
 // Update existing customer
 async function updateCustomer(existingCustomer, organizationData, qboConfig) {
   const { accessToken, companyId, baseUrl } = qboConfig;
+
+  console.log('📧 Updating customer email from', existingCustomer.PrimaryEmailAddr?.Address, 'to', organizationData.primaryContact?.workEmail);
 
   const updateData = {
     ...existingCustomer,

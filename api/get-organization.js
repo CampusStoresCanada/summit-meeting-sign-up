@@ -61,13 +61,10 @@ export default async function handler(req, res) {
 
     const org = data.results[0];
 
-    // Check if organization already has "25/26 Partner" tag
+    // Check if organization already has "25/26 Member" tag
     let hasPartnerTag = false;
     if (tagSystemDbId && org.properties['Tag']?.relation) {
       try {
-        console.log('🔍 Starting tag check for organization:', org.properties.Organization?.title?.[0]?.text?.content);
-        console.log('🏷️ Organization has', org.properties['Tag'].relation.length, 'tag relations');
-        console.log('🏷️ Organization tag IDs:', org.properties['Tag'].relation.map(tag => tag.id));
 
         // Get the "25/26 Member" tag ID
         const partnerTagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
@@ -87,43 +84,23 @@ export default async function handler(req, res) {
 
         if (partnerTagResponse.ok) {
           const partnerTagData = await partnerTagResponse.json();
-          console.log('🔍 Partner tag search returned', partnerTagData.results.length, 'results');
 
           if (partnerTagData.results.length > 0) {
             const partnerTagId = partnerTagData.results[0].id;
-            console.log('✅ Found 25/26 Member tag ID:', partnerTagId);
 
             // Check if organization has this tag
             const orgTagIds = org.properties['Tag'].relation.map(tag => tag.id);
             hasPartnerTag = orgTagIds.includes(partnerTagId);
 
-            console.log('🔍 Checking if org has partner tag:', {
-              partnerTagId: partnerTagId,
-              orgTagIds: orgTagIds,
-              hasPartnerTag: hasPartnerTag
-            });
 
             if (hasPartnerTag) {
-              console.log(`🛑 Organization already has 25/26 Member tag: ${org.properties.Organization?.title?.[0]?.text?.content}`);
-            } else {
-              console.log(`✅ Organization does NOT have 25/26 Member tag: ${org.properties.Organization?.title?.[0]?.text?.content}`);
+              console.log(`🛑 Organization already renewed: ${org.properties.Organization?.title?.[0]?.text?.content}`);
             }
-          } else {
-            console.log('❌ No "25/26 Member" tag found in Tag System database');
           }
-        } else {
-          console.log('❌ Partner tag search failed:', partnerTagResponse.status);
         }
       } catch (tagError) {
-        console.error('⚠️ Error checking partner tag:', tagError);
+        console.error('⚠️ Error checking member tag:', tagError);
         // Continue without tag check if there's an error
-      }
-    } else {
-      if (!tagSystemDbId) {
-        console.log('⚠️ No Tag System DB ID configured');
-      }
-      if (!org.properties['Tag']?.relation) {
-        console.log('⚠️ Organization has no Tag relations');
       }
     }
 

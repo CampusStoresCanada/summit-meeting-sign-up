@@ -1152,22 +1152,18 @@
             let lineItems = '';
 
             if (billingDisplay === 'single-item') {
-                // Single line with everything combined
+                // Single line with everything combined (no qty/price columns)
                 lineItems = `
                     <tr>
                         <td class="desc-col">2025-2026 CSC Membership</td>
-                        <td class="qty-col">1</td>
-                        <td class="price-col">C$${totalWithHST.toFixed(2)}</td>
                         <td class="amount-col">C$${totalWithHST.toFixed(2)}</td>
                     </tr>
                 `;
             } else if (billingDisplay === 'membership-conference') {
-                // Two lines: Membership and Conference (no quantities shown)
+                // Two lines: Membership and Conference (no qty/price columns)
                 lineItems = `
                     <tr>
                         <td class="desc-col">Membership</td>
-                        <td class="qty-col">-</td>
-                        <td class="price-col">-</td>
                         <td class="amount-col">C$${membershipFee.toFixed(2)}</td>
                     </tr>
                 `;
@@ -1177,8 +1173,6 @@
                     lineItems += `
                     <tr>
                         <td class="desc-col">Conference Registration</td>
-                        <td class="qty-col">-</td>
-                        <td class="price-col">-</td>
                         <td class="amount-col">C$${conferenceTotal.toFixed(2)}</td>
                     </tr>
                     `;
@@ -1188,14 +1182,12 @@
                     lineItems += `
                     <tr>
                         <td class="desc-col">HST (13%)</td>
-                        <td class="qty-col">-</td>
-                        <td class="price-col">-</td>
                         <td class="amount-col">C$${conferenceHST.toFixed(2)}</td>
                     </tr>
                     `;
                 }
             } else {
-                // Individual line items with quantities
+                // Individual line items with quantities (show all columns)
                 lineItems = `
                     <tr>
                         <td class="desc-col">Membership</td>
@@ -1262,8 +1254,8 @@
                         <thead>
                             <tr>
                                 <th class="desc-col">Description</th>
-                                <th class="qty-col">Qty</th>
-                                <th class="price-col">Price</th>
+                                ${billingDisplay === 'individual-line-items' ? '<th class="qty-col">Qty</th>' : ''}
+                                ${billingDisplay === 'individual-line-items' ? '<th class="price-col">Price</th>' : ''}
                                 <th class="amount-col">Amount</th>
                             </tr>
                         </thead>

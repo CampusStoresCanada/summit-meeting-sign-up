@@ -1998,7 +1998,7 @@ body::before {
     background: #ffffff;
     margin-top: 1vw;
     margin-left: -18px;
-    max-height: 20vw;
+    max-height: 32vw;
     width: 38vw;
     overflow-y: auto;
     overflow-x: hidden;

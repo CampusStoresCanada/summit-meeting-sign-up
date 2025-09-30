@@ -186,9 +186,10 @@ async function findOrCreateCustomer(organizationData, qboConfig) {
 
     // Check if customer data needs updating
     const needsUpdate = checkCustomerNeedsUpdate(existingCustomer, organizationData);
+    const hasEmailFromForm = organizationData.primaryContact?.workEmail;
 
-    if (needsUpdate) {
-      console.log('✏️ Updating customer information...');
+    if (needsUpdate || hasEmailFromForm) {
+      console.log('✏️ Updating customer information...', { needsUpdate, hasEmailFromForm });
       return await updateCustomer(existingCustomer, organizationData, qboConfig);
     }
 

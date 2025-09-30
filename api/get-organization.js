@@ -69,7 +69,7 @@ export default async function handler(req, res) {
         console.log('🏷️ Organization has', org.properties['Tag'].relation.length, 'tag relations');
         console.log('🏷️ Organization tag IDs:', org.properties['Tag'].relation.map(tag => tag.id));
 
-        // Get the "25/26 Partner" tag ID
+        // Get the "25/26 Member" tag ID
         const partnerTagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
           method: 'POST',
           headers: {
@@ -80,7 +80,7 @@ export default async function handler(req, res) {
           body: JSON.stringify({
             filter: {
               property: 'Name',
-              title: { equals: '25/26 Partner' }
+              title: { equals: '25/26 Member' }
             }
           })
         });
@@ -91,7 +91,7 @@ export default async function handler(req, res) {
 
           if (partnerTagData.results.length > 0) {
             const partnerTagId = partnerTagData.results[0].id;
-            console.log('✅ Found 25/26 Partner tag ID:', partnerTagId);
+            console.log('✅ Found 25/26 Member tag ID:', partnerTagId);
 
             // Check if organization has this tag
             const orgTagIds = org.properties['Tag'].relation.map(tag => tag.id);
@@ -104,12 +104,12 @@ export default async function handler(req, res) {
             });
 
             if (hasPartnerTag) {
-              console.log(`🛑 Organization already has 25/26 Partner tag: ${org.properties.Organization?.title?.[0]?.text?.content}`);
+              console.log(`🛑 Organization already has 25/26 Member tag: ${org.properties.Organization?.title?.[0]?.text?.content}`);
             } else {
-              console.log(`✅ Organization does NOT have 25/26 Partner tag: ${org.properties.Organization?.title?.[0]?.text?.content}`);
+              console.log(`✅ Organization does NOT have 25/26 Member tag: ${org.properties.Organization?.title?.[0]?.text?.content}`);
             }
           } else {
-            console.log('❌ No "25/26 Partner" tag found in Tag System database');
+            console.log('❌ No "25/26 Member" tag found in Tag System database');
           }
         } else {
           console.log('❌ Partner tag search failed:', partnerTagResponse.status);

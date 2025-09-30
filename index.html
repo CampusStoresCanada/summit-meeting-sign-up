@@ -1177,22 +1177,9 @@
                 const qboResult = await createQuickBooksInvoice();
 
                 // Store invoice URL for Step 4 display
-                console.log('🔍 Full QB Result:', qboResult);
-                console.log('🔍 Payment Link:', qboResult?.paymentLink);
-                console.log('🔍 Invoice URL:', qboResult?.invoiceUrl);
-
                 if (qboResult && (qboResult.paymentLink || qboResult.invoiceUrl)) {
                     window.qboInvoiceUrl = qboResult.paymentLink || qboResult.invoiceUrl;
-                    console.log('📄 QuickBooks URL stored:', window.qboInvoiceUrl);
-                    console.log('🔍 Payment link available:', !!qboResult.paymentLink);
-                } else {
-                    console.log('❌ No URL found in QB result:', {
-                        hasResult: !!qboResult,
-                        hasPaymentLink: !!(qboResult?.paymentLink),
-                        hasInvoiceUrl: !!(qboResult?.invoiceUrl),
-                        paymentLinkValue: qboResult?.paymentLink,
-                        invoiceUrlValue: qboResult?.invoiceUrl
-                    });
+                    console.log('📄 QuickBooks invoice ready');
                 }
 
                 // Enable next step button
@@ -1207,26 +1194,10 @@
 
                 // Open QuickBooks invoice in new tab immediately
                 if (window.qboInvoiceUrl) {
-                    console.log('🔗 Opening QuickBooks invoice in new tab:', window.qboInvoiceUrl);
-
-                    // Also log debug info if available
-                    if (qboResult && qboResult.debug) {
-                        console.log('🔍 QB Invoice Debug Info:', qboResult.debug);
-                    }
-                    if (qboResult && qboResult.alternativeUrls) {
-                        console.log('🔗 Alternative QB URLs:', qboResult.alternativeUrls);
-                    }
-
+                    console.log('🔗 Opening QuickBooks invoice in new tab');
                     window.open(window.qboInvoiceUrl, '_blank');
                 } else {
                     console.error('❌ No QuickBooks invoice URL available');
-
-                    // Try to open SOMETHING if we have any URL-like value (for testing)
-                    if (qboResult && (qboResult.paymentLink || qboResult.invoiceUrl)) {
-                        const testUrl = qboResult.paymentLink || qboResult.invoiceUrl;
-                        console.log('🧪 Attempting to open test URL anyway:', testUrl);
-                        window.open(testUrl, '_blank');
-                    }
                 }
 
                 // Show "processing" message while Notion sync continues in background

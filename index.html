@@ -117,8 +117,8 @@
 
         <!-- Success State -->
         <div id="successState" class="success">
-            <h3>✅ Profile Updated Successfully!</h3>
-            <p>Thank you for completing your booth profile. Your information is now under review and will appear on the conference map once approved.</p>
+            <h3>✅ Membership Renewal Complete!</h3>
+            <p>Thank you for renewing your CSC membership. Your payment has been processed and your membership is now active for the 2025-2026 year.</p>
         </div>
 
         <!-- All Content - Hidden until loaded -->
@@ -484,16 +484,20 @@
                         <div id="successContent" style="display: none;">
                             <h1 class="welcome-title">
                                 <span>🎉</span>
-                                Success!
+                                Membership Renewal Complete!
                             </h1>
                             <p class="welcome-text">
-                                Things are in process. There is a human review process underway.
-                                In general we'll try to get this done in a couple of minutes.
+                                Your CSC membership has been successfully renewed for the 2025-2026 year.
+                                Your payment has been processed and you're all set!
                             </p>
                             <p class="welcome-text">
-                                If you haven't seen an update go live and it has been a couple hours,
-                                and is between 8:30 AM and 4:30 PM Mountain Time on a
+                                You'll receive email confirmations for both your payment and membership renewal.
+                                If you have any questions between 8:30 AM and 4:30 PM Mountain Time on a
                                 weekday, you can reach out to <a href="mailto:google@campusstores.ca" style="color: #0071bc;">Steve Thomas</a>.
+                            </p>
+                            <p class="welcome-text">
+                                <strong>What's next?</strong> Your membership benefits are now active, including access to
+                                the conference (if selected) and all CSC member resources.
                             </p>
                             <p class="welcome-text">
                                 Thanks once again for choosing to support Campus Stores Canada,
@@ -5204,6 +5208,14 @@
 
             // Show step 6 (the actual success/completion step)
             showStep(6);
+
+            // Mark all previous steps as completed
+            document.querySelectorAll('.step-item').forEach((item, index) => {
+                item.classList.remove('active');
+                if (index < 5) { // Mark steps 1-4 and 5 as completed (steps 0-4 in 0-based index)
+                    item.classList.add('completed');
+                }
+            });
 
             // Show appropriate content based on whether there was an error
             if (hasError) {

@@ -905,9 +905,11 @@
                 `;
 
                 // Add individual conference registrations for each attending contact
-                const attendingContacts = organizationContacts.filter(contact =>
-                    teamState.attendingContacts.has(contact.id)
-                );
+                // Include both existing and new contacts
+                const attendingContacts = [
+                    ...organizationContacts.filter(contact => teamState.attendingContacts.has(contact.id)),
+                    ...(teamState.newContacts || []).filter(contact => teamState.attendingContacts.has(contact.id))
+                ];
 
                 attendingContacts.forEach(contact => {
                     preview += `
@@ -3163,17 +3165,26 @@
             let freeAttendees = 0;
 
             attendingContactIds.forEach(contactId => {
-                const contact = organizationContacts.find(c => c.id === contactId);
+                // Check both existing contacts and new contacts
+                let contact = organizationContacts.find(c => c.id === contactId);
+
+                // If not found in existing contacts, check new contacts
+                if (!contact && teamState.newContacts) {
+                    contact = teamState.newContacts.find(c => c.id === contactId);
+                }
+
                 if (contact) {
                     if (contact.isBoardOfDirectors) {
                         freeAttendees++;
                         console.log(`🏛️ Board member ${contact.name} gets free conference attendance`);
                     } else {
                         paidAttendees++;
+                        console.log(`💰 ${contact.name} will be charged for conference`);
                     }
                 } else {
-                    // Contact not found, assume paid
+                    // Contact not found in either list, assume paid
                     paidAttendees++;
+                    console.log(`⚠️ Contact ${contactId} not found, assuming paid attendee`);
                 }
             });
 

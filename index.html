@@ -18,6 +18,60 @@
     
     <!-- YOUR CUSTOM STYLESHEET -->
     <link rel="stylesheet" href="vendor-wizard.css">
+
+    <!-- Conference Attendance Breakdown Styles -->
+    <style>
+        .conference-attendance-breakdown {
+            margin-top: 1.5em;
+            padding: 1em;
+            background: #f8f9fa;
+            border-radius: 0.5em;
+            border-left: 4px solid #007bff;
+        }
+
+        .breakdown-header {
+            font-weight: bold;
+            margin-bottom: 0.8em;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .breakdown-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5em;
+            padding: 0.3em 0;
+        }
+
+        .breakdown-item.free {
+            opacity: 0.8;
+        }
+
+        .breakdown-item.paid {
+            font-weight: 500;
+        }
+
+        .attendee-icon {
+            margin-right: 0.5em;
+            font-size: 1.1em;
+        }
+
+        .attendee-name {
+            font-weight: 500;
+            margin-right: 0.8em;
+            min-width: 120px;
+        }
+
+        .attendee-reason {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .breakdown-item.paid .attendee-reason {
+            color: #28a745;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
     <div class="wizard-container">
@@ -855,7 +909,7 @@
             // Calculate amounts with Board of Directors discounts
             const membershipFee = membershipPricing[institutionSize] || 0;
             const conferenceCosts = calculateConferenceCosts();
-            const { totalAttendees, paidAttendees, freeAttendees, conferenceTotal, conferenceHST } = conferenceCosts;
+            const { totalAttendees, paidAttendees, freeAttendees, conferenceTotal, conferenceHST, attendeeBreakdown } = conferenceCosts;
             const subtotal = membershipFee + conferenceTotal;
             const totalWithHST = membershipFee + conferenceTotal + conferenceHST;
 
@@ -904,21 +958,17 @@
                     </div>
                 `;
 
-                // Add individual conference registrations for each attending contact
-                // Include both existing and new contacts
-                const attendingContacts = [
-                    ...organizationContacts.filter(contact => teamState.attendingContacts.has(contact.id)),
-                    ...(teamState.newContacts || []).filter(contact => teamState.attendingContacts.has(contact.id))
-                ];
+                // Add individual conference registrations for each PAID attending contact only
+                const paidAttendingContacts = attendeeBreakdown.filter(attendee => attendee.category === 'paid');
 
-                attendingContacts.forEach(contact => {
+                paidAttendingContacts.forEach(attendee => {
                     preview += `
                         <div class="invoice-line-item">
                             <span class="item-description">Conference Registration</span>
                             <span class="item-amount">$${conferencePerPerson.toFixed(2)}</span>
                         </div>
                         <div class="invoice-line-subitem">
-                            ${contact.name}
+                            ${attendee.name}
                         </div>
                     `;
                 });
@@ -940,8 +990,54 @@
                 preview += '<div class="preview-placeholder">Select billing format to see preview</div>';
             }
 
+            // Add conference attendance breakdown if there are attendees
+            if (totalAttendees > 0) {
+                preview += generateAttendeeBreakdown(attendeeBreakdown);
+            }
+
             preview += '</div>';
             return preview;
+        }
+
+        function generateAttendeeBreakdown(attendeeBreakdown) {
+            if (!attendeeBreakdown || attendeeBreakdown.length === 0) {
+                return '';
+            }
+
+            let breakdown = `
+                <div class="conference-attendance-breakdown">
+                    <div class="breakdown-header">Conference Attendance Summary:</div>
+            `;
+
+            // Group attendees by category for better display
+            const freeAttendees = attendeeBreakdown.filter(a => a.category === 'free');
+            const paidAttendees = attendeeBreakdown.filter(a => a.category === 'paid');
+
+            // Show free attendees first
+            freeAttendees.forEach(attendee => {
+                const icon = attendee.reason.includes('Board of Directors') ? '👑' : '✅';
+                breakdown += `
+                    <div class="breakdown-item free">
+                        <span class="attendee-icon">${icon}</span>
+                        <span class="attendee-name">${attendee.name}</span>
+                        <span class="attendee-reason">${attendee.reason}</span>
+                    </div>
+                `;
+            });
+
+            // Show paid attendees
+            paidAttendees.forEach(attendee => {
+                breakdown += `
+                    <div class="breakdown-item paid">
+                        <span class="attendee-icon">💰</span>
+                        <span class="attendee-name">${attendee.name}</span>
+                        <span class="attendee-reason">${attendee.reason} ($${attendee.cost.toFixed(2)})</span>
+                    </div>
+                `;
+            });
+
+            breakdown += `</div>`;
+            return breakdown;
         }
 
         function openInvoiceModal() {
@@ -1436,7 +1532,7 @@
 
             const membershipFee = membershipPricing[formState.institutionSize] || 0;
             const conferenceCosts = calculateConferenceCosts();
-            const { totalAttendees, paidAttendees, freeAttendees, conferenceTotal, conferenceHST } = conferenceCosts;
+            const { totalAttendees, paidAttendees, freeAttendees, conferenceTotal, conferenceHST, attendeeBreakdown } = conferenceCosts;
             const total = membershipFee + conferenceTotal + conferenceHST;
 
             return {
@@ -1447,7 +1543,8 @@
                 paidAttendees,
                 freeAttendees,
                 total,
-                institutionSize: formState.institutionSize
+                institutionSize: formState.institutionSize,
+                attendeeBreakdown: attendeeBreakdown
             };
         }
 
@@ -3130,7 +3227,7 @@
             }
         }
 
-        // Calculate conference costs with Board of Directors discounts
+        // Calculate conference costs with detailed attendee categorization
         function calculateConferenceCosts() {
             // Safety checks for uninitialized variables
             if (!teamState || !teamState.attendingContacts) {
@@ -3140,7 +3237,8 @@
                     freeAttendees: 0,
                     totalAttendees: 0,
                     conferenceTotal: 0,
-                    conferenceHST: 0
+                    conferenceHST: 0,
+                    attendeeBreakdown: []
                 };
             }
 
@@ -3156,34 +3254,70 @@
                     freeAttendees: 0,
                     totalAttendees: totalAttendees,
                     conferenceTotal,
-                    conferenceHST
+                    conferenceHST,
+                    attendeeBreakdown: []
                 };
             }
 
             const attendingContactIds = Array.from(teamState.attendingContacts || []);
             let paidAttendees = 0;
             let freeAttendees = 0;
+            const attendeeBreakdown = [];
 
             attendingContactIds.forEach(contactId => {
                 // Check both existing contacts and new contacts
                 let contact = organizationContacts.find(c => c.id === contactId);
+                let isNewContact = false;
 
                 // If not found in existing contacts, check new contacts
                 if (!contact && teamState.newContacts) {
                     contact = teamState.newContacts.find(c => c.id === contactId);
+                    isNewContact = true;
                 }
 
                 if (contact) {
+                    let category, reason, cost;
+
+                    // Categorize the attendee
                     if (contact.isBoardOfDirectors) {
+                        category = 'free';
+                        reason = 'Board of Directors - Complimentary';
+                        cost = 0;
                         freeAttendees++;
                         console.log(`🏛️ Board member ${contact.name} gets free conference attendance`);
+                    } else if (contact.isConferenceDelegate && !isNewContact) {
+                        category = 'free';
+                        reason = 'Previously Registered';
+                        cost = 0;
+                        freeAttendees++;
+                        console.log(`🎫 ${contact.name} already registered for conference`);
                     } else {
+                        category = 'paid';
+                        reason = isNewContact ? 'Adding to Conference' : 'Adding to Conference';
+                        cost = 325;
                         paidAttendees++;
                         console.log(`💰 ${contact.name} will be charged for conference`);
                     }
+
+                    attendeeBreakdown.push({
+                        id: contactId,
+                        name: contact.name,
+                        category: category,
+                        reason: reason,
+                        cost: cost,
+                        isNewContact: isNewContact
+                    });
                 } else {
                     // Contact not found in either list, assume paid
                     paidAttendees++;
+                    attendeeBreakdown.push({
+                        id: contactId,
+                        name: 'Unknown Contact',
+                        category: 'paid',
+                        reason: 'Adding to Conference',
+                        cost: 325,
+                        isNewContact: false
+                    });
                     console.log(`⚠️ Contact ${contactId} not found, assuming paid attendee`);
                 }
             });
@@ -3192,14 +3326,16 @@
             const conferenceTotal = paidAttendees * conferencePerPerson;
             const conferenceHST = conferenceTotal * 0.13;
 
-            console.log(`🎪 Conference costs: ${paidAttendees} paid attendees, ${freeAttendees} free (board members)`);
+            console.log(`🎪 Conference costs: ${paidAttendees} paid, ${freeAttendees} free`);
+            console.log('📋 Attendee breakdown:', attendeeBreakdown);
 
             return {
                 paidAttendees,
                 freeAttendees,
                 totalAttendees: paidAttendees + freeAttendees,
                 conferenceTotal,
-                conferenceHST
+                conferenceHST,
+                attendeeBreakdown
             };
         }
 

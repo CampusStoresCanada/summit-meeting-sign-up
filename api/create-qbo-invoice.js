@@ -647,20 +647,16 @@ async function sendInvoiceEmail(invoiceId, emailAddress, qboConfig) {
     console.log('📧 Sending invoice email to:', emailAddress);
 
     // QuickBooks API endpoint for sending invoice via email
-    const sendUrl = `${baseUrl}/v3/company/${companyId}/invoice/${invoiceId}/send`;
-
-    const emailPayload = {
-      EmailAddress: emailAddress
-    };
+    const sendUrl = `${baseUrl}/v3/company/${companyId}/invoice/${invoiceId}/send?sendTo=${encodeURIComponent(emailAddress)}`;
 
     const response = await fetch(sendUrl, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/octet-stream'
       },
-      body: JSON.stringify(emailPayload)
+      body: null // Empty body required for QB send operation
     });
 
     if (!response.ok) {

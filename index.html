@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSC Membership Renewal - Campus Stores Canada</title>
+    <link rel="icon" type="image/png" href="https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1600096854522-HS7NUI12I1ML6SPJFLLY/Artboard+1.png?format=1500w">
     
     <!-- External Fonts -->
     <link rel="stylesheet" href="https://use.typekit.net/ilr6ctr.css">
@@ -474,7 +475,7 @@
         // ===========================================
         let currentStep = 0;
         const totalSteps = 6;
-        let vendorData = {};
+        let organizationData = {};
         let organizationContacts = [];
         let conferenceTeam = [];
         let categoryDropdownOpen = false;
@@ -1848,9 +1849,9 @@
             defaultOption.textContent = 'Select province';
             provinceFieldInput.appendChild(defaultOption);
 
-            // Add province options from vendorData
-            if (window.vendorData && window.vendorData.provinceOptions) {
-                window.vendorData.provinceOptions.forEach(option => {
+            // Add province options from organizationData
+            if (window.organizationData && window.organizationData.provinceOptions) {
+                window.organizationData.provinceOptions.forEach(option => {
                     const optionElement = document.createElement('option');
                     optionElement.value = option.value;
                     optionElement.textContent = option.label;
@@ -2213,12 +2214,12 @@
             }
 
             try {
-                console.log('🪄 Loading vendor data for token:', token);
-                await loadVendorData(token);
+                console.log('🪄 Loading organization data for token:', token);
+                await loadOrganizationData(token);
                 initializeDropdown();
                 showWelcomeScreen();
             } catch (error) {
-                console.error('Error loading vendor data:', error);
+                console.error('Error loading organization data:', error);
                 showErrorState('Unable to load your profile information. Please try again later.');
             }
         });
@@ -3360,25 +3361,25 @@
         // ===========================================
         // DATA LOADING
         // ===========================================
-        async function loadVendorData(token) {
+        async function loadOrganizationData(token) {
             showLoadingState();
-            
+
             try {
-                console.log('📡 Fetching vendor profile...');
-                const response = await fetch(`${API_BASE}/vendor-profile?token=${token}`);
-                
+                console.log('📡 Fetching organization data...');
+                const response = await fetch(`${API_BASE}/get-organization?token=${token}`);
+
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                
-                vendorData = await response.json();
-                console.log('✅ Vendor data loaded:', vendorData);
-                
-                populateForm(vendorData);
+
+                organizationData = await response.json();
+                console.log('✅ Organization data loaded:', organizationData);
+
+                populateForm(organizationData);
                 await loadOrganizationContacts(token);
-                
+
             } catch (error) {
-                console.error('💥 Failed to load vendor data:', error);
+                console.error('💥 Failed to load organization data:', error);
                 throw error;
             }
         }
@@ -3501,7 +3502,7 @@
             console.log('💾 Initial form state stored for change detection');
 
             // Store vendor data globally for address modal access
-            window.vendorData = {
+            window.organizationData = {
                 organization: data.organization,
                 institutionSizeOptions: data.institutionSizeOptions,
                 provinceOptions: data.provinceOptions
@@ -3509,7 +3510,6 @@
 
             // Populate dropdowns and set current values
             populateInstitutionSizeDropdown(data.institutionSizeOptions, formState.institutionSize);
-            populateProvinceDropdown(data.provinceOptions, formState.province);
 
             window.formData = {
                 organization: data.organization
@@ -3558,46 +3558,6 @@
             }
         }
 
-        function populateProvinceDropdown(options, currentValue) {
-            console.log('🍁 Populating province dropdown:', { options, currentValue });
-
-            const optionsContainer = document.getElementById('provinceOptions');
-            const displayText = document.getElementById('provinceText');
-
-            if (!optionsContainer || !options) {
-                console.log('❌ Missing province elements:', { optionsContainer, options });
-                return;
-            }
-
-            // Clear existing options
-            optionsContainer.innerHTML = '';
-
-            // Populate options
-            options.forEach(option => {
-                const optionElement = document.createElement('div');
-                optionElement.className = 'dropdown-option';
-                optionElement.setAttribute('data-value', option.value);
-                optionElement.textContent = option.label;
-                optionsContainer.appendChild(optionElement);
-            });
-
-            // Set current value if exists
-            if (currentValue) {
-                console.log('🔍 Looking for current province:', currentValue);
-                const currentOption = options.find(option => option.value === currentValue);
-                console.log('📍 Found current province option:', currentOption);
-
-                if (currentOption) {
-                    displayText.textContent = currentOption.label;
-                    formState.province = currentValue;
-                    console.log('✅ Set province display to:', currentOption.label);
-                } else {
-                    console.log('❌ Current province value not found in options');
-                }
-            } else {
-                console.log('ℹ️ No current province value to set');
-            }
-        }
 
         function updateAddressDisplay() {
             const addressLine1 = document.getElementById('addressLine1');
@@ -4825,27 +4785,36 @@
                
                console.log('✅ Conference team processed');
                
-               // Submit vendor data
-               console.log('📝 Submitting vendor data for review...');
-               
-               const vendorData = {
-                   token: token,
-                   formState: formState,
-                   catalogueState: catalogueState
+               // Update organization data directly (no quarantine needed for membership renewal)
+               console.log('📝 Updating organization data...');
+
+               const organizationUpdates = {
+                   institutionName: formState.companyName,
+                   website: formState.website,
+                   institutionSize: formState.institutionSize,
+                   address: {
+                       streetAddress: formState.streetAddress,
+                       city: formState.city,
+                       province: formState.province,
+                       postalCode: formState.postalCode
+                   }
                };
-               
-               const vendorResponse = await fetch(`${API_BASE}/submit-vendor-profile`, {
+
+               const orgResponse = await fetch(`${API_BASE}/update-organization`, {
                    method: 'POST',
                    headers: { 'Content-Type': 'application/json' },
-                   body: JSON.stringify(vendorData)
+                   body: JSON.stringify({
+                       token: token,
+                       organizationUpdates: organizationUpdates
+                   })
                });
-               
-               if (!vendorResponse.ok) {
-                   const vendorError = await vendorResponse.json();
-                   throw new Error(`Vendor submission failed: ${vendorError.details || vendorError.error}`);
+
+               if (!orgResponse.ok) {
+                   const orgError = await orgResponse.json();
+                   throw new Error(`Organization update failed: ${orgError.details || orgError.error}`);
                }
-               
-               console.log('✅ Vendor data submitted');
+
+               console.log('✅ Organization data updated directly');
                
            } catch (error) {
                console.error('💥 API Error:', error);

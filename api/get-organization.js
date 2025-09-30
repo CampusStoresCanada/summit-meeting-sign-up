@@ -23,6 +23,7 @@ export default async function handler(req, res) {
 
   const notionToken = process.env.NOTION_TOKEN;
   const organizationsDbId = process.env.NOTION_ORGANIZATIONS_DB_ID;
+  const tagSystemDbId = process.env.NOTION_TAG_SYSTEM_DB_ID;
 
   if (!notionToken || !organizationsDbId) {
     console.error('❌ Missing environment variables!');
@@ -59,6 +60,47 @@ export default async function handler(req, res) {
     }
 
     const org = data.results[0];
+
+    // Check if organization already has "25/26 Partner" tag
+    let hasPartnerTag = false;
+    if (tagSystemDbId && org.properties['Tag']?.relation) {
+      try {
+        // Get the "25/26 Partner" tag ID
+        const partnerTagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${notionToken}`,
+            'Content-Type': 'application/json',
+            'Notion-Version': '2022-06-28'
+          },
+          body: JSON.stringify({
+            filter: {
+              property: 'Name',
+              title: { equals: '25/26 Partner' }
+            }
+          })
+        });
+
+        if (partnerTagResponse.ok) {
+          const partnerTagData = await partnerTagResponse.json();
+          if (partnerTagData.results.length > 0) {
+            const partnerTagId = partnerTagData.results[0].id;
+            console.log('✅ Found 25/26 Partner tag ID:', partnerTagId);
+
+            // Check if organization has this tag
+            const orgTagIds = org.properties['Tag'].relation.map(tag => tag.id);
+            hasPartnerTag = orgTagIds.includes(partnerTagId);
+
+            if (hasPartnerTag) {
+              console.log(`🛑 Organization already has 25/26 Partner tag: ${org.properties.Organization?.title?.[0]?.text?.content}`);
+            }
+          }
+        }
+      } catch (tagError) {
+        console.error('⚠️ Error checking partner tag:', tagError);
+        // Continue without tag check if there's an error
+      }
+    }
 
     // Extract organization data (no booth number needed for membership renewal)
     const institutionSize = org.properties['Institution Size']?.select?.name || '';
@@ -113,7 +155,8 @@ export default async function handler(req, res) {
         }
       },
       institutionSizeOptions: institutionSizeOptions,
-      provinceOptions: provinceOptions
+      provinceOptions: provinceOptions,
+      hasPartnerTag: hasPartnerTag
     };
 
     res.status(200).json(organizationData);

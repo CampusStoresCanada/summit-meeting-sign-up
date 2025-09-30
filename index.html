@@ -84,6 +84,95 @@
             height: 60px;
             object-fit: contain;
         }
+
+        .already-renewed-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .already-renewed-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5em;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .already-renewed-icon {
+            font-size: 4em;
+            margin-bottom: 0.5em;
+        }
+
+        .already-renewed-content h2 {
+            color: #2c3e50;
+            margin-bottom: 1em;
+            font-family: 'davis-sans', sans-serif;
+        }
+
+        .already-renewed-content p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5em;
+        }
+
+        .already-renewed-content a {
+            color: #0071bc;
+            text-decoration: none;
+        }
+
+        .already-renewed-content a:hover {
+            text-decoration: underline;
+        }
+
+        .already-renewed-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+            margin-top: 2em;
+        }
+
+        .option-btn {
+            padding: 1em 1.5em;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .option-btn.primary {
+            background: #0071bc;
+            color: white;
+        }
+
+        .option-btn.primary:hover {
+            background: #005a94;
+            text-decoration: none;
+        }
+
+        .option-btn.secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .option-btn small {
+            display: block;
+            font-size: 0.8em;
+            margin-top: 0.25em;
+        }
     </style>
 </head>
 <body>
@@ -119,6 +208,27 @@
         <div id="successState" class="success">
             <h3>✅ Membership Renewal Complete!</h3>
             <p>Thank you for renewing your CSC membership. Your payment has been processed and your membership is now active for the 2025-2026 year.</p>
+        </div>
+
+        <!-- Already Renewed Overlay -->
+        <div id="alreadyRenewedOverlay" class="already-renewed-overlay" style="display: none;">
+            <div class="already-renewed-content">
+                <div class="already-renewed-icon">🔒</div>
+                <h2>Membership Already Current</h2>
+                <p>Hey, we see you but we think that you've already completed this process and the payment has been applied to your account. Thanks for doing that.</p>
+
+                <p>If this is an error on our part, get in contact with <a href="mailto:google@campusstores.ca">Steve Thomas</a>.</p>
+
+                <div class="already-renewed-options">
+                    <a href="https://campusstores.events/conference-26/delegate-registration" target="_blank" class="option-btn primary">
+                        🎪 Conference Registration
+                    </a>
+                    <button class="option-btn secondary" disabled>
+                        ✏️ Edit Organization Details<br>
+                        <small>Coming Soon</small>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- All Content - Hidden until loaded -->
@@ -3576,12 +3686,38 @@
                 organizationData = await response.json();
                 console.log('✅ Organization data loaded:', organizationData);
 
+                // Check if organization already has 25/26 Partner tag
+                if (organizationData.hasPartnerTag) {
+                    console.log('🛑 Organization already renewed - showing overlay');
+                    showAlreadyRenewedOverlay(organizationData.organization.name);
+                    return; // Stop the normal flow
+                }
+
                 populateForm(organizationData);
                 await loadOrganizationContacts(token);
 
             } catch (error) {
                 console.error('💥 Failed to load organization data:', error);
                 throw error;
+            }
+        }
+
+        function showAlreadyRenewedOverlay(organizationName) {
+            // Update the organization name in the overlay
+            const overlay = document.getElementById('alreadyRenewedOverlay');
+            if (overlay) {
+                // Update the organization name in the edit button
+                const editButton = overlay.querySelector('.option-btn.secondary');
+                if (editButton) {
+                    editButton.innerHTML = `✏️ Edit ${organizationName} Details<br><small>Coming Soon</small>`;
+                }
+
+                // Hide loading state and wizard content
+                hideLoadingState();
+                document.getElementById('wizardContent').style.display = 'none';
+
+                // Show the overlay
+                overlay.style.display = 'flex';
             }
         }
 

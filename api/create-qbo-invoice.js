@@ -79,6 +79,15 @@ export default async function handler(req, res) {
       `${baseUrlForUI.replace('api.intuit.com', 'qbo.intuit.com')}/app/invoice?txnId=${invoice.Id}`,
     ];
 
+    console.log('📧 Sending invoice via email to generate payment link...');
+
+    // Send the invoice via email to generate the payment link
+    const emailResult = await sendInvoiceEmail(invoice.Id, organizationData.primaryContact?.workEmail, {
+      accessToken: qboAccessToken,
+      companyId: qboCompanyId,
+      baseUrl: qboBaseUrl
+    });
+
     console.log('🔗 Fetching invoice payment link from QuickBooks...');
 
     // Get the invoice payment link using the invoiceLink parameter
@@ -622,5 +631,51 @@ async function getInvoicePaymentLink(invoiceId, qboConfig) {
   } catch (error) {
     console.error('❌ Error fetching invoice payment link:', error);
     return null;
+  }
+}
+
+// Send invoice via email to generate payment link
+async function sendInvoiceEmail(invoiceId, emailAddress, qboConfig) {
+  const { accessToken, companyId, baseUrl } = qboConfig;
+
+  if (!emailAddress) {
+    console.log('⚠️ No email address provided, skipping invoice email');
+    return { success: false, message: 'No email address provided' };
+  }
+
+  try {
+    console.log('📧 Sending invoice email to:', emailAddress);
+
+    // QuickBooks API endpoint for sending invoice via email
+    const sendUrl = `${baseUrl}/v3/company/${companyId}/invoice/${invoiceId}/send`;
+
+    const emailPayload = {
+      EmailAddress: emailAddress
+    };
+
+    const response = await fetch(sendUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(emailPayload)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Failed to send invoice email:', response.status, response.statusText, errorText);
+      return { success: false, message: `Email sending failed: ${response.status} ${response.statusText}` };
+    }
+
+    const result = await response.json();
+    console.log('✅ Invoice email sent successfully');
+
+    return { success: true, message: 'Invoice email sent successfully', result };
+
+  } catch (error) {
+    console.error('❌ Error sending invoice email:', error);
+    return { success: false, message: 'Failed to send invoice email', error: error.message };
   }
 }

@@ -97,23 +97,14 @@ export default async function handler(req, res) {
       baseUrl: qboBaseUrl
     });
 
-    console.log('📋 Generated possible invoice URLs:', possibleUrls);
-
     res.status(200).json({
       success: true,
       message: 'Invoice created in QuickBooks Online',
       qboInvoiceId: invoice.Id,
       qboInvoiceNumber: invoice.DocNumber,
       qboCustomerId: customer.Id,
-      invoiceUrl: invoicePaymentLink, // Only use payment link from QuickBooks
-      paymentLink: invoicePaymentLink, // Direct payment link from QuickBooks
-      alternativeUrls: invoicePaymentLink ? [] : possibleUrls, // Only show alternatives if no payment link
-      debug: {
-        invoiceId: invoice.Id,
-        companyId: process.env.QBO_COMPANY_ID,
-        baseUrl: qboBaseUrl,
-        hasPaymentLink: !!invoicePaymentLink
-      }
+      invoiceUrl: invoicePaymentLink || possibleUrls[0],
+      paymentLink: invoicePaymentLink
     });
 
   } catch (error) {
@@ -162,16 +153,11 @@ async function findOrCreateCustomer(organizationData, qboConfig) {
   const { accessToken, companyId, baseUrl } = qboConfig;
 
   console.log('🔍 Looking for customer:', organizationData.name);
-  console.log('📧 Primary contact email:', organizationData.primaryContact?.workEmail);
-  console.log('👥 Organization data:', JSON.stringify(organizationData, null, 2));
 
   // Search for existing customer by name (use DisplayName field)
   const query = `SELECT * FROM Customer WHERE DisplayName='${organizationData.name.replace(/'/g, "\\'")}' MAXRESULTS 1`;
   const searchUrl = `${baseUrl}/v3/company/${companyId}/query?query=${encodeURIComponent(query)}`;
 
-  console.log('🔍 QBO Search URL:', searchUrl);
-  console.log('🔍 Original query:', query);
-  console.log('🔍 Company name:', organizationData.name);
 
   const searchResponse = await fetch(searchUrl, {
     headers: {
@@ -182,9 +168,7 @@ async function findOrCreateCustomer(organizationData, qboConfig) {
 
   if (!searchResponse.ok) {
     const errorText = await searchResponse.text();
-    console.error('❌ QBO Search Error Response:', errorText);
-    console.error('❌ QBO Search Headers:', Object.fromEntries(searchResponse.headers));
-    throw new Error(`Customer search failed: ${searchResponse.status} ${searchResponse.statusText} - ${errorText}`);
+    throw new Error(`Customer search failed: ${searchResponse.status} ${searchResponse.statusText}`);
   }
 
   const searchData = await searchResponse.json();
@@ -198,7 +182,7 @@ async function findOrCreateCustomer(organizationData, qboConfig) {
     const hasEmailFromForm = organizationData.primaryContact?.workEmail;
 
     if (needsUpdate || hasEmailFromForm) {
-      console.log('✏️ Updating customer information...', { needsUpdate, hasEmailFromForm });
+      console.log('✏️ Updating customer information...');
       return await updateCustomer(existingCustomer, organizationData, qboConfig);
     }
 
@@ -238,7 +222,6 @@ function checkCustomerNeedsUpdate(existingCustomer, organizationData) {
 async function updateCustomer(existingCustomer, organizationData, qboConfig) {
   const { accessToken, companyId, baseUrl } = qboConfig;
 
-  console.log('📧 Updating customer email from', existingCustomer.PrimaryEmailAddr?.Address, 'to', organizationData.primaryContact?.workEmail);
 
   const updateData = {
     ...existingCustomer,
@@ -273,7 +256,7 @@ async function updateCustomer(existingCustomer, organizationData, qboConfig) {
   }
 
   const updateResult = await updateResponse.json();
-  console.log('✅ Customer updated:', JSON.stringify(updateResult, null, 2));
+  console.log('✅ Customer updated successfully');
 
   // For update operations, the response structure is different
   if (updateResult.QueryResponse?.Customer?.length > 0) {
@@ -323,7 +306,7 @@ async function createCustomer(organizationData, qboConfig) {
   }
 
   const createResult = await createResponse.json();
-  console.log('✅ Customer created:', JSON.stringify(createResult, null, 2));
+  console.log('✅ Customer created successfully');
 
   // For create operations, the response structure is different
   if (createResult.QueryResponse?.Customer?.length > 0) {
@@ -373,7 +356,7 @@ async function createInvoice(customer, invoiceData, billingPreferences, qboConfi
   }
 
   const invoiceResult = await invoiceResponse.json();
-  console.log('✅ Invoice created:', JSON.stringify(invoiceResult, null, 2));
+  console.log('✅ Invoice created successfully');
 
   // For invoice create operations, check different possible response structures
   if (invoiceResult.QueryResponse?.Invoice?.length > 0) {
@@ -585,9 +568,8 @@ async function retryInvoiceCreation(requestBody, newTokens) {
     qboInvoiceId: invoice.Id,
     qboInvoiceNumber: invoice.DocNumber,
     qboCustomerId: customer.Id,
-    invoiceUrl: invoicePaymentLink, // Only use payment link from QuickBooks
-    paymentLink: invoicePaymentLink, // Direct payment link from QuickBooks
-    alternativeUrls: invoicePaymentLink ? [] : possibleUrls, // Only show alternatives if no payment link
+    invoiceUrl: invoicePaymentLink || possibleUrls[0],
+    paymentLink: invoicePaymentLink,
     tokenRefreshed: true
   };
 }
@@ -614,17 +596,13 @@ async function getInvoicePaymentLink(invoiceId, qboConfig) {
     }
 
     const result = await response.json();
-    console.log('📋 Full QB payment link response:', JSON.stringify(result, null, 2));
-
     const invoice = result.QueryResponse?.Invoice?.[0] || result.Invoice;
-    console.log('📋 Parsed invoice object:', JSON.stringify(invoice, null, 2));
 
     if (invoice?.InvoiceLink) {
-      console.log('✅ Got invoice payment link:', invoice.InvoiceLink);
+      console.log('✅ Got invoice payment link');
       return invoice.InvoiceLink;
     } else {
-      console.log('⚠️ No InvoiceLink field found in invoice response');
-      console.log('Available invoice fields:', Object.keys(invoice || {}));
+      console.log('⚠️ No payment link available from QuickBooks');
       return null;
     }
 
@@ -648,7 +626,7 @@ async function sendInvoiceEmail(invoiceId, emailAddress, qboConfig) {
     const testEmailOverride = 'google@campusstores.ca';
     const actualEmailToSend = testEmailOverride;
 
-    console.log('📧 Sending invoice email to:', emailAddress, '(overridden for testing to:', actualEmailToSend, ')');
+    console.log('📧 Sending invoice email (test override active)');
 
     // QuickBooks API endpoint for sending invoice via email
     const sendUrl = `${baseUrl}/v3/company/${companyId}/invoice/${invoiceId}/send?sendTo=${encodeURIComponent(actualEmailToSend)}`;

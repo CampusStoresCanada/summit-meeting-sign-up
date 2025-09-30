@@ -71,6 +71,13 @@
             color: #28a745;
             font-weight: 500;
         }
+
+        .invoice-preview-note {
+            font-size: 0.8em;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -1098,13 +1105,32 @@
             // Calculate costs with Board of Directors discounts
             const membershipFee = membershipPricing[institutionSize] || 0;
             const conferenceCosts = calculateConferenceCosts();
-            const { totalAttendees, paidAttendees, freeAttendees, conferenceTotal, conferenceHST } = conferenceCosts;
+            const { totalAttendees, paidAttendees, freeAttendees, conferenceTotal, conferenceHST, attendeeBreakdown } = conferenceCosts;
             const subtotal = membershipFee + conferenceTotal;
             const totalWithHST = membershipFee + conferenceTotal + conferenceHST;
 
             // Get organization info from form state
             const orgName = formState.institutionName || 'Organization Name';
-            const orgAddress = formState.address || '';
+
+            // Format address from form state, fallback to loaded organization data
+            let orgAddress = '';
+            if (formState.address) {
+                const addr = formState.address;
+                const addressParts = [
+                    addr.streetAddress,
+                    addr.city && addr.province ? `${addr.city}, ${addr.province}` : (addr.city || addr.province),
+                    addr.postalCode
+                ].filter(Boolean);
+                orgAddress = addressParts.join('<br>');
+            } else if (window.organizationData?.organization?.address) {
+                const addr = window.organizationData.organization.address;
+                const addressParts = [
+                    addr.streetAddress,
+                    addr.city && addr.province ? `${addr.city}, ${addr.province}` : (addr.city || addr.province),
+                    addr.postalCode
+                ].filter(Boolean);
+                orgAddress = addressParts.join('<br>');
+            }
 
             // Get primary contact
             const primaryContact = organizationContacts.find(c => c.isPrimaryContact);
@@ -1113,6 +1139,7 @@
             let lineItems = '';
 
             if (billingDisplay === 'single-item') {
+                // Single line with everything combined
                 lineItems = `
                     <tr>
                         <td class="desc-col">2025-2026 CSC Membership</td>
@@ -1122,65 +1149,83 @@
                     </tr>
                 `;
             } else if (billingDisplay === 'membership-conference') {
+                // Two lines: Membership and Conference (no quantities shown)
                 lineItems = `
                     <tr>
-                        <td class="desc-col">2025-2026 CSC Membership</td>
-                        <td class="qty-col">1</td>
-                        <td class="price-col">C$${membershipFee.toFixed(2)}</td>
+                        <td class="desc-col">Membership</td>
+                        <td class="qty-col">-</td>
+                        <td class="price-col">-</td>
                         <td class="amount-col">C$${membershipFee.toFixed(2)}</td>
                     </tr>
+                `;
+
+                // Only show conference line if there are paid attendees
+                if (paidAttendees > 0) {
+                    lineItems += `
                     <tr>
                         <td class="desc-col">Conference Registration</td>
-                        <td class="qty-col">${totalAttendees}</td>
-                        <td class="price-col">C$${conferencePerPerson.toFixed(2)}</td>
+                        <td class="qty-col">-</td>
+                        <td class="price-col">-</td>
                         <td class="amount-col">C$${conferenceTotal.toFixed(2)}</td>
                     </tr>
-                    ${conferenceHST > 0 ? `
+                    `;
+                }
+
+                if (conferenceHST > 0) {
+                    lineItems += `
                     <tr>
                         <td class="desc-col">HST (13%)</td>
-                        <td class="qty-col">1</td>
-                        <td class="price-col">C$${conferenceHST.toFixed(2)}</td>
+                        <td class="qty-col">-</td>
+                        <td class="price-col">-</td>
                         <td class="amount-col">C$${conferenceHST.toFixed(2)}</td>
                     </tr>
-                    ` : ''}
-                `;
+                    `;
+                }
             } else {
-                // Default line items structure for 'itemized' or other formats
+                // Individual line items with quantities
                 lineItems = `
                     <tr>
-                        <td class="desc-col">2025-2026 CSC Membership</td>
+                        <td class="desc-col">Membership</td>
                         <td class="qty-col">1</td>
                         <td class="price-col">C$${membershipFee.toFixed(2)}</td>
                         <td class="amount-col">C$${membershipFee.toFixed(2)}</td>
                     </tr>
-                    ${totalAttendees > 0 ? `
+                `;
+
+                // Show each PAID conference registration separately
+                const paidAttendingContacts = attendeeBreakdown?.filter(attendee => attendee.category === 'paid') || [];
+                paidAttendingContacts.forEach(attendee => {
+                    lineItems += `
                     <tr>
-                        <td class="desc-col">Conference Registration</td>
-                        <td class="qty-col">${totalAttendees}</td>
-                        <td class="price-col">C$${conferencePerPerson.toFixed(2)}</td>
-                        <td class="amount-col">C$${conferenceTotal.toFixed(2)}</td>
+                        <td class="desc-col">Conference Registration<br><small style="color: #666;">${attendee.name}</small></td>
+                        <td class="qty-col">1</td>
+                        <td class="price-col">C$${attendee.cost.toFixed(2)}</td>
+                        <td class="amount-col">C$${attendee.cost.toFixed(2)}</td>
                     </tr>
-                    ${conferenceHST > 0 ? `
+                    `;
+                });
+
+                if (conferenceHST > 0) {
+                    lineItems += `
                     <tr>
                         <td class="desc-col">HST (13%)</td>
                         <td class="qty-col">1</td>
                         <td class="price-col">C$${conferenceHST.toFixed(2)}</td>
                         <td class="amount-col">C$${conferenceHST.toFixed(2)}</td>
                     </tr>
-                    ` : ''}
-                    ` : ''}
-                `;
+                    `;
+                }
             }
 
             return `
                 <div class="invoice-container">
                     <div class="invoice-header">
                         <div class="csc-logo">
-                            <img src="https://csc-ca.com/wp-content/uploads/2023/09/CSC-logo-horizontal-300x99.png" alt="Campus Stores Canada" />
+                            <img src="https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1600096854522-HS7NUI12I1ML6SPJFLLY/Artboard+1.png?format=1500w" alt="Campus Stores Canada" />
                         </div>
                         <div class="invoice-title">
-                            <h1>INVOICE</h1>
-                            <div class="invoice-number">Invoice #: ${Date.now()}</div>
+                            <h1>INVOICE PREVIEW</h1>
+                            <div class="invoice-preview-note">For review purposes only - Invoice numbers assigned by QuickBooks</div>
                             <div class="invoice-date">Date: ${currentDate}</div>
                         </div>
                     </div>

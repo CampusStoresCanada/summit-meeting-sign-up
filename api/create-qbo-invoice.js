@@ -384,41 +384,25 @@ function formatLineItems(invoiceData, billingPreferences) {
   };
 
   const conferenceItemId = '200000504'; // Conference Registration Member
+  const combinedItemId = '200000312'; // Membership 2025-2026 (flexible pricing)
 
   // Get the correct membership item ID based on institution size
   const membershipItemId = membershipItemMap[institutionSize] || '200000404'; // Default to Small if not found
 
   if (billingDisplay === 'single-item') {
-    // Single line display - still use separate items for proper accounting
-    // Membership item
+    // Single line item with combined total - use flexible pricing item
     lines.push({
-      Amount: membershipFee,
+      Amount: membershipFee + conferenceTotal + conferenceHST,
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
-          value: membershipItemId,
-          name: `Membership 2025-2026 - ${institutionSize}`
+          value: combinedItemId,
+          name: "Membership 2025-2026"
         },
         Qty: 1,
-        UnitPrice: membershipFee
+        UnitPrice: membershipFee + conferenceTotal + conferenceHST
       }
     });
-
-    // Conference item if applicable
-    if (conferenceTotal + conferenceHST > 0) {
-      lines.push({
-        Amount: conferenceTotal + conferenceHST,
-        DetailType: "SalesItemLineDetail",
-        SalesItemLineDetail: {
-          ItemRef: {
-            value: conferenceItemId,
-            name: "Conference Registration Member"
-          },
-          Qty: 1,
-          UnitPrice: conferenceTotal + conferenceHST
-        }
-      });
-    }
   } else if (billingDisplay === 'membership-conference') {
     // Membership line - use size-specific item
     lines.push({

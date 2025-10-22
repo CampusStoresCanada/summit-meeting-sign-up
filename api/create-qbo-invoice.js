@@ -372,77 +372,95 @@ async function createInvoice(customer, invoiceData, billingPreferences, qboConfi
 // Format line items based on billing display preference
 function formatLineItems(invoiceData, billingPreferences) {
   const lines = [];
-  const { membershipFee, conferenceTotal, conferenceHST, billingDisplay } = invoiceData;
+  const { membershipFee, conferenceTotal, conferenceHST, billingDisplay, institutionSize } = invoiceData;
+
+  // Map institution size to QuickBooks Item IDs
+  const membershipItemMap = {
+    'Xsmall': '200000304',
+    'Small': '200000404',
+    'Medium': '200000309',
+    'Large': '200000205',
+    'Xlarge': '200000210'
+  };
+
+  const conferenceItemId = '200000504'; // Conference Registration Member
+
+  // Get the correct membership item ID based on institution size
+  const membershipItemId = membershipItemMap[institutionSize] || '200000404'; // Default to Small if not found
 
   if (billingDisplay === 'single-item') {
-    // Single line item with total using the exact service item from QBO
+    // Single line item with total - use membership item
     lines.push({
       Amount: membershipFee + conferenceTotal + conferenceHST,
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
-          value: "19", // CSC Membership & Conference (ID: 19)
-          name: "CSC Membership & Conference"
+          value: membershipItemId,
+          name: `Membership 2025-2026 - ${institutionSize}`
         },
         Qty: 1,
         UnitPrice: membershipFee + conferenceTotal + conferenceHST
       }
     });
   } else if (billingDisplay === 'membership-conference') {
-    // Membership line
+    // Membership line - use size-specific item
     lines.push({
       Amount: membershipFee,
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
-          value: "20", // CSC Service (ID: 20)
-          name: "CSC Membership"
+          value: membershipItemId,
+          name: `Membership 2025-2026 - ${institutionSize}`
         },
         Qty: 1,
         UnitPrice: membershipFee
       }
     });
 
-    // Conference line (with HST included in description)
-    lines.push({
-      Amount: conferenceTotal + conferenceHST,
-      DetailType: "SalesItemLineDetail",
-      SalesItemLineDetail: {
-        ItemRef: {
-          value: "20", // CSC Service (ID: 20)
-          name: "Conference Registration"
-        },
-        Qty: 1,
-        UnitPrice: conferenceTotal + conferenceHST
-      }
-    });
+    // Conference line (with HST included)
+    if (conferenceTotal + conferenceHST > 0) {
+      lines.push({
+        Amount: conferenceTotal + conferenceHST,
+        DetailType: "SalesItemLineDetail",
+        SalesItemLineDetail: {
+          ItemRef: {
+            value: conferenceItemId,
+            name: "Conference Registration Member"
+          },
+          Qty: 1,
+          UnitPrice: conferenceTotal + conferenceHST
+        }
+      });
+    }
   } else {
-    // Individual line items - use CSC Service for all
+    // Individual line items
     lines.push({
       Amount: membershipFee,
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
-          value: "20", // CSC Service (ID: 20)
-          name: "CSC Membership"
+          value: membershipItemId,
+          name: `Membership 2025-2026 - ${institutionSize}`
         },
         Qty: 1,
         UnitPrice: membershipFee
       }
     });
 
-    lines.push({
-      Amount: conferenceTotal,
-      DetailType: "SalesItemLineDetail",
-      SalesItemLineDetail: {
-        ItemRef: {
-          value: "20", // CSC Service (ID: 20)
-          name: "Conference Registration"
-        },
-        Qty: invoiceData.attendingCount || 1,
-        UnitPrice: conferenceTotal / (invoiceData.attendingCount || 1)
-      }
-    });
+    if (conferenceTotal > 0) {
+      lines.push({
+        Amount: conferenceTotal,
+        DetailType: "SalesItemLineDetail",
+        SalesItemLineDetail: {
+          ItemRef: {
+            value: conferenceItemId,
+            name: "Conference Registration Member"
+          },
+          Qty: invoiceData.attendingCount || 1,
+          UnitPrice: conferenceTotal / (invoiceData.attendingCount || 1)
+        }
+      });
+    }
 
     if (conferenceHST > 0) {
       lines.push({
@@ -450,8 +468,8 @@ function formatLineItems(invoiceData, billingPreferences) {
         DetailType: "SalesItemLineDetail",
         SalesItemLineDetail: {
           ItemRef: {
-            value: "20", // CSC Service (ID: 20)
-            name: "HST (13%)"
+            value: conferenceItemId,
+            name: "Conference HST (13%)"
           },
           Qty: 1,
           UnitPrice: conferenceHST

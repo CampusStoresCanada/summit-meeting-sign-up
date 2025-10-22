@@ -339,6 +339,7 @@ async function createInvoice(customer, invoiceData, billingPreferences, qboConfi
   };
 
   console.log('📄 Creating invoice with line items:', lineItems.length);
+  console.log('📋 Line items being sent:', JSON.stringify(lineItems, null, 2));
 
   const invoiceResponse = await fetch(`${baseUrl}/v3/company/${companyId}/invoice`, {
     method: 'POST',

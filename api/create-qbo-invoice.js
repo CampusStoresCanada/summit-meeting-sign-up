@@ -373,7 +373,8 @@ async function createInvoice(customer, invoiceData, billingPreferences, qboConfi
 // Format line items based on billing display preference
 function formatLineItems(invoiceData, billingPreferences) {
   const lines = [];
-  const { membershipFee, conferenceTotal, conferenceHST, billingDisplay, institutionSize } = invoiceData;
+  const { membershipFee, conferenceTotal, conferenceHST, institutionSize } = invoiceData;
+  const { billingDisplay } = billingPreferences;
 
   console.log('🔍 formatLineItems called with billingDisplay:', billingDisplay, 'type:', typeof billingDisplay);
   console.log('🔍 billingPreferences:', billingPreferences);

@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     console.log('👤 Customer ready:', customer.DisplayName || customer.Name);
 
     // Step 2: Create invoice based on billing preference
-    const invoice = await createInvoice(customer, invoiceData, billingPreferences, {
+    const invoice = await createInvoice(customer, invoiceData, billingPreferences, organizationData, {
       accessToken: qboAccessToken,
       companyId: qboCompanyId,
       baseUrl: qboBaseUrl
@@ -320,10 +320,10 @@ async function createCustomer(organizationData, qboConfig) {
 }
 
 // Create invoice with proper line items based on billing preference
-async function createInvoice(customer, invoiceData, billingPreferences, qboConfig) {
+async function createInvoice(customer, invoiceData, billingPreferences, organizationData, qboConfig) {
   const { accessToken, companyId, baseUrl } = qboConfig;
 
-  const lineItems = formatLineItems(invoiceData, billingPreferences);
+  const lineItems = formatLineItems(invoiceData, billingPreferences, organizationData);
 
   const invoicePayload = {
     Line: lineItems,
@@ -371,13 +371,27 @@ async function createInvoice(customer, invoiceData, billingPreferences, qboConfi
 }
 
 // Format line items based on billing display preference
-function formatLineItems(invoiceData, billingPreferences) {
+function formatLineItems(invoiceData, billingPreferences, organizationData) {
   const lines = [];
   const { membershipFee, conferenceTotal, conferenceHST, institutionSize } = invoiceData;
   const { billingDisplay } = billingPreferences;
+  const province = organizationData?.address?.province || '';
 
-  console.log('🔍 formatLineItems called with billingDisplay:', billingDisplay, 'type:', typeof billingDisplay);
-  console.log('🔍 billingPreferences:', billingPreferences);
+  console.log('🔍 formatLineItems called with billingDisplay:', billingDisplay, 'province:', province);
+
+  // Map province to tax code ID
+  const provinceTaxMap = {
+    'Ontario': '13',           // HST ON 13%
+    'New Brunswick': '8',      // HST NB 15%
+    'Newfoundland': '12',      // HST NL 15%
+    'Newfoundland and Labrador': '12',  // HST NL 15%
+    'Nova Scotia': '10',       // HST NS 14%
+    'Prince Edward Island': '8', // Use NB rate (15%) - or create PEI specific
+    // All other provinces use GST
+  };
+
+  const membershipTaxCode = provinceTaxMap[province] || '3'; // Default to GST (5%)
+  const conferenceTaxCode = '13'; // Always HST ON (13%) - event in Ontario
 
   // Map institution size to QuickBooks Item IDs
   const membershipItemMap = {
@@ -396,21 +410,22 @@ function formatLineItems(invoiceData, billingPreferences) {
 
   if (billingDisplay === 'single-item') {
     // Single line item with combined total - use flexible pricing item
-    // Tax is already included in the amount (conferenceHST), so mark as non-taxable
+    // Use conference tax code since conference always has tax
+    // Total is membershipFee + conferenceTotal (QB will add tax)
     lines.push({
-      Amount: membershipFee + conferenceTotal + conferenceHST,
+      Amount: membershipFee + conferenceTotal,
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
           name: "Membership 2025-2026"
         },
         Qty: 1,
-        UnitPrice: membershipFee + conferenceTotal + conferenceHST,
+        UnitPrice: membershipFee + conferenceTotal,
         TaxCodeRef: {
-          value: "NON"  // Non-taxable - tax already included in price
+          value: conferenceTaxCode  // HST ON (13%) - conference determines tax
         }
       },
-      Description: `Membership fee: $${membershipFee}, Conference: $${conferenceTotal + conferenceHST} (includes HST)`
+      Description: `Membership: $${membershipFee}, Conference: $${conferenceTotal} + tax`
     });
   } else if (billingDisplay === 'membership-conference') {
     // Membership line - use size-specific item
@@ -567,7 +582,7 @@ async function retryInvoiceCreation(requestBody, newTokens) {
   console.log('👤 Customer ready:', customer.DisplayName || customer.Name);
 
   // Step 2: Create invoice
-  const invoice = await createInvoice(customer, invoiceData, billingPreferences, qboConfig);
+  const invoice = await createInvoice(customer, invoiceData, billingPreferences, organizationData, qboConfig);
   console.log('📄 Invoice created on retry:', invoice.DocNumber);
 
   // Try multiple potential URL formats for QB invoice access

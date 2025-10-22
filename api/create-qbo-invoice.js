@@ -389,9 +389,10 @@ function formatLineItems(invoiceData, billingPreferences) {
   const membershipItemId = membershipItemMap[institutionSize] || '200000404'; // Default to Small if not found
 
   if (billingDisplay === 'single-item') {
-    // Single line item with total - use membership item
+    // Single line display - still use separate items for proper accounting
+    // Membership item
     lines.push({
-      Amount: membershipFee + conferenceTotal + conferenceHST,
+      Amount: membershipFee,
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
@@ -399,9 +400,25 @@ function formatLineItems(invoiceData, billingPreferences) {
           name: `Membership 2025-2026 - ${institutionSize}`
         },
         Qty: 1,
-        UnitPrice: membershipFee + conferenceTotal + conferenceHST
+        UnitPrice: membershipFee
       }
     });
+
+    // Conference item if applicable
+    if (conferenceTotal + conferenceHST > 0) {
+      lines.push({
+        Amount: conferenceTotal + conferenceHST,
+        DetailType: "SalesItemLineDetail",
+        SalesItemLineDetail: {
+          ItemRef: {
+            value: conferenceItemId,
+            name: "Conference Registration Member"
+          },
+          Qty: 1,
+          UnitPrice: conferenceTotal + conferenceHST
+        }
+      });
+    }
   } else if (billingDisplay === 'membership-conference') {
     // Membership line - use size-specific item
     lines.push({

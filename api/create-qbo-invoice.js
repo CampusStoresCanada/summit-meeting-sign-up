@@ -397,12 +397,13 @@ function formatLineItems(invoiceData, billingPreferences) {
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
-          value: combinedItemId,
+          value: String(combinedItemId),
           name: "Membership 2025-2026"
         },
         Qty: 1,
         UnitPrice: membershipFee + conferenceTotal + conferenceHST
-      }
+      },
+      Description: `Membership fee: $${membershipFee}, Conference: $${conferenceTotal + conferenceHST}`
     });
   } else if (billingDisplay === 'membership-conference') {
     // Membership line - use size-specific item

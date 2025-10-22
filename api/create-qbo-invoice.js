@@ -396,6 +396,7 @@ function formatLineItems(invoiceData, billingPreferences) {
 
   if (billingDisplay === 'single-item') {
     // Single line item with combined total - use flexible pricing item
+    // Tax is already included in the amount (conferenceHST), so mark as non-taxable
     lines.push({
       Amount: membershipFee + conferenceTotal + conferenceHST,
       DetailType: "SalesItemLineDetail",
@@ -406,10 +407,10 @@ function formatLineItems(invoiceData, billingPreferences) {
         Qty: 1,
         UnitPrice: membershipFee + conferenceTotal + conferenceHST,
         TaxCodeRef: {
-          value: "TAX"
+          value: "NON"  // Non-taxable - tax already included in price
         }
       },
-      Description: `Membership fee: $${membershipFee}, Conference: $${conferenceTotal + conferenceHST}`
+      Description: `Membership fee: $${membershipFee}, Conference: $${conferenceTotal + conferenceHST} (includes HST)`
     });
   } else if (billingDisplay === 'membership-conference') {
     // Membership line - use size-specific item

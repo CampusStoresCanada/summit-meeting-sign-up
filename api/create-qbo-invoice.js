@@ -401,8 +401,7 @@ function formatLineItems(invoiceData, billingPreferences) {
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
-          value: String(combinedItemId),
-          name: "Membership 2025-2026"
+          value: String(combinedItemId)
         },
         Qty: 1,
         UnitPrice: membershipFee + conferenceTotal + conferenceHST

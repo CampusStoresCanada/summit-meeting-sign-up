@@ -375,6 +375,9 @@ function formatLineItems(invoiceData, billingPreferences) {
   const lines = [];
   const { membershipFee, conferenceTotal, conferenceHST, billingDisplay, institutionSize } = invoiceData;
 
+  console.log('🔍 formatLineItems called with billingDisplay:', billingDisplay, 'type:', typeof billingDisplay);
+  console.log('🔍 billingPreferences:', billingPreferences);
+
   // Map institution size to QuickBooks Item IDs
   const membershipItemMap = {
     'Xsmall': '200000304',

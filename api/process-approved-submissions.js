@@ -1,7 +1,7 @@
 // api/process-approved-submissions.js - Process approved vendor submissions
 export default async function handler(req, res) {
-  // Allow CORS for testing
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Allow CORS for production
+  res.setHeader('Access-Control-Allow-Origin', 'https://membershiprenewal.campusstores.ca');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   

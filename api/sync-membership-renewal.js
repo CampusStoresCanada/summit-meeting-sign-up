@@ -1,6 +1,8 @@
 // api/sync-membership-renewal.js - Batch sync all membership renewal data to Notion
+import { sendErrorNotification } from './lib/ses-mailer.js';
+
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', 'https://membershiprenewal.campusstores.ca');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -305,14 +307,27 @@ async function sendErrorNotification(token, syncData, syncResults) {
     emailBody += `===================================\n`;
     emailBody += JSON.stringify({ token, syncData, syncResults }, null, 2);
 
-    // For now, just log it (we'll implement actual email sending later)
+    // Log error notification content
     console.log('📧 ERROR NOTIFICATION EMAIL CONTENT:');
     console.log('=====================================');
     console.log(emailBody);
     console.log('=====================================');
 
-    // TODO: Implement actual email sending here
-    // Could use Nodemailer, SendGrid, or similar service
+    // Send error notification email via AWS SES
+    try {
+      const emailResult = await sendErrorNotification({
+        subject: 'Membership Renewal Sync Failed',
+        body: emailBody
+      });
+
+      if (emailResult.success) {
+        console.log('✅ Error notification email sent successfully');
+      } else {
+        console.error('❌ Failed to send error notification email:', emailResult.error);
+      }
+    } catch (emailError) {
+      console.error('💥 Error sending notification email:', emailError);
+    }
 
   } catch (error) {
     console.error('💥 Error generating error notification:', error);

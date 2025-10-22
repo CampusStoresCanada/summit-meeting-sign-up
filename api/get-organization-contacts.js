@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   console.log('📥 Request method:', req.method);
   console.log('📥 Request query:', req.query);
 
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', 'https://membershiprenewal.campusstores.ca');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 

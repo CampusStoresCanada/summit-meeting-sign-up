@@ -1,0 +1,13 @@
+{
+  "name": "csc-membership-renewal",
+  "version": "1.0.0",
+  "description": "CSC Membership Renewal System",
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-ses": "^3.679.0",
+    "@notionhq/client": "^2.2.15"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,5 +1,5 @@
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', 'https://membershiprenewal.campusstores.ca');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
@@ -102,8 +102,10 @@ module.exports = async function handler(req, res) {
                    org.properties.Logo?.files?.[0]?.file?.url ||
                    '';
 
-    // Extract institution size
-    const institutionSize = org.properties['Institution Size']?.select?.name || '';
+    // Extract institution size (handle both Select and Formula types)
+    const institutionSize = org.properties['Institution Size']?.select?.name
+      || org.properties['Institution Size']?.formula?.string
+      || '';
 
     // Extract address information
     const streetAddress = org.properties['Street Address']?.rich_text?.[0]?.text?.content || '';

@@ -1,6 +1,6 @@
 // api/create-qbo-invoice.js - Create invoice in QuickBooks Online
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', 'https://membershiprenewal.campusstores.ca');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     console.error('❌ Missing QuickBooks Online credentials');
     res.status(500).json({
       error: 'QuickBooks configuration missing',
-      message: 'Steve is an idiot and will be in contact with you momentarily'
+      message: 'System configuration error. Please contact support for assistance.'
     });
     return;
   }
@@ -135,8 +135,8 @@ export default async function handler(req, res) {
     }
 
     const errorMessage = isAuthError
-      ? 'Steve is an idiot and forgot to refresh the QuickBooks tokens. He will be in contact with you momentarily.'
-      : 'Steve is an idiot and broke the QuickBooks integration. He will be in contact with you momentarily.';
+      ? 'Authentication error with QuickBooks. Please try again or contact support if the issue persists.'
+      : 'Unable to create invoice at this time. Please try again or contact support if the issue persists.';
 
     res.status(500).json({
       success: false,

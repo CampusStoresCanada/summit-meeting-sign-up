@@ -401,7 +401,7 @@ function formatLineItems(invoiceData, billingPreferences) {
       DetailType: "SalesItemLineDetail",
       SalesItemLineDetail: {
         ItemRef: {
-          value: combinedItemId
+          name: "Membership 2025-2026"
         },
         Qty: 1,
         UnitPrice: membershipFee + conferenceTotal + conferenceHST

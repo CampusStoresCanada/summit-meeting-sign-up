@@ -404,7 +404,10 @@ function formatLineItems(invoiceData, billingPreferences) {
           name: "Membership 2025-2026"
         },
         Qty: 1,
-        UnitPrice: membershipFee + conferenceTotal + conferenceHST
+        UnitPrice: membershipFee + conferenceTotal + conferenceHST,
+        TaxCodeRef: {
+          value: "TAX"
+        }
       },
       Description: `Membership fee: $${membershipFee}, Conference: $${conferenceTotal + conferenceHST}`
     });

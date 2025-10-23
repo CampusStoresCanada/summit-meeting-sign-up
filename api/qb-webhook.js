@@ -9,11 +9,19 @@ export default async function handler(req, res) {
   }
 
   console.log('📬 Received QuickBooks webhook');
+  console.log('🔍 Headers:', JSON.stringify(req.headers, null, 2));
+  console.log('📦 Body:', JSON.stringify(req.body, null, 2));
 
   try {
     // Verify webhook signature from QuickBooks
     const signature = req.headers['intuit-signature'];
     const webhookToken = process.env.QBO_WEBHOOK_TOKEN; // You'll set this in dashboard
+
+    console.log('🔐 Signature verification:', {
+      hasWebhookToken: !!webhookToken,
+      hasSignature: !!signature,
+      webhookTokenLength: webhookToken?.length || 0
+    });
 
     if (webhookToken && signature) {
       const payload = JSON.stringify(req.body);
@@ -35,34 +43,66 @@ export default async function handler(req, res) {
     // Process the webhook payload
     const { eventNotifications } = req.body;
 
+    console.log('📋 Event notifications count:', eventNotifications?.length || 0);
+
     if (!eventNotifications || eventNotifications.length === 0) {
       console.log('⚠️ No event notifications in webhook');
-      res.status(200).json({ received: true });
+      res.status(200).json({ received: true, message: 'No events to process' });
       return;
     }
+
+    let processedCount = 0;
+    let paymentCount = 0;
 
     // Process each notification
     for (const notification of eventNotifications) {
       const { realmId, dataChangeEvent } = notification;
 
+      console.log('🔔 Notification:', {
+        realmId,
+        hasDataChangeEvent: !!dataChangeEvent,
+        entityCount: dataChangeEvent?.entities?.length || 0
+      });
+
       if (!dataChangeEvent || !dataChangeEvent.entities) {
+        console.log('⚠️ Skipping notification - no entities');
         continue;
       }
 
       // Look for Payment events
       for (const entity of dataChangeEvent.entities) {
+        console.log('📄 Entity:', {
+          name: entity.name,
+          id: entity.id,
+          operation: entity.operation
+        });
+
         if (entity.name === 'Payment') {
-          console.log(`💳 Payment event detected: ${entity.operation} - ID: ${entity.id}`);
+          paymentCount++;
+          console.log(`💳 Payment event #${paymentCount}: ${entity.operation} - ID: ${entity.id}`);
 
           // Only process Create and Update operations (not Delete or Void)
           if (entity.operation === 'Create' || entity.operation === 'Update') {
+            console.log(`✅ Processing payment ${entity.id}...`);
             await handlePaymentEvent(entity.id, realmId);
+            processedCount++;
+          } else {
+            console.log(`⏭️ Skipping operation: ${entity.operation}`);
           }
+        } else {
+          console.log(`⏭️ Skipping non-payment entity: ${entity.name}`);
         }
       }
     }
 
-    res.status(200).json({ received: true, processed: true });
+    console.log(`✅ Webhook processing complete: ${processedCount} payments processed out of ${paymentCount} payment events`);
+
+    res.status(200).json({
+      received: true,
+      processed: true,
+      paymentsProcessed: processedCount,
+      totalPaymentEvents: paymentCount
+    });
 
   } catch (error) {
     console.error('💥 Webhook processing error:', error);
@@ -72,9 +112,18 @@ export default async function handler(req, res) {
 
 // Handle a payment event
 async function handlePaymentEvent(paymentId, realmId) {
+  console.log(`\n🔧 handlePaymentEvent called with paymentId: ${paymentId}, realmId: ${realmId}`);
+
   const qboAccessToken = process.env.QBO_ACCESS_TOKEN;
   const qboCompanyId = process.env.QBO_COMPANY_ID;
   const qboBaseUrl = process.env.QBO_BASE_URL || 'https://quickbooks.api.intuit.com';
+
+  console.log('🔑 QB Config:', {
+    hasAccessToken: !!qboAccessToken,
+    accessTokenLength: qboAccessToken?.length || 0,
+    companyId: qboCompanyId,
+    baseUrl: qboBaseUrl
+  });
 
   if (!qboAccessToken || !qboCompanyId) {
     console.error('❌ Missing QuickBooks credentials');
@@ -82,6 +131,8 @@ async function handlePaymentEvent(paymentId, realmId) {
   }
 
   // Verify realmId matches our company
+  console.log('🏢 Company check:', { realmId, expectedCompanyId: qboCompanyId, matches: realmId === qboCompanyId });
+
   if (realmId !== qboCompanyId) {
     console.warn(`⚠️ Payment for different company: ${realmId} (expected ${qboCompanyId})`);
     return;

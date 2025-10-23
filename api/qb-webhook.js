@@ -1,5 +1,6 @@
 // api/qb-webhook.js - Receive QuickBooks webhook notifications for payments
 import crypto from 'crypto';
+import { sendErrorNotification } from './lib/ses-mailer.js';
 
 export default async function handler(req, res) {
   // QB webhooks are always POST
@@ -154,6 +155,27 @@ async function handlePaymentEvent(paymentId, realmId) {
 
     if (!paymentResponse.ok) {
       console.error(`❌ Failed to fetch payment: ${paymentResponse.status}`);
+
+      // Handle token expiry
+      if (paymentResponse.status === 401) {
+        console.log('🔄 Token expired, triggering refresh...');
+
+        try {
+          // Trigger token refresh
+          await fetch('https://membershiprenewal.campusstores.ca/api/auto-refresh-qb-tokens', {
+            method: 'POST'
+          });
+
+          // Send error notification
+          await sendErrorNotification({
+            subject: 'QB Webhook Failed - Token Expired',
+            body: `QuickBooks webhook failed due to expired token.\n\nPayment ID: ${paymentId}\nRealm ID: ${realmId}\n\nToken refresh has been triggered. QuickBooks will retry the webhook automatically.`
+          });
+        } catch (error) {
+          console.error('❌ Error handling token expiry:', error);
+        }
+      }
+
       return;
     }
 
@@ -231,6 +253,17 @@ async function processInvoicePayment(invoiceId) {
 
     if (orgData.results.length === 0) {
       console.warn(`⚠️ No organization found for invoice ID: ${invoiceId}`);
+
+      // Send error notification - this is critical!
+      try {
+        await sendErrorNotification({
+          subject: 'QB Webhook - Organization Not Found',
+          body: `A payment was received but no organization was found in Notion.\n\nQuickBooks Invoice ID: ${invoiceId}\n\nPossible causes:\n1. Invoice ID not yet saved to Notion (payment happened too quickly)\n2. Organization was deleted from Notion\n3. QB Invoice ID field not populated correctly\n\nAction Required:\nManually add "25/26 Member" tag to the organization that paid invoice ${invoiceId}.`
+        });
+      } catch (emailError) {
+        console.error('❌ Failed to send error notification:', emailError);
+      }
+
       return;
     }
 
@@ -269,6 +302,17 @@ async function processInvoicePayment(invoiceId) {
 
     if (memberTagData.results.length === 0) {
       console.error('❌ "25/26 Member" tag not found in Tag System');
+
+      // CRITICAL ERROR - tag missing means ALL webhooks will fail!
+      try {
+        await sendErrorNotification({
+          subject: 'CRITICAL: QB Webhook - "25/26 Member" Tag Missing',
+          body: `The "25/26 Member" tag was not found in the Notion Tag System database.\n\nThis is a CRITICAL error - all payment webhooks will fail until this is fixed!\n\nOrganization: ${orgName}\nInvoice ID: ${invoiceId}\n\nAction Required:\n1. Check that "25/26 Member" tag exists in Tag System database\n2. Verify tag name is exactly "25/26 Member" (case-sensitive)\n3. Manually add tag to any organizations that paid while this was broken`
+        });
+      } catch (emailError) {
+        console.error('❌ Failed to send error notification:', emailError);
+      }
+
       return;
     }
 
@@ -308,6 +352,17 @@ async function processInvoicePayment(invoiceId) {
     if (!updateResponse.ok) {
       const errorText = await updateResponse.text();
       console.error(`❌ Failed to add tag: ${updateResponse.status} ${errorText}`);
+
+      // Notify about tag update failure
+      try {
+        await sendErrorNotification({
+          subject: 'QB Webhook - Failed to Add Tag',
+          body: `Payment received but failed to add "25/26 Member" tag to organization.\n\nOrganization: ${orgName}\nInvoice ID: ${invoiceId}\nError: ${updateResponse.status} ${errorText}\n\nAction Required:\nManually add "25/26 Member" tag to ${orgName} in Notion.`
+        });
+      } catch (emailError) {
+        console.error('❌ Failed to send error notification:', emailError);
+      }
+
       return;
     }
 
@@ -315,5 +370,15 @@ async function processInvoicePayment(invoiceId) {
 
   } catch (error) {
     console.error('❌ Error processing invoice payment:', error);
+
+    // Send general error notification
+    try {
+      await sendErrorNotification({
+        subject: 'QB Webhook - Processing Error',
+        body: `An error occurred while processing a payment webhook.\n\nInvoice ID: ${invoiceId}\nError: ${error.message}\n\nStack trace:\n${error.stack}\n\nAction Required:\nCheck Vercel logs for more details and manually process this payment.`
+      });
+    } catch (emailError) {
+      console.error('❌ Failed to send error notification:', emailError);
+    }
   }
 }

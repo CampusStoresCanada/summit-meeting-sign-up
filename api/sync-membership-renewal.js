@@ -166,7 +166,7 @@ export default async function handler(req, res) {
       console.error('❌ Batch sync completed with errors');
 
       // Send error notification email with data dump
-      await sendErrorNotification(token, syncData, syncResults);
+      await generateAndSendErrorEmail(token, syncData, syncResults);
 
       res.status(207).json({ // 207 Multi-Status for partial success
         success: false,
@@ -191,7 +191,7 @@ export default async function handler(req, res) {
 
     // Try to send error notification even for fatal errors
     try {
-      await sendErrorNotification(req.body?.token, req.body?.syncData, {
+      await generateAndSendErrorEmail(req.body?.token, req.body?.syncData, {
         fatal: true,
         error: error.message,
         stack: error.stack
@@ -208,8 +208,8 @@ export default async function handler(req, res) {
   }
 }
 
-// Send error notification email with human-readable data dump
-async function sendErrorNotification(token, syncData, syncResults) {
+// Generate and send error notification email with human-readable data dump
+async function generateAndSendErrorEmail(token, syncData, syncResults) {
   try {
     console.log('📧 Sending error notification email...');
 

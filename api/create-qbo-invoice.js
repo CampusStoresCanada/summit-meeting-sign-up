@@ -1,4 +1,6 @@
 // api/create-qbo-invoice.js - Create invoice in QuickBooks Online
+import { sendBookkeeperNotification } from './lib/ses-mailer.js';
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', 'https://membershiprenewal.campusstores.ca');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -105,6 +107,40 @@ export default async function handler(req, res) {
     } catch (notionError) {
       console.error('⚠️ Failed to save Invoice ID to Notion:', notionError);
       // Don't fail the whole request - invoice was created successfully
+    }
+
+    // Send bookkeeper notification for invoice coding
+    console.log('📧 Sending bookkeeper notification...');
+    try {
+      // Build attendee breakdown from invoice data
+      const attendeeBreakdown = (invoiceData.attendeeBreakdown || []).map(attendee => ({
+        name: attendee.name,
+        category: attendee.category,
+        reason: attendee.reason
+      }));
+
+      await sendBookkeeperNotification({
+        organizationName: organizationData.name,
+        invoiceId: invoice.Id,
+        invoiceNumber: invoice.DocNumber,
+        invoiceUrl: invoicePaymentLink || possibleUrls[0],
+        billingDisplay: billingPreferences.billingDisplay,
+        institutionSize: invoiceData.institutionSize,
+        membershipFee: invoiceData.membershipFee,
+        conferenceTotal: invoiceData.conferenceTotal,
+        conferenceHST: invoiceData.conferenceHST,
+        conferenceAttendees: {
+          paid: invoiceData.paidAttendees || 0,
+          free: invoiceData.freeAttendees || 0,
+          breakdown: attendeeBreakdown
+        },
+        totalAmount: invoice.TotalAmt,
+        customerAddress: organizationData.address
+      });
+      console.log('✅ Bookkeeper notification sent');
+    } catch (emailError) {
+      console.error('⚠️ Failed to send bookkeeper notification:', emailError);
+      // Don't fail invoice creation if email fails
     }
 
     res.status(200).json({

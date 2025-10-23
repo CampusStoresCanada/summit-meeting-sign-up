@@ -1439,10 +1439,72 @@
                 // Create QuickBooks invoice (Notion sync will happen in background)
                 const qboResult = await createQuickBooksInvoice();
 
-                // Store invoice URL for Step 4 display
-                if (qboResult && (qboResult.paymentLink || qboResult.invoiceUrl)) {
-                    window.qboInvoiceUrl = qboResult.paymentLink || qboResult.invoiceUrl;
-                    console.log('📄 QuickBooks invoice ready');
+                // Check if we need to retry due to token expiry
+                if (qboResult && qboResult.needsRetry) {
+                    const retrySeconds = qboResult.retryAfter || 10;
+                    console.log(`⏳ Retrying in ${retrySeconds} seconds...`);
+
+                    // Show retry countdown message
+                    if (modal && actions) {
+                        actions.innerHTML = `
+                            <div style="text-align: center; padding: 16px;">
+                                <div style="color: #ba003b; margin-bottom: 12px; font-weight: 600;">🔄 Refreshing Authentication</div>
+                                <div style="color: #666; font-size: 14px; margin-bottom: 16px;">
+                                    ${qboResult.message}
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+                                    <div style="width: 20px; height: 20px; border: 2px solid #ba003b; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                                    <span style="color: #666; font-size: 14px;">Retrying in <span id="retry-countdown">${retrySeconds}</span> seconds...</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // Countdown timer
+                    let countdown = retrySeconds;
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        const countdownEl = document.getElementById('retry-countdown');
+                        if (countdownEl) {
+                            countdownEl.textContent = countdown;
+                        }
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
+                        }
+                    }, 1000);
+
+                    // Wait for the retry period
+                    await new Promise(resolve => setTimeout(resolve, retrySeconds * 1000));
+
+                    // Show creating invoice message again
+                    if (modal && actions) {
+                        actions.innerHTML = `
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px;">
+                                <div style="width: 20px; height: 20px; border: 2px solid #ba003b; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                                <span style="color: #666; font-size: 14px;">Creating QuickBooks invoice (retry)...</span>
+                            </div>
+                        `;
+                    }
+
+                    // Retry the invoice creation
+                    const retryResult = await createQuickBooksInvoice();
+
+                    // If the retry also fails, throw error
+                    if (retryResult && retryResult.needsRetry) {
+                        throw new Error('QuickBooks authentication issue persists. Please contact support.');
+                    }
+
+                    // Store the successful retry result
+                    if (retryResult && (retryResult.paymentLink || retryResult.invoiceUrl)) {
+                        window.qboInvoiceUrl = retryResult.paymentLink || retryResult.invoiceUrl;
+                        console.log('📄 QuickBooks invoice ready (after retry)');
+                    }
+                } else {
+                    // Store invoice URL for Step 4 display
+                    if (qboResult && (qboResult.paymentLink || qboResult.invoiceUrl)) {
+                        window.qboInvoiceUrl = qboResult.paymentLink || qboResult.invoiceUrl;
+                        console.log('📄 QuickBooks invoice ready');
+                    }
                 }
 
                 // Enable next step button
@@ -1673,6 +1735,18 @@
 
             if (!response.ok) {
                 console.error('❌ QuickBooks invoice creation failed:', result);
+
+                // Check if this is a token expiry that requires retry
+                if (result.error === 'QUICKBOOKS_TOKEN_EXPIRED' && result.retry) {
+                    console.log('🔄 Token expired, will retry automatically...');
+                    // Return a special object indicating retry is needed
+                    return {
+                        needsRetry: true,
+                        retryAfter: result.retryAfter || 10,
+                        message: result.message
+                    };
+                }
+
                 throw new Error(result.message || 'QuickBooks invoice creation failed');
             }
 

@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/auto-refresh-qb-tokens",
-      "schedule": "*/50 * * * *"
+      "schedule": "*/30 * * * *"
     }
   ]
 }

@@ -110,40 +110,47 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('💥 QuickBooks invoice creation failed:', error);
 
-    // Check if it's an auth error and try to refresh tokens
-    const isAuthError = error.message?.includes('401') || error.message?.includes('Unauthorized');
+    // Check if it's a token expiry error
+    const isTokenExpired = error.message === 'QUICKBOOKS_TOKEN_EXPIRED';
 
-    if (isAuthError) {
-      console.log('🔄 Token expired, attempting automatic refresh...');
+    if (isTokenExpired) {
+      console.log('🔄 Token expired, triggering automatic refresh...');
 
       try {
-        // Attempt to refresh the access token
-        const newTokens = await refreshQuickBooksTokens();
+        // Trigger token refresh (updates Vercel env vars for next request)
+        const refreshUrl = `${req.headers.origin || 'https://membershiprenewal.campusstores.ca'}/api/auto-refresh-qb-tokens`;
+        const refreshResponse = await fetch(refreshUrl, { method: 'POST' });
 
-        if (newTokens) {
-          console.log('✅ Tokens refreshed successfully, retrying invoice creation...');
+        if (refreshResponse.ok) {
+          console.log('✅ Token refresh triggered successfully');
 
-          // Retry the invoice creation with new tokens
-          const retryResult = await retryInvoiceCreation(req.body, newTokens);
-
-          res.status(200).json(retryResult);
+          // Return special response telling user to retry
+          res.status(503).json({
+            success: false,
+            error: 'QUICKBOOKS_TOKEN_EXPIRED',
+            message: 'System is refreshing authentication. Please try creating your invoice again in 10 seconds.',
+            retry: true,
+            retryAfter: 10
+          });
           return;
+        } else {
+          console.error('❌ Token refresh trigger failed');
         }
       } catch (refreshError) {
-        console.error('❌ Token refresh failed:', refreshError);
+        console.error('❌ Token refresh error:', refreshError);
       }
     }
 
-    const errorMessage = isAuthError
-      ? 'Authentication error with QuickBooks. Please try again or contact support if the issue persists.'
+    // Generic error response
+    const errorMessage = isTokenExpired
+      ? 'QuickBooks authentication expired. System is refreshing - please retry in 10 seconds.'
       : 'Unable to create invoice at this time. Please try again or contact support if the issue persists.';
 
     res.status(500).json({
       success: false,
       error: 'QuickBooks invoice creation failed',
       message: errorMessage,
-      details: error.message,
-      isAuthError: isAuthError
+      details: error.message
     });
   }
 }
@@ -167,6 +174,10 @@ async function findOrCreateCustomer(organizationData, qboConfig) {
   });
 
   if (!searchResponse.ok) {
+    // Check for expired token (401 Unauthorized)
+    if (searchResponse.status === 401) {
+      throw new Error('QUICKBOOKS_TOKEN_EXPIRED');
+    }
     const errorText = await searchResponse.text();
     throw new Error(`Customer search failed: ${searchResponse.status} ${searchResponse.statusText}`);
   }

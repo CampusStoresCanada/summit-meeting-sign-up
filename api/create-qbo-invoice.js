@@ -97,6 +97,16 @@ export default async function handler(req, res) {
       baseUrl: qboBaseUrl
     });
 
+    // Save QB Invoice ID to Notion for webhook matching
+    console.log('💾 Saving QB Invoice ID to Notion...');
+    try {
+      await saveInvoiceIdToNotion(token, invoice.Id, invoice.DocNumber);
+      console.log('✅ QB Invoice ID saved to Notion');
+    } catch (notionError) {
+      console.error('⚠️ Failed to save Invoice ID to Notion:', notionError);
+      // Don't fail the whole request - invoice was created successfully
+    }
+
     res.status(200).json({
       success: true,
       message: 'Invoice created in QuickBooks Online',
@@ -709,5 +719,80 @@ async function sendInvoiceEmail(invoiceId, emailAddress, qboConfig) {
   } catch (error) {
     console.error('❌ Error sending invoice email:', error);
     return { success: false, message: 'Failed to send invoice email', error: error.message };
+  }
+}
+
+// Save QuickBooks Invoice ID to Notion Organization record
+async function saveInvoiceIdToNotion(token, invoiceId, invoiceNumber) {
+  const notionToken = process.env.NOTION_TOKEN;
+  const organizationsDbId = process.env.NOTION_ORGANIZATIONS_DB_ID;
+
+  if (!notionToken || !organizationsDbId) {
+    throw new Error('Missing Notion credentials');
+  }
+
+  try {
+    // Find the organization by token
+    const queryResponse = await fetch(`https://api.notion.com/v1/databases/${organizationsDbId}/query`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${notionToken}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({
+        filter: {
+          property: 'Token',
+          rich_text: { equals: token }
+        }
+      })
+    });
+
+    if (!queryResponse.ok) {
+      throw new Error(`Notion query failed: ${queryResponse.status}`);
+    }
+
+    const queryData = await queryResponse.json();
+
+    if (queryData.results.length === 0) {
+      throw new Error('Organization not found for token');
+    }
+
+    const orgPageId = queryData.results[0].id;
+
+    // Update the organization with QB Invoice ID
+    const updateResponse = await fetch(`https://api.notion.com/v1/pages/${orgPageId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${notionToken}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({
+        properties: {
+          'QBO Invoice ID': {
+            rich_text: [
+              {
+                text: {
+                  content: invoiceId.toString()
+                }
+              }
+            ]
+          }
+        }
+      })
+    });
+
+    if (!updateResponse.ok) {
+      const errorText = await updateResponse.text();
+      throw new Error(`Notion update failed: ${updateResponse.status} ${errorText}`);
+    }
+
+    console.log(`✅ Saved Invoice ID ${invoiceId} (${invoiceNumber}) to Notion organization`);
+    return { success: true };
+
+  } catch (error) {
+    console.error('❌ Failed to save invoice ID to Notion:', error);
+    throw error;
   }
 }

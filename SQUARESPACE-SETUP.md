@@ -1,6 +1,8 @@
-# Squarespace Conference Delegate Webhook Setup
+# Squarespace Conference Delegate Polling Setup
 
-This replaces the flaky Zapier integration with a reliable API key-based webhook system.
+This replaces the flaky Zapier integration with a reliable API key-based polling system.
+
+**How it works:** Every 5 minutes, the system polls Squarespace for new delegate orders and automatically processes them into Notion. There's a 0-5 minute delay, but for delegate registrations this is totally acceptable.
 
 ## Step 1: Generate Squarespace API Key
 
@@ -35,11 +37,13 @@ To get your Notion Contacts Database ID:
 2. Create a new tag called **"26 Conference Delegate"** (exact name, case-sensitive)
 3. Optionally create **"First Conference"** tag as well
 
-## Step 4: Set Up Webhook Subscription
+## Step 4: Add "Squarespace Order ID" Property to Notion Contacts
 
-1. Visit: `https://membershiprenewal.campusstores.ca/api/setup-squarespace-webhook`
-2. You should see a success page confirming the webhook is active
-3. The webhook secret will be automatically saved to Vercel
+1. Open your Notion Contacts database
+2. Add a new property:
+   - **Name:** Squarespace Order ID
+   - **Type:** Text
+3. This prevents processing the same order multiple times
 
 ## Step 5: Test It!
 
@@ -59,9 +63,9 @@ To get your Notion Contacts Database ID:
    - "26 Conference Delegate" tag added
    - "First Conference" tag added (if they answered yes)
 
-## What the Webhook Does
+## What the Polling System Does
 
-When an order is created with SKU 26999:
+Every 5 minutes, it checks for new orders with SKU 26999 and:
 1. Extracts form data from each delegate registration
 2. Searches for existing contact by email in Notion
 3. If contact exists: Updates their information
@@ -73,7 +77,7 @@ When an order is created with SKU 26999:
 
 ## Troubleshooting
 
-### Webhook not receiving orders
+### Polling not finding orders
 - Check Vercel logs for errors
 - Verify SQUARESPACE_API_KEY is set correctly
 - Make sure the API key has Orders (Read/Write) and Webhook Subscriptions permissions
@@ -95,22 +99,24 @@ Unlike Zapier, Squarespace API keys **do not expire automatically**. You only ne
 
 ## Files Involved
 
-- `/api/squarespace-delegate-webhook.js` - Main webhook endpoint
-- `/api/setup-squarespace-webhook.js` - One-time setup script
+- `/api/poll-squarespace-delegates.js` - Polling endpoint (runs every 5 minutes)
 - `/api/lib/ses-mailer.js` - Error notifications
+- `/api/vercel.json` - Cron job configuration
 
-## OAuth Files (Not Needed)
+## Unused Files (Can be Deleted)
 
-These files were created for OAuth but are not needed since we're using API keys:
-- `/api/squarespace-oauth-start.js` - Can be deleted
-- `/api/squarespace-oauth-callback.js` - Can be deleted
-- `/api/auto-refresh-squarespace-token.js` - Can be deleted
-- Cron job for Squarespace token refresh - Can be removed from vercel.json
+These files were created for webhook/OAuth approaches but aren't needed for polling:
+- `/api/squarespace-delegate-webhook.js` - Webhook endpoint (requires OAuth)
+- `/api/squarespace-oauth-start.js` - OAuth flow (not needed)
+- `/api/squarespace-oauth-callback.js` - OAuth callback (not needed)
+- `/api/auto-refresh-squarespace-token.js` - Token refresh (not needed)
+- `/api/setup-squarespace-webhook.js` - Webhook setup (requires OAuth)
 
 ## Future: Exhibitor Registration
 
 You can duplicate this setup for exhibitor registrations:
-1. Create `/api/squarespace-exhibitor-webhook.js` (copy delegate webhook)
+1. Create `/api/poll-squarespace-exhibitors.js` (copy delegate polling script)
 2. Change SKU filter to your exhibitor SKU
 3. Change tags to exhibitor-specific tags
-4. Use same API key, just add another webhook subscription
+4. Add another cron job to vercel.json
+5. Use same API key - no additional setup needed!

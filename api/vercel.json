@@ -9,8 +9,8 @@
       "schedule": "*/30 * * * *"
     },
     {
-      "path": "/api/auto-refresh-squarespace-token",
-      "schedule": "*/30 * * * *"
+      "path": "/api/poll-squarespace-delegates",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

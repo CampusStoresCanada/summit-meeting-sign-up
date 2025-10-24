@@ -4,10 +4,10 @@
 export default async function handler(req, res) {
   console.log('🔧 Setting up Squarespace webhook subscription...');
 
-  const oauthToken = process.env.SQUARESPACE_OAUTH_TOKEN;
+  const apiKey = process.env.SQUARESPACE_API_KEY;
 
-  if (!oauthToken) {
-    console.error('❌ No Squarespace OAuth token found');
+  if (!apiKey) {
+    console.error('❌ No Squarespace API key found');
     res.status(500).send(`
       <!DOCTYPE html>
       <html>
@@ -20,9 +20,10 @@ export default async function handler(req, res) {
       </head>
       <body>
         <div class="error">
-          <h1>❌ OAuth Token Not Found</h1>
-          <p>You need to complete the OAuth flow first.</p>
-          <p><a href="/api/squarespace-oauth-start">Click here to start OAuth flow</a></p>
+          <h1>❌ API Key Not Found</h1>
+          <p>You need to add your Squarespace API key to Vercel environment variables.</p>
+          <p><strong>SQUARESPACE_API_KEY</strong> = your generated API key</p>
+          <p>Generate one at: Settings → Advanced → Developer API Keys</p>
         </div>
       </body>
       </html>
@@ -39,7 +40,7 @@ export default async function handler(req, res) {
     const response = await fetch('https://api.squarespace.com/1.0/webhook_subscriptions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${oauthToken}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({

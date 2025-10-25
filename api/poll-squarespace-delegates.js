@@ -25,12 +25,16 @@ export default async function handler(req, res) {
 
   try {
     // Fetch recent orders (last 24 hours to be safe)
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const now = new Date();
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-    console.log(`📦 Fetching orders since: ${since}`);
+    const modifiedAfter = since.toISOString();
+    const modifiedBefore = now.toISOString();
+
+    console.log(`📦 Fetching orders between: ${modifiedAfter} and ${modifiedBefore}`);
 
     const ordersResponse = await fetch(
-      `https://api.squarespace.com/1.0/commerce/orders?modifiedAfter=${since}`,
+      `https://api.squarespace.com/1.0/commerce/orders?modifiedAfter=${modifiedAfter}&modifiedBefore=${modifiedBefore}`,
       {
         headers: {
           'Authorization': `Bearer ${apiKey}`,

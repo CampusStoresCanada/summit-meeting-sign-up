@@ -386,7 +386,9 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
     });
 
     if (!updateResponse.ok) {
-      throw new Error(`Failed to update contact: ${updateResponse.status}`);
+      const errorText = await updateResponse.text();
+      console.error(`❌ Notion update failed: ${updateResponse.status}`, errorText);
+      throw new Error(`Failed to update contact: ${updateResponse.status} - ${errorText}`);
     }
 
     return await updateResponse.json();

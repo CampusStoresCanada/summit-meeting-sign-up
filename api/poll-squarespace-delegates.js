@@ -354,7 +354,7 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
           'Work Email': {
             email: delegateInfo.email.toLowerCase()
           },
-          'Job Title': {
+          'Role/Title': {
             rich_text: [
               {
                 text: {
@@ -372,7 +372,7 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
               }
             ]
           },
-          'Squarespace Order ID': {
+          'Conference Order ID': {
             rich_text: [
               {
                 text: {
@@ -418,10 +418,10 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
             }
           ]
         },
-        'Email': {
+        'Work Email': {
           email: delegateInfo.email.toLowerCase()
         },
-        'Job Title': {
+        'Role/Title': {
           rich_text: [
             {
               text: {
@@ -439,7 +439,7 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
             }
           ]
         },
-        'Squarespace Order ID': {
+        'Conference Order ID': {
           rich_text: [
             {
               text: {

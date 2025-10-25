@@ -117,6 +117,8 @@ export default async function handler(req, res) {
       }
 
       console.log(`\n📦 Processing order: ${orderId}`);
+      console.log(`🔍 DEBUG - Order number: ${order.orderNumber || 'N/A'}`);
+      console.log(`🔍 DEBUG - Full order keys:`, Object.keys(order));
 
       try {
         // Extract delegate registrations from line items
@@ -147,7 +149,8 @@ export default async function handler(req, res) {
               consentRecording: getCustomizationValue('Waiver'),
               firstConference: getCustomizationValue('Is this your first CSC conference?'),
               canCollMember: getCustomizationValue('Is your school a member of CANCOLL?'),
-              orderId: orderId // Store order ID with contact
+              orderId: orderId, // Store order ID with contact
+              orderNumber: order.orderNumber || orderId // Use human-readable order number if available
             };
 
             console.log(`👤 Processing delegate: ${delegateInfo.name} (${delegateInfo.email})`);
@@ -376,7 +379,7 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
             rich_text: [
               {
                 text: {
-                  content: delegateInfo.orderId
+                  content: delegateInfo.orderNumber
                 }
               }
             ]
@@ -443,7 +446,7 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
           rich_text: [
             {
               text: {
-                content: delegateInfo.orderId
+                content: delegateInfo.orderNumber
               }
             }
           ]

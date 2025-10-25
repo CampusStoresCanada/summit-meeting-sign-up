@@ -361,15 +361,6 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
           'Work Email': {
             email: delegateInfo.email.toLowerCase()
           },
-          'Institution': {
-            rich_text: [
-              {
-                text: {
-                  content: delegateInfo.institution
-                }
-              }
-            ]
-          },
           'Role/Title': {
             rich_text: [
               {
@@ -379,11 +370,14 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
               }
             ]
           },
-          'Work Phone': {
+          'Work Phone Number': {
+            phone_number: delegateInfo.phone
+          },
+          'Notes': {
             rich_text: [
               {
                 text: {
-                  content: delegateInfo.phone
+                  content: `Institution: ${delegateInfo.institution}\nRegistered via Squarespace for conference.`
                 }
               }
             ]
@@ -446,15 +440,6 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
         'Work Email': {
           email: delegateInfo.email.toLowerCase()
         },
-        'Institution': {
-          rich_text: [
-            {
-              text: {
-                content: delegateInfo.institution
-              }
-            }
-          ]
-        },
         'Role/Title': {
           rich_text: [
             {
@@ -464,11 +449,14 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
             }
           ]
         },
-        'Work Phone': {
+        'Work Phone Number': {
+          phone_number: delegateInfo.phone
+        },
+        'Notes': {
           rich_text: [
             {
               text: {
-                content: delegateInfo.phone
+                content: `Institution: ${delegateInfo.institution}\nRegistered via Squarespace for conference.`
               }
             }
           ]

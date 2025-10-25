@@ -130,21 +130,23 @@ export default async function handler(req, res) {
         // Process each delegate registration
         for (const registration of delegateItems) {
           try {
-            // Extract form data from customizations/variantOptions
-            const formData = registration.customizations || registration.variantOptions || {};
+            // Extract form data from customizations array
+            const customizations = registration.customizations || [];
 
-            // DEBUG: Log the entire registration object to see structure
-            console.log('🔍 DEBUG - Full registration object:', JSON.stringify(registration, null, 2));
-            console.log('🔍 DEBUG - Form data extracted:', JSON.stringify(formData, null, 2));
+            // Helper function to find value by label
+            const getCustomizationValue = (label) => {
+              const item = customizations.find(c => c.label === label);
+              return item ? item.value : '';
+            };
 
             const delegateInfo = {
-              name: formData.name || formData.Name || '',
-              email: formData.email || formData.Email || '',
-              jobTitle: formData.jobTitle || formData['Job Title'] || '',
-              dietaryRestrictions: formData.dietaryRestrictions || formData['Dietary Restrictions'] || '',
-              consentRecording: formData.consentRecording || formData['Consent for Recording'] || '',
-              firstConference: formData.firstConference || formData['First Conference'] || '',
-              canCollMember: formData.canCollMember || formData['CanCOLL Member'] || '',
+              name: getCustomizationValue('Name'),
+              email: getCustomizationValue('Email'),
+              jobTitle: getCustomizationValue('Job Title'),
+              dietaryRestrictions: getCustomizationValue('Do you have any dietary restrictions we need to know about?'),
+              consentRecording: getCustomizationValue('Waiver'),
+              firstConference: getCustomizationValue('Is this your first CSC conference?'),
+              canCollMember: getCustomizationValue('Is your school a member of CANCOLL?'),
               orderId: orderId // Store order ID with contact
             };
 
@@ -506,9 +508,14 @@ async function addTagToContact(contactId, tagId, notionToken) {
   }
 }
 
-// Helper to check if a form response is "yes"
+// Helper to check if a form response indicates "yes" or first time attendance
 function isYesResponse(value) {
   if (!value) return false;
   const normalized = value.toString().toLowerCase().trim();
-  return normalized === 'yes' || normalized === 'true' || normalized === '1';
+  // Check for various affirmative responses
+  return normalized === 'yes' ||
+         normalized === 'true' ||
+         normalized === '1' ||
+         normalized.includes('first time') ||
+         normalized.includes('would like a ribbon');
 }

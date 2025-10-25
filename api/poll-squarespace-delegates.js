@@ -145,7 +145,9 @@ export default async function handler(req, res) {
             const delegateInfo = {
               name: getCustomizationValue('Name'),
               email: getCustomizationValue('Email'),
+              institution: getCustomizationValue('Institution'),
               jobTitle: getCustomizationValue('Job Title'),
+              phone: getCustomizationValue('Direct Phone'),
               dietaryRestrictions: getCustomizationValue('Do you have any dietary restrictions we need to know about?'),
               consentRecording: getCustomizationValue('Waiver'),
               firstConference: getCustomizationValue('Is this your first CSC conference?'),
@@ -359,11 +361,29 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
           'Work Email': {
             email: delegateInfo.email.toLowerCase()
           },
+          'Institution': {
+            rich_text: [
+              {
+                text: {
+                  content: delegateInfo.institution
+                }
+              }
+            ]
+          },
           'Role/Title': {
             rich_text: [
               {
                 text: {
                   content: delegateInfo.jobTitle
+                }
+              }
+            ]
+          },
+          'Work Phone': {
+            rich_text: [
+              {
+                text: {
+                  content: delegateInfo.phone
                 }
               }
             ]
@@ -426,11 +446,29 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
         'Work Email': {
           email: delegateInfo.email.toLowerCase()
         },
+        'Institution': {
+          rich_text: [
+            {
+              text: {
+                content: delegateInfo.institution
+              }
+            }
+          ]
+        },
         'Role/Title': {
           rich_text: [
             {
               text: {
                 content: delegateInfo.jobTitle
+              }
+            }
+          ]
+        },
+        'Work Phone': {
+          rich_text: [
+            {
+              text: {
+                content: delegateInfo.phone
               }
             }
           ]

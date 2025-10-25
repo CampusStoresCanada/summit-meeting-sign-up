@@ -321,7 +321,9 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
   });
 
   if (!searchResponse.ok) {
-    throw new Error(`Failed to search for contact: ${searchResponse.status}`);
+    const errorText = await searchResponse.text();
+    console.error(`❌ Notion search failed: ${searchResponse.status}`, errorText);
+    throw new Error(`Failed to search for contact: ${searchResponse.status} - ${errorText}`);
   }
 
   const searchData = await searchResponse.json();

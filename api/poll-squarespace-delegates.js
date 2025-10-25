@@ -108,15 +108,16 @@ export default async function handler(req, res) {
     // Process each order
     for (const order of delegateOrders) {
       const orderId = order.id;
+      const orderNumber = order.orderNumber?.toString() || orderId;
 
-      // Skip if already processed
-      if (processedOrderIds.has(orderId)) {
-        console.log(`⏭️ Skipping already processed order: ${orderId}`);
+      // Skip if already processed (check by order number)
+      if (processedOrderIds.has(orderNumber)) {
+        console.log(`⏭️ Skipping already processed order: ${orderNumber}`);
         skippedCount++;
         continue;
       }
 
-      console.log(`\n📦 Processing order: ${orderId}`);
+      console.log(`\n📦 Processing order: ${orderNumber} (ID: ${orderId})`);
       console.log(`🔍 DEBUG - Order number: ${order.orderNumber || 'N/A'}`);
       console.log(`🔍 DEBUG - Full order keys:`, Object.keys(order));
 
@@ -261,9 +262,9 @@ async function getProcessedOrderIds(notionToken, contactsDbId) {
   const data = await response.json();
 
   for (const page of data.results) {
-    const orderId = page.properties['Squarespace Order ID']?.rich_text?.[0]?.text?.content;
-    if (orderId) {
-      processedIds.add(orderId);
+    const orderNumber = page.properties['Conference Order ID']?.rich_text?.[0]?.text?.content;
+    if (orderNumber) {
+      processedIds.add(orderNumber);
     }
   }
 

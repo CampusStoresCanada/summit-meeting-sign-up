@@ -476,7 +476,7 @@ async function addTagToContact(contactId, tagId, notionToken) {
   }
 
   const pageData = await pageResponse.json();
-  const existingTags = pageData.properties.Tag?.relation || [];
+  const existingTags = pageData.properties['Personal Tag']?.relation || [];
 
   // Check if tag already exists
   const hasTag = existingTags.some(tag => tag.id === tagId);
@@ -496,7 +496,7 @@ async function addTagToContact(contactId, tagId, notionToken) {
     },
     body: JSON.stringify({
       properties: {
-        'Tag': {
+        'Personal Tag': {
           relation: [
             ...existingTags,
             { id: tagId }

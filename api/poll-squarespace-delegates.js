@@ -133,6 +133,10 @@ export default async function handler(req, res) {
             // Extract form data from customizations/variantOptions
             const formData = registration.customizations || registration.variantOptions || {};
 
+            // DEBUG: Log the entire registration object to see structure
+            console.log('🔍 DEBUG - Full registration object:', JSON.stringify(registration, null, 2));
+            console.log('🔍 DEBUG - Form data extracted:', JSON.stringify(formData, null, 2));
+
             const delegateInfo = {
               name: formData.name || formData.Name || '',
               email: formData.email || formData.Email || '',

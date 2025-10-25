@@ -312,7 +312,7 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
     },
     body: JSON.stringify({
       filter: {
-        property: 'Email',
+        property: 'Work Email',
         email: {
           equals: delegateInfo.email.toLowerCase()
         }
@@ -351,7 +351,7 @@ async function findOrCreateContact(delegateInfo, notionToken, contactsDbId) {
               }
             ]
           },
-          'Email': {
+          'Work Email': {
             email: delegateInfo.email.toLowerCase()
           },
           'Job Title': {

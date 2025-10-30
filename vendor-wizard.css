@@ -30,6 +30,53 @@ body::before {
     z-index: -1;
 }
 
+/* ===========================================
+   BUTTON STYLES (Summit Registration)
+   =========================================== */
+
+.btn {
+    padding: 0.8em 2em;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background: #ba003b;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #9a0030;
+}
+
+.btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-secondary {
+    background: #f8f9fa;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.btn-secondary:hover {
+    background: #e9ecef;
+}
+
+.button-group {
+    display: flex;
+    gap: 1em;
+    margin-top: 2em;
+    justify-content: space-between;
+}
+
 @media (orientation: portrait), (max-width: 768px) {
     .mobile-buttons {
         display: flex;

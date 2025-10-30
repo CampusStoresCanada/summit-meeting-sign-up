@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Managers & Directors Summit Registration - Campus Stores Canada</title>
+    <link rel="icon" type="image/png" href="https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1600096854522-HS7NUI12I1ML6SPJFLLY/Artboard+1.png?format=1500w">
+
+    <!-- External Fonts -->
+    <link rel="stylesheet" href="https://use.typekit.net/ilr6ctr.css">
+
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="vendor-wizard.css">
+
+    <!-- Summit-Specific Styles -->
+    <style>
+        /* Serious/Confidential Tone Styling */
+        .summit-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1.5em;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+
+        .summit-critical {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 1.5em;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+
+        .summit-info {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 1.5em;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+
+        .agreement-text {
+            background: #f8f9fa;
+            padding: 2em;
+            margin: 1.5em 0;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        .agreement-text h3 {
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            color: #2c3e50;
+        }
+
+        .agreement-text p {
+            margin-bottom: 1em;
+        }
+
+        .agreement-text ul {
+            margin-left: 2em;
+            margin-bottom: 1em;
+        }
+
+        .checkbox-group {
+            margin: 1.5em 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1em;
+            padding: 1em;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            border-color: #0071bc;
+        }
+
+        .checkbox-item.checked {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 1em;
+            margin-top: 0.3em;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            flex: 1;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .file-upload-area {
+            margin: 2em 0;
+            padding: 2em;
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: #0071bc;
+            background: #f0f8ff;
+        }
+
+        .file-upload-area.has-file {
+            border-color: #28a745;
+            background: #f8fff9;
+            border-style: solid;
+        }
+
+        .file-upload-label {
+            display: block;
+            cursor: pointer;
+            padding: 1em;
+        }
+
+        .file-upload-input {
+            display: none;
+        }
+
+        .file-name-display {
+            margin-top: 1em;
+            padding: 0.8em;
+            background: white;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #28a745;
+        }
+
+        .radio-group {
+            margin: 1.5em 0;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1em;
+            padding: 1.2em;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .radio-item:hover {
+            border-color: #0071bc;
+        }
+
+        .radio-item.selected {
+            border-color: #0071bc;
+            background: #f0f8ff;
+        }
+
+        .radio-item input[type="radio"] {
+            margin-right: 1em;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .radio-item label {
+            cursor: pointer;
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .explanation-text {
+            color: #6c757d;
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 0.5em;
+            line-height: 1.5;
+        }
+
+        .contact-selection {
+            margin: 2em 0;
+        }
+
+        .contact-card {
+            padding: 1.2em;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            margin-bottom: 1em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .contact-card:hover {
+            border-color: #0071bc;
+        }
+
+        .contact-card.selected {
+            border-color: #0071bc;
+            background: #f0f8ff;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 0.3em;
+        }
+
+        .contact-details {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .add-new-person-btn {
+            padding: 1em;
+            background: #f8f9fa;
+            border: 2px dashed #ced4da;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-new-person-btn:hover {
+            border-color: #0071bc;
+            background: #f0f8ff;
+        }
+
+        .new-person-form {
+            margin-top: 1.5em;
+            padding: 1.5em;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .form-field {
+            margin-bottom: 1.2em;
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: 0.5em;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-field input {
+            width: 100%;
+            padding: 0.8em;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .form-field input:focus {
+            outline: none;
+            border-color: #0071bc;
+            box-shadow: 0 0 0 3px rgba(0, 113, 188, 0.1);
+        }
+
+        .field-error {
+            color: #dc3545;
+            font-size: 0.85em;
+            margin-top: 0.3em;
+            display: none;
+        }
+
+        .field-error.visible {
+            display: block;
+        }
+
+        .progress-indicator {
+            margin-bottom: 2em;
+            padding: 1em;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .progress-text {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-bottom: 0.5em;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0071bc, #00a4e4);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="wizard-container">
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">
+            <div class="loading-title">
+                Loading<span class="dots">
+                    <span class="dot">.</span>
+                    <span class="dot">.</span>
+                    <span class="dot">.</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Upload Animation State -->
+        <div class="uploading-state" id="uploadingState">
+            <div class="uploading-title">
+                Uploading<span class="dots">
+                    <span class="dot">.</span>
+                    <span class="dot">.</span>
+                    <span class="dot">.</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="sidebar">
+            <div class="logo-container">
+                <img src="https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1600096854522-HS7NUI12I1ML6SPJFLLY/Artboard+1.png?format=1500w" alt="CSC Logo">
+            </div>
+            <h2 class="sidebar-title">Managers & Directors Summit</h2>
+            <div class="step-indicators">
+                <div class="step-indicator active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Identity Verification</div>
+                </div>
+                <div class="step-indicator" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Your Attendance</div>
+                </div>
+                <div class="step-indicator" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Format & Agreement</div>
+                </div>
+                <div class="step-indicator" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Designate Alternate</div>
+                </div>
+                <div class="step-indicator" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">Confirmation</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wizard-content">
+            <!-- Welcome Section -->
+            <div id="welcomeSection" class="content-section active">
+                <h1>Managers & Directors Summit Registration</h1>
+
+                <div class="summit-info">
+                    <p><strong>This is a highly confidential meeting requiring explicit agreements at multiple decision points.</strong></p>
+                    <p>This registration process will guide you through several important decisions and require your acknowledgment of strict confidentiality requirements.</p>
+                </div>
+
+                <div class="summit-warning">
+                    <p><strong>Before you begin:</strong></p>
+                    <ul>
+                        <li>You will need to review and sign confidentiality agreements</li>
+                        <li>You must be able to upload signed PDF or image files</li>
+                        <li>All checkboxes and agreements are required - no exceptions</li>
+                        <li>This process should take 10-15 minutes to complete</li>
+                    </ul>
+                </div>
+
+                <button class="btn btn-primary" onclick="startWizard()">Begin Registration</button>
+            </div>
+
+            <!-- Step 1: Identity Verification -->
+            <div id="step1Section" class="content-section">
+                <div class="progress-indicator">
+                    <div class="progress-text">Step 1 of 5</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%;"></div>
+                    </div>
+                </div>
+
+                <h1>Identity Verification</h1>
+
+                <div class="summit-info">
+                    <p><strong>We're looking for specific people in leadership roles, not just "a representative" or "the person nearby."</strong></p>
+                    <p>This meeting requires decision-makers who can speak candidly about strategic and operational matters.</p>
+                </div>
+
+                <div class="radio-group">
+                    <p style="font-weight: 600; margin-bottom: 1em;">Are you the primary CSC member for your institution?</p>
+
+                    <div class="radio-item" onclick="selectIdentity('yes')">
+                        <input type="radio" name="identity" id="identityYes" value="yes">
+                        <label for="identityYes">Yes, I am the primary CSC member</label>
+                    </div>
+
+                    <div class="radio-item" onclick="selectIdentity('no')">
+                        <input type="radio" name="identity" id="identityNo" value="no">
+                        <label for="identityNo">No, I am not the primary member</label>
+                    </div>
+                </div>
+
+                <div id="notPrimaryMessage" style="display: none;" class="summit-critical">
+                    <p><strong>This registration is for the primary CSC member only.</strong></p>
+                    <p>Please forward this link to your institution's primary CSC member. If you're unsure who that is, please contact <a href="mailto:info@campusstores.ca">info@campusstores.ca</a></p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button class="btn btn-primary" id="step1NextBtn" onclick="nextStep()" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Attendance Decision (Primary Member) -->
+            <div id="step2Section" class="content-section">
+                <div class="progress-indicator">
+                    <div class="progress-text">Step 2 of 5</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 40%;"></div>
+                    </div>
+                </div>
+
+                <h1>Will You Be Attending?</h1>
+
+                <div class="radio-group">
+                    <p style="font-weight: 600; margin-bottom: 1em;">Will you be attending the Managers & Directors Summit?</p>
+
+                    <div class="radio-item" onclick="selectPrimaryAttendance('yes')">
+                        <input type="radio" name="primaryAttendance" id="primaryAttendYes" value="yes">
+                        <label for="primaryAttendYes">Yes, I will attend</label>
+                    </div>
+
+                    <div class="radio-item" onclick="selectPrimaryAttendance('no')">
+                        <input type="radio" name="primaryAttendance" id="primaryAttendNo" value="no">
+                        <label for="primaryAttendNo">No, I will not attend</label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button class="btn btn-primary" id="step2NextBtn" onclick="nextStep()" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 3a: Attendance Format (Primary Member) -->
+            <div id="step3aSection" class="content-section">
+                <div class="progress-indicator">
+                    <div class="progress-text">Step 3 of 5</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%;"></div>
+                    </div>
+                </div>
+
+                <h1>How Will You Attend?</h1>
+
+                <div class="radio-group">
+                    <p style="font-weight: 600; margin-bottom: 1em;">Please select your attendance format:</p>
+
+                    <div class="radio-item" onclick="selectPrimaryFormat('in-person')">
+                        <input type="radio" name="primaryFormat" id="primaryFormatInPerson" value="in-person">
+                        <label for="primaryFormatInPerson">
+                            In Person
+                            <div class="explanation-text">I will attend the summit in person at the designated location</div>
+                        </label>
+                    </div>
+
+                    <div class="radio-item" onclick="selectPrimaryFormat('virtual')">
+                        <input type="radio" name="primaryFormat" id="primaryFormatVirtual" value="virtual">
+                        <label for="primaryFormatVirtual">
+                            Virtual (Online)
+                            <div class="explanation-text">I will attend the summit remotely via video conference</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button class="btn btn-primary" id="step3aNextBtn" onclick="nextStep()" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 3b: Primary Confidentiality Agreement -->
+            <div id="step3bSection" class="content-section">
+                <div class="progress-indicator">
+                    <div class="progress-text">Step 3 of 5 - Confidentiality Agreement</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%;"></div>
+                    </div>
+                </div>
+
+                <h1>Confidentiality Agreement</h1>
+
+                <div class="summit-critical">
+                    <p><strong>Please read the following confidentiality requirements carefully.</strong></p>
+                    <p>You must agree to all terms and upload a signed copy to proceed.</p>
+                </div>
+
+                <div class="agreement-text">
+                    <h3>Before you register, you need to understand what you're agreeing to.</h3>
+
+                    <p>This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.</p>
+
+                    <h3>What We'll Be Discussing</h3>
+                    <p>Frank conversations about:</p>
+                    <ul>
+                        <li>The real financial situation of your campus store</li>
+                        <li>Staffing levels, changes, and expertise needs</li>
+                        <li>Operational challenges and solutions</li>
+                        <li>Strategic decisions your institution is requiring</li>
+                    </ul>
+
+                    <h3>Who Can Attend</h3>
+                    <p>This meeting is designed for management-level staff who can speak candidly about their store's operations and strategic decisions.</p>
+
+                    <p><strong>If you are the primary CSC member:</strong> You can attend yourself or designate someone else from your team.</p>
+
+                    <p><strong>Important consideration about collective bargaining agreements:</strong> If you or your designee are covered by a collective bargaining agreement, you must review your contract to ensure there are no provisions that would require you to disclose information from this meeting. By registering, you assume full responsibility for any conflicts between this confidentiality agreement and your employment contract.</p>
+
+                    <p><strong>If you are designating someone else:</strong> You are personally responsible for ensuring they understand and will follow these rules. The CSC Board reserves the right to exclude any designee if they believe that person cannot contribute meaningfully to the conversation.</p>
+
+                    <h3>The Rules</h3>
+                    <p><strong>In-Person:</strong> "What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward."</p>
+
+                    <p><strong>Virtual:</strong> You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.</p>
+
+                    <h3>Consequences</h3>
+                    <p>Breaking confidentiality results in immediate membership termination with no appeals or refunds.</p>
+                </div>
+
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="primaryAgree1" onchange="updatePrimaryAgreementState()">
+                        <label for="primaryAgree1">I understand this meeting requires absolute confidentiality under Traffic Light Protocol Red</label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="primaryAgree2" onchange="updatePrimaryAgreementState()">
+                        <label for="primaryAgree2">I have reviewed applicable employment contracts and accept responsibility for any conflicts</label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="primaryAgree3" onchange="updatePrimaryAgreementState()">
+                        <label for="primaryAgree3">I agree to follow all confidentiality requirements and virtual attendance rules</label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="primaryAgree4" onchange="updatePrimaryAgreementState()">
+                        <label for="primaryAgree4">I acknowledge that breaking confidentiality terminates CSC membership immediately</label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="primaryAgree5" onchange="updatePrimaryAgreementState()">
+                        <label for="primaryAgree5">I accept responsibility for ensuring any designee understands and agrees to these terms</label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="primaryAgree6" onchange="updatePrimaryAgreementState()">
+                        <label for="primaryAgree6">I understand the CSC Board may exclude any designee deemed unable to contribute meaningfully</label>
+                    </div>
+                </div>
+
+                <div class="file-upload-area" id="primaryAgreementUploadArea">
+                    <label for="primaryAgreementFile" class="file-upload-label">
+                        <p style="font-weight: 600; margin-bottom: 0.5em;">Upload Signed Confidentiality Agreement</p>
+                        <p style="color: #6c757d; font-size: 0.9em;">Click to select a PDF or image file (JPG, PNG)</p>
+                        <p style="color: #6c757d; font-size: 0.85em; margin-top: 0.5em;">Maximum file size: 5MB</p>
+                    </label>
+                    <input type="file" id="primaryAgreementFile" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" onchange="handlePrimaryAgreementUpload(event)">
+                    <div id="primaryAgreementFileName" class="file-name-display" style="display: none;"></div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button class="btn btn-primary" id="step3bNextBtn" onclick="nextStep()" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 3c: Virtual Protocol Agreement (Conditional) -->
+            <div id="step3cSection" class="content-section">
+                <div class="progress-indicator">
+                    <div class="progress-text">Step 3 of 5 - Virtual Attendance Protocol</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%;"></div>
+                    </div>
+                </div>
+
+                <h1>Virtual Attendance Protocol</h1>
+
+                <div class="summit-warning">
+                    <p><strong>Virtual attendance requires additional protocols to maintain confidentiality.</strong></p>
+                    <p>Please review and agree to the following requirements:</p>
+                </div>
+
+                <div class="agreement-text">
+                    <h3>Core Requirements</h3>
+
+                    <p><strong>Before attending:</strong> Test camera/microphone, ensure stable internet, secure a private lockable room, and silence notifications.</p>
+
+                    <p><strong>During the meeting:</strong> Your camera needs to stay on for the entire meeting. Microphone should remain active throughout. You cannot have others in the room, record sessions, take screenshots, use speakers that risk audio leakage, or join from shared spaces.</p>
+
+                    <h3>If Technical Problems Occur</h3>
+                    <p>Reconnect quickly when connection drops. If camera/microphone fails persistently, disconnect and troubleshoot. If someone unexpectedly enters your space, immediately leave the call and rejoin once secured.</p>
+
+                    <h3>Guiding Principle</h3>
+                    <p>Virtual participants join "the room with us, just through a screen." The summit depends on confidentiality for candid discussions about financial and staffing challenges. You must protect conversations with the same security commitment as in-person participants.</p>
+
+                    <h3>Contact for Questions</h3>
+                    <p>If you have setup concerns, reach out to Greg McPherson (<a href="mailto:greg@campusstores.ca">greg@campusstores.ca</a>) before the meeting.</p>
+                </div>
+
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="primaryVirtualAgree" onchange="updatePrimaryVirtualState()">
+                        <label for="primaryVirtualAgree">I agree to maintain these virtual attendance requirements and understand that failure to comply may result in removal from the meeting</label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button class="btn btn-primary" id="step3cNextBtn" onclick="nextStep()" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 3d: Final Breach Acknowledgment -->
+            <div id="step3dSection" class="content-section">
+                <div class="progress-indicator">
+                    <div class="progress-text">Step 3 of 5 - Final Acknowledgment</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%;"></div>
+                    </div>
+                </div>
+
+                <h1>Breach of Confidentiality - Final Acknowledgment</h1>
+
+                <div class="summit-critical">
+                    <p style="font-size: 1.1em; line-height: 1.8;">
+                        <strong>If you or your designee breaches confidentiality - even accidentally, even just a rumor - your institution's CSC membership will be terminated immediately.</strong>
+                    </p>
+                    <p style="font-size: 1.1em; line-height: 1.8;">
+                        <strong>There are no warnings. There are no refunds.</strong>
+                    </p>
+                </div>
+
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="primaryBreachAck" onchange="updatePrimaryBreachState()">
+                        <label for="primaryBreachAck" style="font-size: 1.05em; font-weight: 600;">
+                            I understand and accept these consequences
+                        </label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button class="btn btn-primary" id="step3dNextBtn" onclick="nextStep()" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Designate Alternate -->
+            <div id="step4Section" class="content-section">
+                <div class="progress-indicator">
+                    <div class="progress-text">Step 4 of 5</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%;"></div>
+                    </div>
+                </div>
+
+                <h1>Designate an Alternate</h1>
+
+                <div class="summit-info">
+                    <p id="step4IntroText"></p>
+                </div>
+
+                <div class="radio-group">
+                    <p style="font-weight: 600; margin-bottom: 1em;" id="step4QuestionText"></p>
+
+                    <div class="radio-item" onclick="selectDesignateAlternate('yes')">
+                        <input type="radio" name="designateAlternate" id="designateYes" value="yes">
+                        <label for="designateYes" id="designateYesLabel"></label>
+                    </div>
+
+                    <div class="radio-item" onclick="selectDesignateAlternate('no')">
+                        <input type="radio" name="designateAlternate" id="designateNo" value="no">
+                        <label for="designateNo" id="designateNoLabel"></label>
+                    </div>
+                </div>
+
+                <div id="noDesignateMessage" style="display: none;" class="summit-info">
+                    <p>Thank you for your response. Click Continue to complete your registration.</p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button class="btn btn-primary" id="step4NextBtn" onclick="nextStep()" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Alternate Selection -->
+            <div id="step5Section" class="content-section">
+                <div class="progress-indicator">
+                    <div class="progress-text">Step 4 of 5 - Select Alternate</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%;"></div>
+                    </div>
+                </div>
+
+                <h1>Select Your Alternate</h1>
+
+                <div class="summit-info">
+                    <p>Choose an existing contact or add a new person from your team:</p>
+                </div>
+
+                <div class="contact-selection" id="existingContacts">
+                    <!-- Existing contacts will be populated here -->
+                </div>
+
+                <div class="add-new-person-btn" onclick="toggleNewPersonForm()">
+                    <p style="font-weight: 600;">+ Add a New Person</p>
+                </div>
+
+                <div id="newPersonForm" class="new-person-form" style="display: none;">
+                    <h3 style="margin-top: 0;">New Alternate Information</h3>
+
+                    <div class="form-field">
+                        <label for="alternateName">Full Name *</label>
+                        <input type="text" id="alternateName" placeholder="Jane Smith">
+                        <div class="field-error" id="alternateNameError">Name is required</div>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="alternateTitle">Title/Position *</label>
+                        <input type="text" id="alternateTitle" placeholder="Assistant Manager">
+                        <div class="field-error" id="alternateTitleError">Title is required</div>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="alternateEmail">Email Address *</label>
+                        <input type="email" id="alternateEmail" placeholder="jane.smith@university.edu">
+                        <div class="field-error" id="alternateEmailError">Valid email is required</div>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="alternatePhone">Phone Number *</label>
+                        <input type="tel" id="alternatePhone" placeholder="(555) 123-4567">
+                        <div class="field-error" id="alternatePhoneError">Phone number is required</div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button class="btn btn-primary" id="step5NextBtn" onclick="nextStep()" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 6: Alternate Attendance Format -->
+            <div id="step6Section" class="content-section">
+                <div class="progress-indicator">
+                    <div class="progress-text">Step 4 of 5 - Alternate Format</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%;"></div>
+                    </div>
+                </div>
+
+                <h1>Alternate Attendance Format</h1>
+
+                <div class="radio-group">
+                    <p style="font-weight: 600; margin-bottom: 1em;">How will <span id="alternateNameDisplay"></span> attend?</p>
+
+                    <div class="radio-item" onclick="selectAlternateFormat('in-person')">
+                        <input type="radio" name="alternateFormat" id="alternateFormatInPerson" value="in-person">
+                        <label for="alternateFormatInPerson">
+                            In Person
+                            <div class="explanation-text">They will attend the summit in person at the designated location</div>
+                        </label>
+                    </div>
+
+                    <div class="radio-item" onclick="selectAlternateFormat('virtual')">
+                        <input type="radio" name="alternateFormat" id="alternateFormatVirtual" value="virtual">
+                        <label for="alternateFormatVirtual">
+                            Virtual (Online)
+                            <div class="explanation-text">They will attend the summit remotely via video conference</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button class="btn btn-primary" id="step6NextBtn" onclick="nextStep()" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 7: Primary Member Certification for Alternate -->
+            <div id="step7Section" class="content-section">
+                <div class="progress-indicator">
+                    <div class="progress-text">Step 4 of 5 - Certification</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%;"></div>
+                    </div>
+                </div>
+
+                <h1>Primary Member Certification</h1>
+
+                <div class="summit-warning">
+                    <p><strong>By designating <span id="certificationAlternateName"></span>, you certify the following:</strong></p>
+                </div>
+
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="certify1" onchange="updateCertificationState()">
+                        <label for="certify1">I certify that this person understands and will uphold confidentiality requirements</label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="certify2" onchange="updateCertificationState()">
+                        <label for="certify2">I understand the CSC Board may exclude this designee if they determine they cannot meaningfully contribute</label>
+                    </div>
+                </div>
+
+                <div class="file-upload-area" id="certificationUploadArea">
+                    <label for="certificationFile" class="file-upload-label">
+                        <p style="font-weight: 600; margin-bottom: 0.5em;">Upload Signed Primary Member Certification</p>
+                        <p style="color: #6c757d; font-size: 0.9em;">Click to select a PDF or image file (JPG, PNG)</p>
+                        <p style="color: #6c757d; font-size: 0.85em; margin-top: 0.5em;">Maximum file size: 5MB</p>
+                    </label>
+                    <input type="file" id="certificationFile" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" onchange="handleCertificationUpload(event)">
+                    <div id="certificationFileName" class="file-name-display" style="display: none;"></div>
+                </div>
+
+                <div class="summit-info">
+                    <p><strong>Next Step:</strong> After you submit this certification, <span id="emailAlternateName"></span> will receive an email with a unique link to complete their own confidentiality agreement.</p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
+                    <button class="btn btn-primary" id="step7NextBtn" onclick="nextStep()" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 8: Confirmation -->
+            <div id="step8Section" class="content-section">
+                <div class="progress-indicator">
+                    <div class="progress-text">Complete!</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <h1>Registration Confirmed</h1>
+
+                <div class="summit-info" id="confirmationMessage">
+                    <!-- Dynamic confirmation message will be inserted here -->
+                </div>
+
+                <div class="summit-warning" id="nextStepsMessage">
+                    <!-- Dynamic next steps message will be inserted here -->
+                </div>
+
+                <div style="margin-top: 3em; text-align: center;">
+                    <p style="color: #6c757d;">If you have any questions, please contact <a href="mailto:info@campusstores.ca">info@campusstores.ca</a></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Global State
+        let currentStep = 0;
+        let token = '';
+        let organizationData = {};
+        let organizationContacts = [];
+
+        // Registration State
+        let registrationState = {
+            // Identity
+            isPrimaryMember: null,
+
+            // Primary Member
+            primaryIsAttending: null,
+            primaryFormat: null,
+            primaryAgreementChecks: [],
+            primaryAgreementFile: null,
+            primaryAgreementUrl: null,
+            primaryVirtualAgreed: false,
+            primaryBreachAck: false,
+
+            // Designee
+            hasDesignee: null,
+            designeeContact: null,
+            designeeIsNew: false,
+            designeeFormat: null,
+
+            // Certification
+            certificationChecks: [],
+            certificationFile: null,
+            certificationUrl: null
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Get token from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            token = urlParams.get('token');
+
+            if (!token) {
+                alert('No token provided. Please use the link from your email.');
+                return;
+            }
+
+            // Load organization data
+            await loadOrganizationData();
+        });
+
+        async function loadOrganizationData() {
+            try {
+                const response = await fetch(`/api/get-organization?token=${token}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    alert('Invalid token or organization not found.');
+                    return;
+                }
+
+                organizationData = data;
+
+                // Load contacts
+                const contactsResponse = await fetch(`/api/get-organization-contacts?token=${token}`);
+                const contactsData = await contactsResponse.json();
+                organizationContacts = contactsData.contacts || [];
+
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Error loading organization data. Please try again.');
+            }
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingState').style.display = 'none';
+        }
+
+        function showLoading() {
+            document.getElementById('loadingState').style.display = 'flex';
+        }
+
+        function startWizard() {
+            document.getElementById('welcomeSection').classList.remove('active');
+            document.getElementById('step1Section').classList.add('active');
+            currentStep = 1;
+        }
+
+        // Step 1: Identity Verification
+        function selectIdentity(answer) {
+            registrationState.isPrimaryMember = answer === 'yes';
+
+            document.querySelectorAll('input[name="identity"]').forEach(input => {
+                input.parentElement.classList.remove('selected');
+            });
+
+            const selectedRadio = document.getElementById(`identity${answer === 'yes' ? 'Yes' : 'No'}`);
+            selectedRadio.checked = true;
+            selectedRadio.parentElement.classList.add('selected');
+
+            if (answer === 'no') {
+                document.getElementById('notPrimaryMessage').style.display = 'block';
+                document.getElementById('step1NextBtn').disabled = true;
+            } else {
+                document.getElementById('notPrimaryMessage').style.display = 'none';
+                document.getElementById('step1NextBtn').disabled = false;
+            }
+        }
+
+        // Step 2: Primary Attendance
+        function selectPrimaryAttendance(answer) {
+            registrationState.primaryIsAttending = answer === 'yes';
+
+            document.querySelectorAll('input[name="primaryAttendance"]').forEach(input => {
+                input.parentElement.classList.remove('selected');
+            });
+
+            const selectedRadio = document.getElementById(`primaryAttend${answer === 'yes' ? 'Yes' : 'No'}`);
+            selectedRadio.checked = true;
+            selectedRadio.parentElement.classList.add('selected');
+
+            document.getElementById('step2NextBtn').disabled = false;
+        }
+
+        // Step 3a: Primary Format
+        function selectPrimaryFormat(format) {
+            registrationState.primaryFormat = format;
+
+            document.querySelectorAll('input[name="primaryFormat"]').forEach(input => {
+                input.parentElement.classList.remove('selected');
+            });
+
+            const selectedRadio = document.getElementById(`primaryFormat${format === 'in-person' ? 'InPerson' : 'Virtual'}`);
+            selectedRadio.checked = true;
+            selectedRadio.parentElement.classList.add('selected');
+
+            document.getElementById('step3aNextBtn').disabled = false;
+        }
+
+        // Step 3b: Primary Agreement
+        function updatePrimaryAgreementState() {
+            const allChecked = ['primaryAgree1', 'primaryAgree2', 'primaryAgree3', 'primaryAgree4', 'primaryAgree5', 'primaryAgree6']
+                .every(id => document.getElementById(id).checked);
+
+            const hasFile = registrationState.primaryAgreementFile !== null;
+
+            document.getElementById('step3bNextBtn').disabled = !(allChecked && hasFile);
+
+            // Update checkbox styling
+            document.querySelectorAll('.checkbox-item').forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                if (checkbox && checkbox.checked) {
+                    item.classList.add('checked');
+                } else {
+                    item.classList.remove('checked');
+                }
+            });
+        }
+
+        async function handlePrimaryAgreementUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                event.target.value = '';
+                return;
+            }
+
+            registrationState.primaryAgreementFile = file;
+
+            // Show file name
+            document.getElementById('primaryAgreementFileName').textContent = `✓ ${file.name}`;
+            document.getElementById('primaryAgreementFileName').style.display = 'block';
+            document.getElementById('primaryAgreementUploadArea').classList.add('has-file');
+
+            updatePrimaryAgreementState();
+        }
+
+        // Step 3c: Virtual Protocol
+        function updatePrimaryVirtualState() {
+            registrationState.primaryVirtualAgreed = document.getElementById('primaryVirtualAgree').checked;
+            document.getElementById('step3cNextBtn').disabled = !registrationState.primaryVirtualAgreed;
+
+            // Update checkbox styling
+            const checkboxItem = document.getElementById('primaryVirtualAgree').parentElement;
+            if (registrationState.primaryVirtualAgreed) {
+                checkboxItem.classList.add('checked');
+            } else {
+                checkboxItem.classList.remove('checked');
+            }
+        }
+
+        // Step 3d: Breach Acknowledgment
+        function updatePrimaryBreachState() {
+            registrationState.primaryBreachAck = document.getElementById('primaryBreachAck').checked;
+            document.getElementById('step3dNextBtn').disabled = !registrationState.primaryBreachAck;
+
+            // Update checkbox styling
+            const checkboxItem = document.getElementById('primaryBreachAck').parentElement;
+            if (registrationState.primaryBreachAck) {
+                checkboxItem.classList.add('checked');
+            } else {
+                checkboxItem.classList.remove('checked');
+            }
+        }
+
+        // Step 4: Designate Alternate
+        function initializeStep4() {
+            if (registrationState.primaryIsAttending) {
+                // Primary IS attending - ask if they want to ALSO bring someone
+                document.getElementById('step4IntroText').textContent = 'You can optionally designate an alternate from your institution to attend alongside you.';
+                document.getElementById('step4QuestionText').textContent = 'Would you like to designate an alternate to attend with you?';
+                document.getElementById('designateYesLabel').textContent = 'Yes, I would like to designate an alternate to attend with me';
+                document.getElementById('designateNoLabel').textContent = 'No, I will be the only attendee from my institution';
+            } else {
+                // Primary NOT attending - ask if they want someone else to go
+                document.getElementById('step4IntroText').textContent = 'Since you will not be attending, you can designate an alternate from your institution to attend in your place.';
+                document.getElementById('step4QuestionText').textContent = 'Would you like to designate an alternate to attend?';
+                document.getElementById('designateYesLabel').textContent = 'Yes, I would like to designate an alternate';
+                document.getElementById('designateNoLabel').textContent = 'No, no one from my institution will attend';
+            }
+        }
+
+        function selectDesignateAlternate(answer) {
+            registrationState.hasDesignee = answer === 'yes';
+
+            document.querySelectorAll('input[name="designateAlternate"]').forEach(input => {
+                input.parentElement.classList.remove('selected');
+            });
+
+            const selectedRadio = document.getElementById(`designate${answer === 'yes' ? 'Yes' : 'No'}`);
+            selectedRadio.checked = true;
+            selectedRadio.parentElement.classList.add('selected');
+
+            if (answer === 'no') {
+                document.getElementById('noDesignateMessage').style.display = 'block';
+            } else {
+                document.getElementById('noDesignateMessage').style.display = 'none';
+            }
+
+            document.getElementById('step4NextBtn').disabled = false;
+        }
+
+        // Step 5: Alternate Selection
+        function initializeStep5() {
+            const container = document.getElementById('existingContacts');
+            container.innerHTML = '';
+
+            organizationContacts.forEach(contact => {
+                const card = document.createElement('div');
+                card.className = 'contact-card';
+                card.onclick = () => selectExistingContact(contact);
+
+                card.innerHTML = `
+                    <input type="radio" name="alternateContact" id="contact-${contact.id}" style="margin-right: 1em;">
+                    <div>
+                        <div class="contact-name">${contact.name}</div>
+                        <div class="contact-details">${contact.roleTitle || ''}</div>
+                        <div class="contact-details">${contact.workEmail || ''}</div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function selectExistingContact(contact) {
+            registrationState.designeeContact = contact;
+            registrationState.designeeIsNew = false;
+
+            document.querySelectorAll('.contact-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            event.currentTarget.classList.add('selected');
+            event.currentTarget.querySelector('input[type="radio"]').checked = true;
+
+            document.getElementById('step5NextBtn').disabled = false;
+        }
+
+        function toggleNewPersonForm() {
+            const form = document.getElementById('newPersonForm');
+            const isVisible = form.style.display !== 'none';
+
+            if (isVisible) {
+                form.style.display = 'none';
+            } else {
+                form.style.display = 'block';
+                // Deselect existing contacts
+                document.querySelectorAll('.contact-card').forEach(card => {
+                    card.classList.remove('selected');
+                    card.querySelector('input[type="radio"]').checked = false;
+                });
+                registrationState.designeeIsNew = true;
+                validateNewPersonForm();
+            }
+        }
+
+        function validateNewPersonForm() {
+            const name = document.getElementById('alternateName').value.trim();
+            const title = document.getElementById('alternateTitle').value.trim();
+            const email = document.getElementById('alternateEmail').value.trim();
+            const phone = document.getElementById('alternatePhone').value.trim();
+
+            const isValid = name && title && email && phone && email.includes('@');
+
+            if (isValid) {
+                registrationState.designeeContact = { name, title, email, phone, isNew: true };
+                document.getElementById('step5NextBtn').disabled = false;
+            } else {
+                document.getElementById('step5NextBtn').disabled = true;
+            }
+        }
+
+        // Add input listeners for new person form
+        document.addEventListener('DOMContentLoaded', () => {
+            ['alternateName', 'alternateTitle', 'alternateEmail', 'alternatePhone'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', validateNewPersonForm);
+                }
+            });
+        });
+
+        // Step 6: Alternate Format
+        function initializeStep6() {
+            const name = registrationState.designeeContact.name || 'your alternate';
+            document.getElementById('alternateNameDisplay').textContent = name;
+        }
+
+        function selectAlternateFormat(format) {
+            registrationState.designeeFormat = format;
+
+            document.querySelectorAll('input[name="alternateFormat"]').forEach(input => {
+                input.parentElement.classList.remove('selected');
+            });
+
+            const selectedRadio = document.getElementById(`alternateFormat${format === 'in-person' ? 'InPerson' : 'Virtual'}`);
+            selectedRadio.checked = true;
+            selectedRadio.parentElement.classList.add('selected');
+
+            document.getElementById('step6NextBtn').disabled = false;
+        }
+
+        // Step 7: Certification
+        function initializeStep7() {
+            const name = registrationState.designeeContact.name || 'your alternate';
+            document.getElementById('certificationAlternateName').textContent = name;
+            document.getElementById('emailAlternateName').textContent = name;
+        }
+
+        function updateCertificationState() {
+            const allChecked = ['certify1', 'certify2'].every(id => document.getElementById(id).checked);
+            const hasFile = registrationState.certificationFile !== null;
+
+            document.getElementById('step7NextBtn').disabled = !(allChecked && hasFile);
+
+            // Update checkbox styling
+            document.querySelectorAll('#step7Section .checkbox-item').forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                if (checkbox && checkbox.checked) {
+                    item.classList.add('checked');
+                } else {
+                    item.classList.remove('checked');
+                }
+            });
+        }
+
+        async function handleCertificationUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                event.target.value = '';
+                return;
+            }
+
+            registrationState.certificationFile = file;
+
+            // Show file name
+            document.getElementById('certificationFileName').textContent = `✓ ${file.name}`;
+            document.getElementById('certificationFileName').style.display = 'block';
+            document.getElementById('certificationUploadArea').classList.add('has-file');
+
+            updateCertificationState();
+        }
+
+        // Step 8: Confirmation
+        function initializeStep8() {
+            let message = '';
+            let nextSteps = '';
+
+            if (registrationState.primaryIsAttending && registrationState.hasDesignee) {
+                // Both attending
+                message = `
+                    <p><strong>Registration confirmed for both you and ${registrationState.designeeContact.name}.</strong></p>
+                    <p>Both of you will attend the Managers & Directors Summit.</p>
+                    <ul>
+                        <li><strong>Your attendance:</strong> ${registrationState.primaryFormat === 'in-person' ? 'In-Person' : 'Virtual'}</li>
+                        <li><strong>${registrationState.designeeContact.name}'s attendance:</strong> ${registrationState.designeeFormat === 'in-person' ? 'In-Person' : 'Virtual'}</li>
+                    </ul>
+                `;
+                nextSteps = `
+                    <p><strong>Next Steps:</strong></p>
+                    <ul>
+                        <li>${registrationState.designeeContact.name} will receive an email with a unique link to complete their confidentiality agreement</li>
+                        <li>You will both receive confirmation emails with meeting details</li>
+                        <li>Calendar invitations will be sent closer to the event date</li>
+                    </ul>
+                `;
+            } else if (registrationState.primaryIsAttending && !registrationState.hasDesignee) {
+                // Primary only
+                message = `
+                    <p><strong>Registration confirmed!</strong></p>
+                    <p>You will attend the Managers & Directors Summit ${registrationState.primaryFormat === 'in-person' ? 'in person' : 'virtually'}.</p>
+                `;
+                nextSteps = `
+                    <p><strong>Next Steps:</strong></p>
+                    <ul>
+                        <li>You will receive a confirmation email with meeting details</li>
+                        <li>A calendar invitation will be sent closer to the event date</li>
+                        ${registrationState.primaryFormat === 'virtual' ? '<li>Virtual attendance link and technical setup instructions will be provided</li>' : ''}
+                    </ul>
+                `;
+            } else if (!registrationState.primaryIsAttending && registrationState.hasDesignee) {
+                // Designee only
+                message = `
+                    <p><strong>Registration confirmed for ${registrationState.designeeContact.name}.</strong></p>
+                    <p>They will attend the Managers & Directors Summit ${registrationState.designeeFormat === 'in-person' ? 'in person' : 'virtually'} on behalf of your institution.</p>
+                `;
+                nextSteps = `
+                    <p><strong>Next Steps:</strong></p>
+                    <ul>
+                        <li>${registrationState.designeeContact.name} will receive an email with a unique link to complete their confidentiality agreement</li>
+                        <li>Once they complete their agreement, both you and they will receive confirmation</li>
+                        <li>They will receive all meeting details and calendar invitations</li>
+                    </ul>
+                `;
+            } else {
+                // No one attending
+                message = `
+                    <p><strong>Thank you for your response.</strong></p>
+                    <p>Your institution will not have a representative at this year's Managers & Directors Summit.</p>
+                `;
+                nextSteps = `
+                    <p>If you change your mind, please contact <a href="mailto:info@campusstores.ca">info@campusstores.ca</a></p>
+                `;
+            }
+
+            document.getElementById('confirmationMessage').innerHTML = message;
+            document.getElementById('nextStepsMessage').innerHTML = nextSteps;
+        }
+
+        // Navigation
+        async function nextStep() {
+            // Initialize next step if needed
+            if (currentStep === 3 && registrationState.primaryIsAttending) {
+                initializeStep4();
+            } else if (currentStep === 4 && registrationState.hasDesignee) {
+                initializeStep5();
+            } else if (currentStep === 5 && registrationState.hasDesignee) {
+                initializeStep6();
+            } else if (currentStep === 6 && registrationState.hasDesignee) {
+                initializeStep7();
+            }
+
+            // Handle conditional flow
+            const nextStepSection = determineNextStep();
+
+            if (nextStepSection === 'submit') {
+                await submitRegistration();
+                return;
+            }
+
+            // Hide current step
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show next step
+            document.getElementById(nextStepSection).classList.add('active');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function previousStep() {
+            const prevStepSection = determinePreviousStep();
+
+            // Hide current step
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show previous step
+            document.getElementById(prevStepSection).classList.add('active');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function determineNextStep() {
+            const currentSection = document.querySelector('.content-section.active');
+            const currentId = currentSection.id;
+
+            switch(currentId) {
+                case 'step1Section':
+                    return 'step2Section';
+
+                case 'step2Section':
+                    // If attending, go to format selection; if not, go to designate alternate
+                    return registrationState.primaryIsAttending ? 'step3aSection' : 'step4Section';
+
+                case 'step3aSection':
+                    return 'step3bSection';
+
+                case 'step3bSection':
+                    // If virtual, show virtual protocol; otherwise skip to breach ack
+                    return registrationState.primaryFormat === 'virtual' ? 'step3cSection' : 'step3dSection';
+
+                case 'step3cSection':
+                    return 'step3dSection';
+
+                case 'step3dSection':
+                    return 'step4Section';
+
+                case 'step4Section':
+                    // If designating, go to selection; otherwise submit
+                    return registrationState.hasDesignee ? 'step5Section' : 'submit';
+
+                case 'step5Section':
+                    return 'step6Section';
+
+                case 'step6Section':
+                    return 'step7Section';
+
+                case 'step7Section':
+                    return 'submit';
+
+                default:
+                    return 'step1Section';
+            }
+        }
+
+        function determinePreviousStep() {
+            const currentSection = document.querySelector('.content-section.active');
+            const currentId = currentSection.id;
+
+            switch(currentId) {
+                case 'step2Section':
+                    return 'step1Section';
+
+                case 'step3aSection':
+                    return 'step2Section';
+
+                case 'step3bSection':
+                    return 'step3aSection';
+
+                case 'step3cSection':
+                    return 'step3bSection';
+
+                case 'step3dSection':
+                    // If virtual, go back to protocol; otherwise skip to agreement
+                    return registrationState.primaryFormat === 'virtual' ? 'step3cSection' : 'step3bSection';
+
+                case 'step4Section':
+                    // If primary attending, came from breach ack; otherwise came from step 2
+                    return registrationState.primaryIsAttending ? 'step3dSection' : 'step2Section';
+
+                case 'step5Section':
+                    return 'step4Section';
+
+                case 'step6Section':
+                    return 'step5Section';
+
+                case 'step7Section':
+                    return 'step6Section';
+
+                default:
+                    return 'welcomeSection';
+            }
+        }
+
+        async function submitRegistration() {
+            showLoading();
+
+            try {
+                // Upload files first
+                const uploadedFiles = await uploadFiles();
+
+                // Submit registration data
+                const response = await fetch('/api/submit-summit-registration', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: token,
+                        organizationId: organizationData.id,
+                        primaryIsAttending: registrationState.primaryIsAttending,
+                        primaryFormat: registrationState.primaryFormat,
+                        primaryAgreementUrl: uploadedFiles.primaryAgreement,
+                        hasDesignee: registrationState.hasDesignee,
+                        designeeContact: registrationState.designeeContact,
+                        designeeFormat: registrationState.designeeFormat,
+                        certificationUrl: uploadedFiles.certification
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    initializeStep8();
+                    document.querySelectorAll('.content-section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    document.getElementById('step8Section').classList.add('active');
+                    hideLoading();
+                } else {
+                    throw new Error(result.error || 'Submission failed');
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('Error submitting registration. Please try again.');
+                hideLoading();
+            }
+        }
+
+        async function uploadFiles() {
+            const files = [];
+
+            if (registrationState.primaryAgreementFile) {
+                const reader = new FileReader();
+                const primaryAgreementBase64 = await new Promise((resolve) => {
+                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(registrationState.primaryAgreementFile);
+                });
+
+                files.push({
+                    name: registrationState.primaryAgreementFile.name,
+                    content: primaryAgreementBase64,
+                    type: registrationState.primaryAgreementFile.type,
+                    fieldName: 'primaryAgreement'
+                });
+            }
+
+            if (registrationState.certificationFile) {
+                const reader = new FileReader();
+                const certificationBase64 = await new Promise((resolve) => {
+                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(registrationState.certificationFile);
+                });
+
+                files.push({
+                    name: registrationState.certificationFile.name,
+                    content: certificationBase64,
+                    type: registrationState.certificationFile.type,
+                    fieldName: 'certification'
+                });
+            }
+
+            if (files.length === 0) return {};
+
+            const response = await fetch('/api/upload-summit-files', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    files: files,
+                    organizationName: organizationData.organizationName,
+                    token: token
+                })
+            });
+
+            const result = await response.json();
+            return result.urls || {};
+        }
+    </script>
+</body>
+</html>

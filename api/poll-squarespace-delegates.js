@@ -201,11 +201,10 @@ export default async function handler(req, res) {
 
     if (errors.length > 0) {
       console.log('⚠️ Errors encountered:', errors);
-      // Temporarily disabled while testing - re-enable once AWS SES is working
-      // await sendErrorNotification({
-      //   subject: 'Squarespace Delegate Polling - Partial Errors',
-      //   body: `Some delegate registrations failed to process.\n\nProcessed: ${processedCount} delegates\nSkipped: ${skippedCount} orders (already processed)\nErrors: ${errors.length}\n\nErrors:\n${errors.join('\n')}\n\nAction Required:\nManually add these delegates to Notion.`
-      // });
+      await sendErrorNotification({
+        subject: 'Squarespace Delegate Polling - Partial Errors',
+        body: `Some delegate registrations failed to process.\n\nProcessed: ${processedCount} delegates\nSkipped: ${skippedCount} orders (already processed)\nErrors: ${errors.length}\n\nErrors:\n${errors.join('\n')}\n\nAction Required:\nManually add these delegates to Notion.`
+      });
     }
 
     res.status(200).json({

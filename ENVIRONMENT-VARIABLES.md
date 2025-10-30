@@ -28,6 +28,7 @@ NOTION_TOKEN=<your_notion_integration_token>
 NOTION_ORGANIZATIONS_DB_ID=<organizations_database_id>
 NOTION_CONTACTS_DB_ID=<contacts_database_id>
 NOTION_SUBMISSIONS_DB_ID=<vendor_submissions_database_id>
+NOTION_SUMMIT_REGISTRATIONS_DB_ID=<summit_registrations_database_id>
 ```
 
 ### Optional (has default)
@@ -159,5 +160,5 @@ Check your `ERROR_NOTIFICATION_EMAIL` inbox for the test email.
 
 ---
 
-**Last Updated:** October 22, 2025
-**Total Variables:** 19 (14 required, 3 for full features, 2 optional)
+**Last Updated:** October 30, 2025
+**Total Variables:** 20 (15 required, 3 for full features, 2 optional)

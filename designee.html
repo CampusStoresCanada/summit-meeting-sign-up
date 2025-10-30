@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summit Designee Agreement - Campus Stores Canada</title>
+    <link rel="icon" type="image/png" href="https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1600096854522-HS7NUI12I1ML6SPJFLLY/Artboard+1.png?format=1500w">
+
+    <!-- External Fonts -->
+    <link rel="stylesheet" href="https://use.typekit.net/ilr6ctr.css">
+
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="vendor-wizard.css">
+
+    <!-- Designee-Specific Styles -->
+    <style>
+        .designee-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2em;
+        }
+
+        .summit-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1.5em;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+
+        .summit-critical {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 1.5em;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+
+        .summit-info {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 1.5em;
+            margin: 2em 0;
+            border-radius: 4px;
+        }
+
+        .agreement-text {
+            background: #f8f9fa;
+            padding: 2em;
+            margin: 1.5em 0;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        .agreement-text h3 {
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            color: #2c3e50;
+        }
+
+        .agreement-text p {
+            margin-bottom: 1em;
+        }
+
+        .agreement-text ul {
+            margin-left: 2em;
+            margin-bottom: 1em;
+        }
+
+        .checkbox-group {
+            margin: 1.5em 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1em;
+            padding: 1em;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            border-color: #0071bc;
+        }
+
+        .checkbox-item.checked {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 1em;
+            margin-top: 0.3em;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            flex: 1;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .file-upload-area {
+            margin: 2em 0;
+            padding: 2em;
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: #0071bc;
+            background: #f0f8ff;
+        }
+
+        .file-upload-area.has-file {
+            border-color: #28a745;
+            background: #f8fff9;
+            border-style: solid;
+        }
+
+        .file-upload-label {
+            display: block;
+            cursor: pointer;
+            padding: 1em;
+        }
+
+        .file-upload-input {
+            display: none;
+        }
+
+        .file-name-display {
+            margin-top: 1em;
+            padding: 0.8em;
+            background: white;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #28a745;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 3em;
+        }
+
+        .header-section img {
+            width: 120px;
+            margin-bottom: 1em;
+        }
+
+        .designation-info {
+            background: #f8f9fa;
+            padding: 1.5em;
+            border-radius: 8px;
+            margin: 2em 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .designation-info h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 0.8em;
+        }
+
+        .info-label {
+            font-weight: 600;
+            min-width: 180px;
+            color: #495057;
+        }
+
+        .info-value {
+            color: #212529;
+        }
+
+        .error-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .error-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5em;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .error-icon {
+            font-size: 4em;
+            margin-bottom: 0.5em;
+        }
+
+        .error-content h2 {
+            color: #dc3545;
+            margin-bottom: 1em;
+        }
+
+        .error-content p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading State -->
+    <div id="loadingState" class="loading">
+        <div class="loading-title">
+            Loading<span class="dots">
+                <span class="dot">.</span>
+                <span class="dot">.</span>
+                <span class="dot">.</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Upload Animation State -->
+    <div class="uploading-state" id="uploadingState">
+        <div class="uploading-title">
+            Uploading<span class="dots">
+                <span class="dot">.</span>
+                <span class="dot">.</span>
+                <span class="dot">.</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Error Overlay (for invalid/expired tokens) -->
+    <div id="errorOverlay" class="error-overlay" style="display: none;">
+        <div class="error-content">
+            <div class="error-icon">⚠️</div>
+            <h2>Invalid or Expired Link</h2>
+            <p id="errorMessage">This registration link is invalid or has expired. Please contact your primary member or <a href="mailto:info@campusstores.ca">info@campusstores.ca</a> for assistance.</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="designee-container" id="mainContent" style="display: none;">
+        <div class="header-section">
+            <img src="https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1600096854522-HS7NUI12I1ML6SPJFLLY/Artboard+1.png?format=1500w" alt="CSC Logo">
+            <h1>Managers & Directors Summit<br>Designee Agreement</h1>
+        </div>
+
+        <div class="summit-info">
+            <p><strong>You have been designated to attend the Managers & Directors Summit</strong></p>
+            <p>This form will guide you through the required confidentiality agreements and acknowledgments.</p>
+        </div>
+
+        <div class="designation-info" id="designationInfo">
+            <h3>Designation Information</h3>
+            <div class="info-row">
+                <div class="info-label">Your Name:</div>
+                <div class="info-value" id="designeeName">—</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Institution:</div>
+                <div class="info-value" id="institutionName">—</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Designated By:</div>
+                <div class="info-value" id="primaryMemberName">—</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Attendance Format:</div>
+                <div class="info-value" id="attendanceFormat">—</div>
+            </div>
+        </div>
+
+        <!-- Confidentiality Agreement -->
+        <h2>Confidentiality Agreement</h2>
+
+        <div class="summit-critical">
+            <p><strong>Please read the following confidentiality requirements carefully.</strong></p>
+            <p>You must agree to all terms and upload a signed copy to proceed.</p>
+        </div>
+
+        <div class="agreement-text">
+            <h3>Managers and Directors' Summit Confidentiality Agreement</h3>
+
+            <p>You have been designated to attend the CSC Managers and Directors' Summit on behalf of <strong><span class="dynamic-primary-name"></span></strong> from <strong><span class="dynamic-institution-name"></span></strong>.</p>
+
+            <p>This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest confidentiality level. Everything discussed remains confidential within the meeting space.</p>
+
+            <h3>Discussions Cover:</h3>
+            <ul>
+                <li>Campus store financial situations</li>
+                <li>Staffing levels and expertise needs</li>
+                <li>Operational challenges and solutions</li>
+                <li>Strategic institutional decisions</li>
+            </ul>
+
+            <h3>Your Responsibility</h3>
+            <p>Your primary member designated you to contribute meaningfully to strategic discussions about your campus store's operations.</p>
+
+            <h3>Critical Consideration - Collective Bargaining Agreements</h3>
+            <p>If covered by a collective bargaining agreement, you must review your contract for provisions requiring information disclosure. By registering, you accept full responsibility for conflicts between this agreement and your employment contract. CSC assumes no liability for resulting consequences.</p>
+
+            <h3>Attendance Rules</h3>
+
+            <p><strong>In-Person:</strong></p>
+            <ul>
+                <li>Confidentiality strictly maintained</li>
+                <li>No recording permitted</li>
+                <li>No post-meeting information sharing</li>
+            </ul>
+
+            <p><strong>Virtual:</strong></p>
+            <ul>
+                <li>Attend alone in private space</li>
+                <li>Camera and microphone remain on throughout</li>
+                <li>No recording allowed</li>
+                <li>No information sharing afterward</li>
+            </ul>
+
+            <h3>Confidentiality Violations</h3>
+            <p>Breaching confidentiality—including accidental disclosure—results in immediate membership termination with no appeals process or fee refunds.</p>
+        </div>
+
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <input type="checkbox" id="designeeAgree1" onchange="updateAgreementState()">
+                <label for="designeeAgree1">I understand this meeting requires absolute confidentiality under Traffic Light Protocol Red</label>
+            </div>
+
+            <div class="checkbox-item">
+                <input type="checkbox" id="designeeAgree2" onchange="updateAgreementState()">
+                <label for="designeeAgree2">I have reviewed applicable employment contracts and accept responsibility for any conflicts</label>
+            </div>
+
+            <div class="checkbox-item">
+                <input type="checkbox" id="designeeAgree3" onchange="updateAgreementState()">
+                <label for="designeeAgree3">I agree to follow all confidentiality requirements and attendance rules</label>
+            </div>
+
+            <div class="checkbox-item">
+                <input type="checkbox" id="designeeAgree4" onchange="updateAgreementState()">
+                <label for="designeeAgree4">I acknowledge that breaking confidentiality terminates CSC membership immediately</label>
+            </div>
+        </div>
+
+        <!-- Virtual Protocol (if virtual) -->
+        <div id="virtualProtocolSection" style="display: none;">
+            <h2>Virtual Attendance Protocol</h2>
+
+            <div class="summit-warning">
+                <p><strong>Virtual attendance requires additional protocols to maintain confidentiality.</strong></p>
+            </div>
+
+            <div class="agreement-text">
+                <h3>Core Requirements</h3>
+
+                <p><strong>Before attending:</strong> Test camera/microphone, ensure stable internet, secure a private lockable room, and silence notifications.</p>
+
+                <p><strong>During the meeting:</strong> Your camera needs to stay on for the entire meeting. Microphone should remain active throughout. You cannot have others in the room, record sessions, take screenshots, use speakers that risk audio leakage, or join from shared spaces.</p>
+
+                <h3>If Technical Problems Occur</h3>
+                <p>Reconnect quickly when connection drops. If camera/microphone fails persistently, disconnect and troubleshoot. If someone unexpectedly enters your space, immediately leave the call and rejoin once secured.</p>
+
+                <h3>Guiding Principle</h3>
+                <p>Virtual participants join "the room with us, just through a screen." The summit depends on confidentiality for candid discussions about financial and staffing challenges. You must protect conversations with the same security commitment as in-person participants.</p>
+
+                <h3>Contact for Questions</h3>
+                <p>If you have setup concerns, reach out to Greg McPherson (<a href="mailto:greg@campusstores.ca">greg@campusstores.ca</a>) before the meeting.</p>
+            </div>
+
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="virtualAgree" onchange="updateAgreementState()">
+                    <label for="virtualAgree">I agree to maintain these virtual attendance requirements and understand that failure to comply may result in removal from the meeting</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Breach Acknowledgment -->
+        <h2>Breach of Confidentiality - Final Acknowledgment</h2>
+
+        <div class="summit-critical">
+            <p style="font-size: 1.1em; line-height: 1.8;">
+                <strong>If you breach confidentiality - even accidentally, even just a rumor - your institution's CSC membership will be terminated immediately.</strong>
+            </p>
+            <p style="font-size: 1.1em; line-height: 1.8;">
+                <strong>There are no warnings. There are no refunds.</strong>
+            </p>
+        </div>
+
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <input type="checkbox" id="breachAck" onchange="updateAgreementState()">
+                <label for="breachAck" style="font-size: 1.05em; font-weight: 600;">
+                    I understand and accept these consequences
+                </label>
+            </div>
+        </div>
+
+        <!-- File Upload -->
+        <h2>Upload Signed Agreement</h2>
+
+        <div class="file-upload-area" id="agreementUploadArea">
+            <label for="agreementFile" class="file-upload-label">
+                <p style="font-weight: 600; margin-bottom: 0.5em;">Upload Your Signed Confidentiality Agreement</p>
+                <p style="color: #6c757d; font-size: 0.9em;">Click to select a PDF or image file (JPG, PNG)</p>
+                <p style="color: #6c757d; font-size: 0.85em; margin-top: 0.5em;">Maximum file size: 5MB</p>
+            </label>
+            <input type="file" id="agreementFile" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileUpload(event)">
+            <div id="agreementFileName" class="file-name-display" style="display: none;"></div>
+        </div>
+
+        <!-- Submit Button -->
+        <div style="text-align: center; margin-top: 3em;">
+            <button class="btn btn-primary" id="submitBtn" onclick="submitDesigneeAgreement()" disabled style="padding: 1em 3em; font-size: 1.1em;">
+                Submit Agreement
+            </button>
+        </div>
+
+        <!-- Confirmation Section (hidden initially) -->
+        <div id="confirmationSection" style="display: none; margin-top: 3em;">
+            <div class="summit-info">
+                <h2 style="margin-top: 0;">✅ Agreement Submitted Successfully</h2>
+                <p>Thank you for completing your confidentiality agreement. Your registration for the Managers & Directors Summit is now complete.</p>
+                <p>You and <span class="dynamic-primary-name"></span> will receive confirmation emails with additional details about the summit.</p>
+                <p>If you have any questions, please contact <a href="mailto:info@campusstores.ca">info@campusstores.ca</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Global State
+        let designeeToken = '';
+        let registrationData = {};
+        let uploadedFile = null;
+        let isVirtual = false;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Get token from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            designeeToken = urlParams.get('token');
+
+            if (!designeeToken) {
+                showError('No token provided. Please use the link from your email.');
+                return;
+            }
+
+            // Load registration data
+            await loadRegistrationData();
+        });
+
+        async function loadRegistrationData() {
+            try {
+                const response = await fetch(`/api/get-designee-registration?token=${designeeToken}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+
+                registrationData = data;
+
+                // Populate form
+                document.getElementById('designeeName').textContent = data.designeeName || '—';
+                document.getElementById('institutionName').textContent = data.institutionName || '—';
+                document.getElementById('primaryMemberName').textContent = data.primaryMemberName || '—';
+                document.getElementById('attendanceFormat').textContent = data.attendanceFormat === 'virtual' ? 'Virtual (Online)' : 'In-Person';
+
+                // Update dynamic fields in agreement
+                document.querySelectorAll('.dynamic-primary-name').forEach(el => {
+                    el.textContent = data.primaryMemberName || 'your primary member';
+                });
+                document.querySelectorAll('.dynamic-institution-name').forEach(el => {
+                    el.textContent = data.institutionName || 'your institution';
+                });
+
+                // Show/hide virtual protocol section
+                isVirtual = data.attendanceFormat === 'virtual';
+                if (isVirtual) {
+                    document.getElementById('virtualProtocolSection').style.display = 'block';
+                }
+
+                // Hide loading, show content
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showError('Error loading registration data. Please try again or contact info@campusstores.ca');
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorOverlay').style.display = 'flex';
+        }
+
+        function updateAgreementState() {
+            const baseChecks = ['designeeAgree1', 'designeeAgree2', 'designeeAgree3', 'designeeAgree4', 'breachAck'];
+            const virtualCheck = isVirtual ? ['virtualAgree'] : [];
+            const allChecks = [...baseChecks, ...virtualCheck];
+
+            const allChecked = allChecks.every(id => document.getElementById(id).checked);
+            const hasFile = uploadedFile !== null;
+
+            document.getElementById('submitBtn').disabled = !(allChecked && hasFile);
+
+            // Update checkbox styling
+            document.querySelectorAll('.checkbox-item').forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                if (checkbox && checkbox.checked) {
+                    item.classList.add('checked');
+                } else {
+                    item.classList.remove('checked');
+                }
+            });
+        }
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                event.target.value = '';
+                return;
+            }
+
+            uploadedFile = file;
+
+            // Show file name
+            document.getElementById('agreementFileName').textContent = `✓ ${file.name}`;
+            document.getElementById('agreementFileName').style.display = 'block';
+            document.getElementById('agreementUploadArea').classList.add('has-file');
+
+            updateAgreementState();
+        }
+
+        async function submitDesigneeAgreement() {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            document.getElementById('uploadingState').style.display = 'flex';
+
+            try {
+                // Upload file first
+                const reader = new FileReader();
+                const fileBase64 = await new Promise((resolve) => {
+                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(uploadedFile);
+                });
+
+                const uploadResponse = await fetch('/api/upload-summit-files', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        files: [{
+                            name: uploadedFile.name,
+                            content: fileBase64,
+                            type: uploadedFile.type,
+                            fieldName: 'designeeAgreement'
+                        }],
+                        organizationName: registrationData.institutionName,
+                        token: designeeToken
+                    })
+                });
+
+                const uploadResult = await uploadResponse.json();
+
+                if (!uploadResult.success) {
+                    throw new Error('File upload failed');
+                }
+
+                // Submit agreement
+                const submitResponse = await fetch('/api/submit-designee-agreement', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        designeeToken: designeeToken,
+                        agreementUrl: uploadResult.urls.designeeAgreement,
+                        virtualProtocolAcknowledged: isVirtual
+                    })
+                });
+
+                const submitResult = await submitResponse.json();
+
+                if (submitResult.success) {
+                    // Show confirmation
+                    document.querySelector('.designee-container').scrollTop = 0;
+                    document.getElementById('confirmationSection').style.display = 'block';
+                    document.querySelectorAll('h2, .designation-info, .summit-critical, .summit-warning, .agreement-text, .checkbox-group, .file-upload-area, #submitBtn').forEach(el => {
+                        el.style.display = 'none';
+                    });
+                } else {
+                    throw new Error(submitResult.error || 'Submission failed');
+                }
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('Error submitting agreement. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Agreement';
+            } finally {
+                document.getElementById('uploadingState').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

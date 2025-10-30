@@ -220,6 +220,59 @@ body::before {
     flex: 1;
 }
 
+/* Step Indicators (Summit Registration) */
+.step-indicators {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+    margin-top: 2em;
+}
+
+.step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    padding: 0.8em;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    opacity: 0.5;
+}
+
+.step-indicator.active {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9em;
+    flex-shrink: 0;
+}
+
+.step-indicator.active .step-number {
+    background: #ba003b;
+    color: white;
+}
+
+.step-label {
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.sidebar-title {
+    font-size: 1.3em;
+    font-weight: 600;
+    margin-bottom: 0.5em;
+    color: #2c3e50;
+}
+
 .step-item {
     display: flex;
     align-items: center;

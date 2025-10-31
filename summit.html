@@ -473,92 +473,40 @@
                 </button>
             </div>
 
-            <!-- Step 3b: Primary Confidentiality Agreement -->
+            <!-- Step 3b: Traffic Light Protocol -->
             <div id="step3bSection" class="content-section">
                 <div class="progress-indicator">
-                    <div class="progress-text">Step 2 of 4 - Confidentiality Agreement</div>
+                    <div class="progress-text">Step 2 of 4 - Traffic Light Protocol Red</div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 50%;"></div>
                     </div>
                 </div>
 
-                <h1>Confidentiality Agreement</h1>
+                <h1>Traffic Light Protocol Red</h1>
 
-                <div class="agreement-text">
-                    <h3>Before you register, you need to understand what you're agreeing to.</h3>
+                <p>This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.</p>
 
-                    <p>This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.</p>
+                <h3>What We'll Be Discussing</h3>
+                <p>Frank conversations about:</p>
+                <ul>
+                    <li>The real financial situation of your campus store</li>
+                    <li>Staffing levels, changes, and expertise needs</li>
+                    <li>Operational challenges and solutions</li>
+                    <li>Strategic decisions your institution is requiring</li>
+                </ul>
 
-                    <h3>What We'll Be Discussing</h3>
-                    <p>Frank conversations about:</p>
-                    <ul>
-                        <li>The real financial situation of your campus store</li>
-                        <li>Staffing levels, changes, and expertise needs</li>
-                        <li>Operational challenges and solutions</li>
-                        <li>Strategic decisions your institution is requiring</li>
-                    </ul>
+                <h3>The Rules</h3>
+                <p><strong>In-Person:</strong> What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward.</p>
+                <p><strong>Virtual:</strong> You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.</p>
 
-                    <h3>Who Can Attend</h3>
-                    <p>This meeting is designed for management-level staff who can speak candidly about their store's operations and strategic decisions.</p>
-
-                    <p><strong>If you are the primary CSC member:</strong> You can attend yourself or designate someone else from your team.</p>
-
-                    <p><strong>Important consideration about collective bargaining agreements:</strong> If you or your designee are covered by a collective bargaining agreement, you must review your contract to ensure there are no provisions that would require you to disclose information from this meeting. By registering, you assume full responsibility for any conflicts between this confidentiality agreement and your employment contract.</p>
-
-                    <p><strong>If you are designating someone else:</strong> You are personally responsible for ensuring they understand and will follow these rules. The CSC Board reserves the right to exclude any designee if they believe that person cannot contribute meaningfully to the conversation.</p>
-
-                    <h3>The Rules</h3>
-                    <p><strong>In-Person:</strong> "What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward."</p>
-
-                    <p><strong>Virtual:</strong> You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.</p>
-
-                    <h3>Consequences</h3>
-                    <p>Breaking confidentiality results in immediate membership termination with no appeals or refunds.</p>
-                </div>
+                <h3>Consequences</h3>
+                <p>Breaking confidentiality results in immediate membership termination with no appeals or refunds.</p>
 
                 <div class="checkbox-group">
                     <div class="checkbox-item">
-                        <input type="checkbox" id="primaryAgree1" onchange="updatePrimaryAgreementState()">
-                        <label for="primaryAgree1">I understand this meeting requires absolute confidentiality under Traffic Light Protocol Red</label>
+                        <input type="checkbox" id="primaryAgree1" onchange="updateStep3bState()">
+                        <label for="primaryAgree1">I understand and agree to Traffic Light Protocol Red confidentiality requirements</label>
                     </div>
-
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="primaryAgree2" onchange="updatePrimaryAgreementState()">
-                        <label for="primaryAgree2">I have reviewed applicable employment contracts and accept responsibility for any conflicts</label>
-                    </div>
-
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="primaryAgree3" onchange="updatePrimaryAgreementState()">
-                        <label for="primaryAgree3">I agree to follow all confidentiality requirements and virtual attendance rules</label>
-                    </div>
-
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="primaryAgree4" onchange="updatePrimaryAgreementState()">
-                        <label for="primaryAgree4">I acknowledge that breaking confidentiality terminates CSC membership immediately</label>
-                    </div>
-
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="primaryAgree5" onchange="updatePrimaryAgreementState()">
-                        <label for="primaryAgree5">I accept responsibility for ensuring any designee understands and agrees to these terms</label>
-                    </div>
-
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="primaryAgree6" onchange="updatePrimaryAgreementState()">
-                        <label for="primaryAgree6">I understand the CSC Board may exclude any designee deemed unable to contribute meaningfully</label>
-                    </div>
-                </div>
-
-                <div class="signature-section">
-                    <h3 style="margin-top: 2em; margin-bottom: 0.5em;">Digital Signature</h3>
-                    <p style="color: #6c757d; margin-bottom: 1em;">Please sign below using your mouse or touchscreen</p>
-
-                    <div class="signature-pad-container">
-                        <canvas id="primarySignatureCanvas" class="signature-canvas"></canvas>
-                    </div>
-
-                    <button type="button" class="clear-signature-btn" onclick="clearPrimarySignature()">
-                        Clear Signature
-                    </button>
                 </div>
 
                 <button class="previous-btn" onclick="previousStep()">
@@ -571,43 +519,27 @@
                 </button>
             </div>
 
-            <!-- Step 3c: Virtual Protocol Agreement (Conditional) -->
+            <!-- Step 3c: Employment Contracts -->
             <div id="step3cSection" class="content-section">
                 <div class="progress-indicator">
-                    <div class="progress-text">Step 2 of 4 - Virtual Attendance Protocol</div>
+                    <div class="progress-text">Step 2 of 4 - Employment Contracts</div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 50%;"></div>
                     </div>
                 </div>
 
-                <h1>Virtual Attendance Protocol</h1>
+                <h1>Employment Contract Review</h1>
 
-                <div class="summit-warning">
-                    <p><strong>Virtual attendance requires additional protocols to maintain confidentiality.</strong></p>
-                    <p>Please review and agree to the following requirements:</p>
-                </div>
+                <p><strong>Important consideration about collective bargaining agreements:</strong></p>
 
-                <div class="agreement-text">
-                    <h3>Core Requirements</h3>
+                <p>If you or your designee are covered by a collective bargaining agreement, you must review your contract to ensure there are no provisions that would require you to disclose information from this meeting.</p>
 
-                    <p><strong>Before attending:</strong> Test camera/microphone, ensure stable internet, secure a private lockable room, and silence notifications.</p>
-
-                    <p><strong>During the meeting:</strong> Your camera needs to stay on for the entire meeting. Microphone should remain active throughout. You cannot have others in the room, record sessions, take screenshots, use speakers that risk audio leakage, or join from shared spaces.</p>
-
-                    <h3>If Technical Problems Occur</h3>
-                    <p>Reconnect quickly when connection drops. If camera/microphone fails persistently, disconnect and troubleshoot. If someone unexpectedly enters your space, immediately leave the call and rejoin once secured.</p>
-
-                    <h3>Guiding Principle</h3>
-                    <p>Virtual participants join "the room with us, just through a screen." The summit depends on confidentiality for candid discussions about financial and staffing challenges. You must protect conversations with the same security commitment as in-person participants.</p>
-
-                    <h3>Contact for Questions</h3>
-                    <p>If you have setup concerns, reach out to Greg McPherson (<a href="mailto:greg@campusstores.ca">greg@campusstores.ca</a>) before the meeting.</p>
-                </div>
+                <p>By registering, you assume full responsibility for any conflicts between this confidentiality agreement and your employment contract.</p>
 
                 <div class="checkbox-group">
                     <div class="checkbox-item">
-                        <input type="checkbox" id="primaryVirtualAgree" onchange="updatePrimaryVirtualState()">
-                        <label for="primaryVirtualAgree">I agree to maintain these virtual attendance requirements and understand that failure to comply may result in removal from the meeting</label>
+                        <input type="checkbox" id="primaryAgree2" onchange="updateStep3cState()">
+                        <label for="primaryAgree2">I have reviewed applicable employment contracts and accept responsibility for any conflicts</label>
                     </div>
                 </div>
 
@@ -621,33 +553,30 @@
                 </button>
             </div>
 
-            <!-- Step 3d: Final Breach Acknowledgment -->
+            <!-- Step 3d: Digital Signature -->
             <div id="step3dSection" class="content-section">
                 <div class="progress-indicator">
-                    <div class="progress-text">Step 2 of 4 - Final Acknowledgment</div>
+                    <div class="progress-text">Step 2 of 4 - Sign Agreement</div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 50%;"></div>
                     </div>
                 </div>
 
-                <h1>Breach of Confidentiality - Final Acknowledgment</h1>
+                <h1>Sign Confidentiality Agreement</h1>
 
-                <div class="summit-critical">
-                    <p style="font-size: 1.1em; line-height: 1.8;">
-                        <strong>If you or your designee breaches confidentiality - even accidentally, even just a rumor - your institution's CSC membership will be terminated immediately.</strong>
-                    </p>
-                    <p style="font-size: 1.1em; line-height: 1.8;">
-                        <strong>There are no warnings. There are no refunds.</strong>
-                    </p>
-                </div>
+                <p>By signing below, you acknowledge that you have read and agree to all confidentiality terms.</p>
 
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="primaryBreachAck" onchange="updatePrimaryBreachState()">
-                        <label for="primaryBreachAck" style="font-size: 1.05em; font-weight: 600;">
-                            I understand and accept these consequences
-                        </label>
+                <div class="signature-section">
+                    <h3>Digital Signature</h3>
+                    <p style="color: #6c757d; margin-bottom: 1em;">Please sign below using your mouse or touchscreen</p>
+
+                    <div class="signature-pad-container">
+                        <canvas id="primarySignatureCanvas" class="signature-canvas"></canvas>
                     </div>
+
+                    <button type="button" class="clear-signature-btn" onclick="clearPrimarySignature()">
+                        Clear Signature
+                    </button>
                 </div>
 
                 <button class="previous-btn" onclick="previousStep()">
@@ -1060,7 +989,7 @@
             primarySignatureCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
             primarySignatureCtx.stroke();
             primaryHasSignature = true;
-            updatePrimaryAgreementState();
+            updateStep3dState();
         }
 
         function stopPrimaryDrawing() {
@@ -1087,31 +1016,28 @@
             primarySignatureCtx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
             primarySignatureCtx.stroke();
             primaryHasSignature = true;
-            updatePrimaryAgreementState();
+            updateStep3dState();
         }
 
         function clearPrimarySignature() {
             if (!primarySignatureCanvas || !primarySignatureCtx) return;
             primarySignatureCtx.clearRect(0, 0, primarySignatureCanvas.width, primarySignatureCanvas.height);
             primaryHasSignature = false;
-            updatePrimaryAgreementState();
+            updateStep3dState();
         }
 
-        function updatePrimaryAgreementState() {
-            const allChecked = ['primaryAgree1', 'primaryAgree2', 'primaryAgree3', 'primaryAgree4', 'primaryAgree5', 'primaryAgree6']
-                .every(id => document.getElementById(id).checked);
+        function updateStep3bState() {
+            const checked = document.getElementById('primaryAgree1').checked;
+            document.getElementById('step3bNextBtn').disabled = !checked;
+        }
 
-            document.getElementById('step3bNextBtn').disabled = !(allChecked && primaryHasSignature);
+        function updateStep3cState() {
+            const checked = document.getElementById('primaryAgree2').checked;
+            document.getElementById('step3cNextBtn').disabled = !checked;
+        }
 
-            // Update checkbox styling
-            document.querySelectorAll('.checkbox-item').forEach(item => {
-                const checkbox = item.querySelector('input[type="checkbox"]');
-                if (checkbox && checkbox.checked) {
-                    item.classList.add('checked');
-                } else {
-                    item.classList.remove('checked');
-                }
-            });
+        function updateStep3dState() {
+            document.getElementById('step3dNextBtn').disabled = !primaryHasSignature;
         }
 
         // Step 3c: Virtual Protocol

@@ -3814,3 +3814,38 @@ body::before {
     margin-bottom: 0.5em;
 }
 
+
+/* Info Section - Agreement Content */
+.info-section {
+    margin-bottom: 40px;
+}
+
+.info-section h3 {
+    font-family: 'davis-sans', sans-serif;
+    font-weight: 600;
+    font-size: 1.2em;
+    color: #000000;
+    margin-top: 2em;
+    margin-bottom: 0.8em;
+}
+
+.info-section h3:first-child {
+    margin-top: 0;
+}
+
+.info-section p {
+    margin-bottom: 1.2em;
+    line-height: 1.6;
+    color: #333333;
+}
+
+.info-section ul {
+    margin-bottom: 1.5em;
+    margin-left: 1.5em;
+}
+
+.info-section li {
+    margin-bottom: 0.6em;
+    line-height: 1.5;
+}
+

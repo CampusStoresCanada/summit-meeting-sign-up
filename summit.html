@@ -338,8 +338,11 @@
         <div class="wizard-content">
             <!-- Sidebar -->
             <div class="sidebar">
-                <div class="logo-container">
-                    <img src="https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1600096854522-HS7NUI12I1ML6SPJFLLY/Artboard+1.png?format=1500w" alt="CSC Logo" class="csc-logo">
+                <div class="logo-section">
+                    <div class="logo-container">
+                        <img src="https://images.squarespace-cdn.com/content/v1/5ec55d5d28a93e0e18d2eeb4/1600096854522-HS7NUI12I1ML6SPJFLLY/Artboard+1.png?format=1500w" alt="CSC Logo" class="csc-logo">
+                        <div id="organizationLogo" class="organization-logo-container"></div>
+                    </div>
                 </div>
                 <h2 class="sidebar-title">Managers & Directors Summit</h2>
                 <div class="step-indicators">
@@ -484,23 +487,29 @@
 
                 <h1>Traffic Light Protocol Red</h1>
 
-                <p>This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.</p>
+                <p style="margin-bottom: 2em;">This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.</p>
 
-                <h3>What We'll Be Discussing</h3>
-                <p>Frank conversations about:</p>
-                <ul>
-                    <li>The real financial situation of your campus store</li>
-                    <li>Staffing levels, changes, and expertise needs</li>
-                    <li>Operational challenges and solutions</li>
-                    <li>Strategic decisions your institution is requiring</li>
-                </ul>
+                <div style="margin-bottom: 2em;">
+                    <h3>What We'll Be Discussing</h3>
+                    <p>Frank conversations about:</p>
+                    <ul>
+                        <li>The real financial situation of your campus store</li>
+                        <li>Staffing levels, changes, and expertise needs</li>
+                        <li>Operational challenges and solutions</li>
+                        <li>Strategic decisions your institution is requiring</li>
+                    </ul>
+                </div>
 
-                <h3>The Rules</h3>
-                <p><strong>In-Person:</strong> What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward.</p>
-                <p><strong>Virtual:</strong> You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.</p>
+                <div style="margin-bottom: 2em;">
+                    <h3>The Rules</h3>
+                    <p><strong>In-Person:</strong> What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward.</p>
+                    <p><strong>Virtual:</strong> You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.</p>
+                </div>
 
-                <h3>Consequences</h3>
-                <p>Breaking confidentiality results in immediate membership termination with no appeals or refunds.</p>
+                <div style="margin-bottom: 2em;">
+                    <h3>Consequences</h3>
+                    <p>Breaking confidentiality results in immediate membership termination with no appeals or refunds.</p>
+                </div>
 
                 <div class="checkbox-group">
                     <div class="checkbox-item">
@@ -877,6 +886,14 @@
                 }
 
                 organizationData = data;
+
+                // Populate organization logo/name in sidebar
+                const organizationLogoContainer = document.getElementById('organizationLogo');
+                if (data.organization?.logo && !data.organization.logo.includes('${')) {
+                    organizationLogoContainer.innerHTML = `<img src="${data.organization.logo}" alt="${data.organization.name || 'Organization'} Logo" class="organization-logo">`;
+                } else if (data.organization?.name) {
+                    organizationLogoContainer.innerHTML = `<div class="organization-name">${data.organization.name}</div>`;
+                }
 
                 // Load contacts
                 const contactsResponse = await fetch(`/api/get-organization-contacts?token=${token}`);

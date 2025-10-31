@@ -1398,8 +1398,7 @@
                     return 'step3bSection';
 
                 case 'step3bSection':
-                    // If virtual, show virtual protocol; otherwise skip to breach ack
-                    return registrationState.primaryFormat === 'virtual' ? 'step3cSection' : 'step3dSection';
+                    return 'step3cSection';
 
                 case 'step3cSection':
                     return 'step3dSection';
@@ -1443,8 +1442,7 @@
                     return 'step3bSection';
 
                 case 'step3dSection':
-                    // If virtual, go back to protocol; otherwise skip to agreement
-                    return registrationState.primaryFormat === 'virtual' ? 'step3cSection' : 'step3bSection';
+                    return 'step3cSection';
 
                 case 'step4Section':
                     // If primary attending, came from breach ack; otherwise came from step 2

@@ -345,22 +345,18 @@
                 <div class="step-indicators">
                     <div class="step-indicator active" data-step="1">
                         <div class="step-number">1</div>
-                        <div class="step-label">Identity Verification</div>
+                        <div class="step-label">Your Attendance</div>
                     </div>
                     <div class="step-indicator" data-step="2">
                         <div class="step-number">2</div>
-                        <div class="step-label">Your Attendance</div>
+                        <div class="step-label">Format & Agreement</div>
                     </div>
                     <div class="step-indicator" data-step="3">
                         <div class="step-number">3</div>
-                        <div class="step-label">Format & Agreement</div>
+                        <div class="step-label">Designate Alternate</div>
                     </div>
                     <div class="step-indicator" data-step="4">
                         <div class="step-number">4</div>
-                        <div class="step-label">Designate Alternate</div>
-                    </div>
-                    <div class="step-indicator" data-step="5">
-                        <div class="step-number">5</div>
                         <div class="step-label">Confirmation</div>
                     </div>
                 </div>
@@ -401,57 +397,12 @@
                     </div>
                 </div>
 
-            <!-- Step 1: Identity Verification -->
-            <div id="step1Section" class="content-section">
-                <div class="progress-indicator">
-                    <div class="progress-text">Step 1 of 5</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 20%;"></div>
-                    </div>
-                </div>
-
-                <h1>Identity Verification</h1>
-
-                <div class="summit-info">
-                    <p><strong>We're looking for specific people in leadership roles, not just "a representative" or "the person nearby."</strong></p>
-                    <p>This meeting requires decision-makers who can speak candidly about strategic and operational matters.</p>
-                </div>
-
-                <div class="radio-group">
-                    <p style="font-weight: 600; margin-bottom: 1em;">Are you the primary CSC member for your institution?</p>
-
-                    <div class="radio-item" onclick="selectIdentity('yes')">
-                        <input type="radio" name="identity" id="identityYes" value="yes">
-                        <label for="identityYes">Yes, I am the primary CSC member</label>
-                    </div>
-
-                    <div class="radio-item" onclick="selectIdentity('no')">
-                        <input type="radio" name="identity" id="identityNo" value="no">
-                        <label for="identityNo">No, I am not the primary member</label>
-                    </div>
-                </div>
-
-                <div id="notPrimaryMessage" style="display: none;" class="summit-critical">
-                    <p><strong>This registration is for the primary CSC member only.</strong></p>
-                    <p>Please forward this link to your institution's primary CSC member. If you're unsure who that is, please contact <a href="mailto:info@campusstores.ca">info@campusstores.ca</a></p>
-                </div>
-
-                <button class="previous-btn" onclick="previousStep()">
-                    <span>←</span>
-                    Previous step
-                </button>
-                <button class="next-btn" id="step1NextBtn" onclick="nextStep()" disabled>
-                    Next step
-                    <span>→</span>
-                </button>
-            </div>
-
-            <!-- Step 2: Attendance Decision (Primary Member) -->
+            <!-- Step 1: Attendance Decision (Primary Member) -->
             <div id="step2Section" class="content-section">
                 <div class="progress-indicator">
-                    <div class="progress-text">Step 2 of 5</div>
+                    <div class="progress-text">Step 1 of 4</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 40%;"></div>
+                        <div class="progress-fill" style="width: 25%;"></div>
                     </div>
                 </div>
 
@@ -484,9 +435,9 @@
             <!-- Step 3a: Attendance Format (Primary Member) -->
             <div id="step3aSection" class="content-section">
                 <div class="progress-indicator">
-                    <div class="progress-text">Step 3 of 5</div>
+                    <div class="progress-text">Step 2 of 4</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 60%;"></div>
+                        <div class="progress-fill" style="width: 50%;"></div>
                     </div>
                 </div>
 
@@ -525,9 +476,9 @@
             <!-- Step 3b: Primary Confidentiality Agreement -->
             <div id="step3bSection" class="content-section">
                 <div class="progress-indicator">
-                    <div class="progress-text">Step 3 of 5 - Confidentiality Agreement</div>
+                    <div class="progress-text">Step 2 of 4 - Confidentiality Agreement</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 60%;"></div>
+                        <div class="progress-fill" style="width: 50%;"></div>
                     </div>
                 </div>
 
@@ -625,9 +576,9 @@
             <!-- Step 3c: Virtual Protocol Agreement (Conditional) -->
             <div id="step3cSection" class="content-section">
                 <div class="progress-indicator">
-                    <div class="progress-text">Step 3 of 5 - Virtual Attendance Protocol</div>
+                    <div class="progress-text">Step 2 of 4 - Virtual Attendance Protocol</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 60%;"></div>
+                        <div class="progress-fill" style="width: 50%;"></div>
                     </div>
                 </div>
 
@@ -675,9 +626,9 @@
             <!-- Step 3d: Final Breach Acknowledgment -->
             <div id="step3dSection" class="content-section">
                 <div class="progress-indicator">
-                    <div class="progress-text">Step 3 of 5 - Final Acknowledgment</div>
+                    <div class="progress-text">Step 2 of 4 - Final Acknowledgment</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 60%;"></div>
+                        <div class="progress-fill" style="width: 50%;"></div>
                     </div>
                 </div>
 
@@ -714,9 +665,9 @@
             <!-- Step 4: Designate Alternate -->
             <div id="step4Section" class="content-section">
                 <div class="progress-indicator">
-                    <div class="progress-text">Step 4 of 5</div>
+                    <div class="progress-text">Step 3 of 4</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 80%;"></div>
+                        <div class="progress-fill" style="width: 75%;"></div>
                     </div>
                 </div>
 
@@ -757,9 +708,9 @@
             <!-- Step 5: Alternate Selection -->
             <div id="step5Section" class="content-section">
                 <div class="progress-indicator">
-                    <div class="progress-text">Step 4 of 5 - Select Alternate</div>
+                    <div class="progress-text">Step 3 of 4 - Select Alternate</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 80%;"></div>
+                        <div class="progress-fill" style="width: 75%;"></div>
                     </div>
                 </div>
 
@@ -818,9 +769,9 @@
             <!-- Step 6: Alternate Attendance Format -->
             <div id="step6Section" class="content-section">
                 <div class="progress-indicator">
-                    <div class="progress-text">Step 4 of 5 - Alternate Format</div>
+                    <div class="progress-text">Step 3 of 4 - Alternate Format</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 80%;"></div>
+                        <div class="progress-fill" style="width: 75%;"></div>
                     </div>
                 </div>
 
@@ -859,9 +810,9 @@
             <!-- Step 7: Primary Member Certification for Alternate -->
             <div id="step7Section" class="content-section">
                 <div class="progress-indicator">
-                    <div class="progress-text">Step 4 of 5 - Certification</div>
+                    <div class="progress-text">Step 3 of 4 - Certification</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 80%;"></div>
+                        <div class="progress-fill" style="width: 75%;"></div>
                     </div>
                 </div>
 
@@ -1011,12 +962,12 @@
         }
 
         function hideLoading() {
-            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('loadingState').classList.remove('active');
             document.querySelector('.wizard-content').classList.add('loaded');
         }
 
         function showLoading() {
-            document.getElementById('loadingState').style.display = 'flex';
+            document.getElementById('loadingState').classList.add('active');
         }
 
         async function startWizard() {
@@ -1026,32 +977,11 @@
             await loadOrganizationData();
 
             document.getElementById('welcomeSection').classList.remove('active');
-            document.getElementById('step1Section').classList.add('active');
+            document.getElementById('step2Section').classList.add('active');
             currentStep = 1;
         }
 
-        // Step 1: Identity Verification
-        function selectIdentity(answer) {
-            registrationState.isPrimaryMember = answer === 'yes';
-
-            document.querySelectorAll('input[name="identity"]').forEach(input => {
-                input.parentElement.classList.remove('selected');
-            });
-
-            const selectedRadio = document.getElementById(`identity${answer === 'yes' ? 'Yes' : 'No'}`);
-            selectedRadio.checked = true;
-            selectedRadio.parentElement.classList.add('selected');
-
-            if (answer === 'no') {
-                document.getElementById('notPrimaryMessage').style.display = 'block';
-                document.getElementById('step1NextBtn').disabled = true;
-            } else {
-                document.getElementById('notPrimaryMessage').style.display = 'none';
-                document.getElementById('step1NextBtn').disabled = false;
-            }
-        }
-
-        // Step 2: Primary Attendance
+        // Step 1: Primary Attendance
         function selectPrimaryAttendance(answer) {
             registrationState.primaryIsAttending = answer === 'yes';
 

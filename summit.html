@@ -925,12 +925,13 @@
             token = urlParams.get('token');
 
             if (!token) {
+                hideLoading();
                 alert('No token provided. Please use the link from your email.');
                 return;
             }
 
-            // Load organization data
-            await loadOrganizationData();
+            // Hide loading and show welcome screen
+            hideLoading();
         });
 
         async function loadOrganizationData() {
@@ -953,6 +954,7 @@
                 hideLoading();
             } catch (error) {
                 console.error('Error loading data:', error);
+                hideLoading();
                 alert('Error loading organization data. Please try again.');
             }
         }
@@ -965,7 +967,12 @@
             document.getElementById('loadingState').style.display = 'flex';
         }
 
-        function startWizard() {
+        async function startWizard() {
+            showLoading();
+
+            // Load organization data
+            await loadOrganizationData();
+
             document.getElementById('welcomeSection').classList.remove('active');
             document.getElementById('step1Section').classList.add('active');
             currentStep = 1;

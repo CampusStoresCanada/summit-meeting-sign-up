@@ -3666,3 +3666,84 @@ body::before {
     font-size: max(0.8vw, 12px);
     font-family: 'davis-sans', sans-serif;
 }
+
+/* ===========================================
+   SUMMIT CONFIDENTIALITY AGREEMENT
+   =========================================== */
+
+.agreement-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 2px solid #ba003b;
+    border-radius: 8px;
+    padding: 1.5em;
+    margin: 1.5em 0;
+    background: #f8f9fa;
+}
+
+.agreement-text h3 {
+    color: #ba003b;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-size: 1.1em;
+}
+
+.agreement-text h3:first-child {
+    margin-top: 0;
+}
+
+.agreement-text p, .agreement-text ul {
+    margin-bottom: 1em;
+    line-height: 1.6;
+}
+
+.agreement-text ul {
+    padding-left: 2em;
+}
+
+.agreement-text li {
+    margin-bottom: 0.5em;
+}
+
+.scroll-indicator {
+    text-align: center;
+    padding: 1.5em;
+    color: #ba003b;
+    font-weight: 600;
+    font-size: 1.1em;
+    background: linear-gradient(to bottom, transparent, #f8f9fa);
+    margin-top: 2em;
+}
+
+.download-agreement-section {
+    text-align: center;
+    margin: 1.5em 0;
+}
+
+.download-btn {
+    background: #0071bc;
+    color: white;
+    border: none;
+    padding: 1em 2em;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.download-btn:hover {
+    background: #005a94;
+    transform: translateY(-1px);
+}
+
+.download-btn:active {
+    transform: translateY(0);
+}
+
+.checkbox-group .checkbox-item input[type="checkbox"]:disabled + label {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+

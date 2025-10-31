@@ -486,39 +486,50 @@
 
                 <div class="summit-critical">
                     <p><strong>Please read the following confidentiality requirements carefully.</strong></p>
-                    <p>You must agree to all terms and upload a signed copy to proceed.</p>
+                    <p>You must scroll to the bottom, agree to all terms, download the agreement, sign it, and upload the signed copy to proceed.</p>
                 </div>
 
-                <div class="agreement-text">
-                    <h3>Before you register, you need to understand what you're agreeing to.</h3>
+                <div class="agreement-container" id="primaryAgreementContainer" onscroll="checkPrimaryAgreementScroll()">
+                    <div class="agreement-text">
+                        <h3>Before you register, you need to understand what you're agreeing to.</h3>
 
-                    <p>This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.</p>
+                        <p>This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.</p>
 
-                    <h3>What We'll Be Discussing</h3>
-                    <p>Frank conversations about:</p>
-                    <ul>
-                        <li>The real financial situation of your campus store</li>
-                        <li>Staffing levels, changes, and expertise needs</li>
-                        <li>Operational challenges and solutions</li>
-                        <li>Strategic decisions your institution is requiring</li>
-                    </ul>
+                        <h3>What We'll Be Discussing</h3>
+                        <p>Frank conversations about:</p>
+                        <ul>
+                            <li>The real financial situation of your campus store</li>
+                            <li>Staffing levels, changes, and expertise needs</li>
+                            <li>Operational challenges and solutions</li>
+                            <li>Strategic decisions your institution is requiring</li>
+                        </ul>
 
-                    <h3>Who Can Attend</h3>
-                    <p>This meeting is designed for management-level staff who can speak candidly about their store's operations and strategic decisions.</p>
+                        <h3>Who Can Attend</h3>
+                        <p>This meeting is designed for management-level staff who can speak candidly about their store's operations and strategic decisions.</p>
 
-                    <p><strong>If you are the primary CSC member:</strong> You can attend yourself or designate someone else from your team.</p>
+                        <p><strong>If you are the primary CSC member:</strong> You can attend yourself or designate someone else from your team.</p>
 
-                    <p><strong>Important consideration about collective bargaining agreements:</strong> If you or your designee are covered by a collective bargaining agreement, you must review your contract to ensure there are no provisions that would require you to disclose information from this meeting. By registering, you assume full responsibility for any conflicts between this confidentiality agreement and your employment contract.</p>
+                        <p><strong>Important consideration about collective bargaining agreements:</strong> If you or your designee are covered by a collective bargaining agreement, you must review your contract to ensure there are no provisions that would require you to disclose information from this meeting. By registering, you assume full responsibility for any conflicts between this confidentiality agreement and your employment contract.</p>
 
-                    <p><strong>If you are designating someone else:</strong> You are personally responsible for ensuring they understand and will follow these rules. The CSC Board reserves the right to exclude any designee if they believe that person cannot contribute meaningfully to the conversation.</p>
+                        <p><strong>If you are designating someone else:</strong> You are personally responsible for ensuring they understand and will follow these rules. The CSC Board reserves the right to exclude any designee if they believe that person cannot contribute meaningfully to the conversation.</p>
 
-                    <h3>The Rules</h3>
-                    <p><strong>In-Person:</strong> "What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward."</p>
+                        <h3>The Rules</h3>
+                        <p><strong>In-Person:</strong> "What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward."</p>
 
-                    <p><strong>Virtual:</strong> You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.</p>
+                        <p><strong>Virtual:</strong> You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.</p>
 
-                    <h3>Consequences</h3>
-                    <p>Breaking confidentiality results in immediate membership termination with no appeals or refunds.</p>
+                        <h3>Consequences</h3>
+                        <p>Breaking confidentiality results in immediate membership termination with no appeals or refunds.</p>
+
+                        <div class="scroll-indicator">↓ Scroll to bottom to enable checkboxes ↓</div>
+                    </div>
+                </div>
+
+                <div class="download-agreement-section">
+                    <button type="button" class="download-btn" onclick="downloadPrimaryAgreement()">
+                        Download Agreement to Sign
+                    </button>
+                    <p style="color: #6c757d; font-size: 0.9em; margin-top: 0.5em;">Download, sign, and upload the signed copy below</p>
                 </div>
 
                 <div class="checkbox-group">
@@ -934,6 +945,13 @@
 
             // Hide loading and show welcome screen
             hideLoading();
+
+            // Disable agreement checkboxes until scrolled to bottom
+            ['primaryAgree1', 'primaryAgree2', 'primaryAgree3', 'primaryAgree4', 'primaryAgree5', 'primaryAgree6']
+                .forEach(id => {
+                    const checkbox = document.getElementById(id);
+                    if (checkbox) checkbox.disabled = true;
+                });
         });
 
         async function loadOrganizationData() {
@@ -1012,6 +1030,84 @@
         }
 
         // Step 3b: Primary Agreement
+        let primaryAgreementScrolledToBottom = false;
+
+        function checkPrimaryAgreementScroll() {
+            const container = document.getElementById('primaryAgreementContainer');
+            const scrolledToBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 10;
+
+            if (scrolledToBottom && !primaryAgreementScrolledToBottom) {
+                primaryAgreementScrolledToBottom = true;
+                // Enable all checkboxes
+                ['primaryAgree1', 'primaryAgree2', 'primaryAgree3', 'primaryAgree4', 'primaryAgree5', 'primaryAgree6']
+                    .forEach(id => {
+                        const checkbox = document.getElementById(id);
+                        checkbox.disabled = false;
+                    });
+                // Hide scroll indicator
+                document.querySelector('.scroll-indicator').style.display = 'none';
+            }
+        }
+
+        function downloadPrimaryAgreement() {
+            // For now, create a simple text version. In production, this should be a proper PDF
+            const agreementText = `MANAGERS & DIRECTORS SUMMIT
+CONFIDENTIALITY AGREEMENT
+
+Before you register, you need to understand what you're agreeing to.
+
+This summit operates under "Traffic Light Protocol Red" - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.
+
+WHAT WE'LL BE DISCUSSING
+
+Frank conversations about:
+- The real financial situation of your campus store
+- Staffing levels, changes, and expertise needs
+- Operational challenges and solutions
+- Strategic decisions your institution is requiring
+
+WHO CAN ATTEND
+
+This meeting is designed for management-level staff who can speak candidly about their store's operations and strategic decisions.
+
+If you are the primary CSC member: You can attend yourself or designate someone else from your team.
+
+Important consideration about collective bargaining agreements: If you or your designee are covered by a collective bargaining agreement, you must review your contract to ensure there are no provisions that would require you to disclose information from this meeting. By registering, you assume full responsibility for any conflicts between this confidentiality agreement and your employment contract.
+
+If you are designating someone else: You are personally responsible for ensuring they understand and will follow these rules. The CSC Board reserves the right to exclude any designee if they believe that person cannot contribute meaningfully to the conversation.
+
+THE RULES
+
+In-Person: "What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward."
+
+Virtual: You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.
+
+CONSEQUENCES
+
+Breaking confidentiality results in immediate membership termination with no appeals or refunds.
+
+BY SIGNING BELOW, I ACKNOWLEDGE THAT I HAVE READ AND AGREE TO ALL TERMS ABOVE.
+
+Signature: _________________________________
+
+Printed Name: _________________________________
+
+Organization: _________________________________
+
+Date: _________________________________
+`;
+
+            const blob = new Blob([agreementText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Summit_Confidentiality_Agreement.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
         function updatePrimaryAgreementState() {
             const allChecked = ['primaryAgree1', 'primaryAgree2', 'primaryAgree3', 'primaryAgree4', 'primaryAgree5', 'primaryAgree6']
                 .every(id => document.getElementById(id).checked);

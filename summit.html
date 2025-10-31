@@ -368,27 +368,38 @@
 
             <!-- Main Content -->
             <div class="main-content">
+                <!-- Mobile Progress Bar -->
+                <div class="mobile-progress">
+                    <div class="mobile-progress-fill" style="width: 0%"></div>
+                </div>
+
                 <!-- Welcome Section -->
                 <div id="welcomeSection" class="content-section active">
-                <h1>Managers & Directors Summit Registration</h1>
+                    <div class="welcome-container">
+                        <div class="welcome-section">
+                            <h1 class="welcome-title">Managers & Directors Summit Registration</h1>
 
-                <div class="summit-info">
-                    <p><strong>This is a highly confidential meeting requiring explicit agreements at multiple decision points.</strong></p>
-                    <p>This registration process will guide you through several important decisions and require your acknowledgment of strict confidentiality requirements.</p>
+                            <div class="summit-info">
+                                <p><strong>This is a highly confidential meeting requiring explicit agreements at multiple decision points.</strong></p>
+                                <p>This registration process will guide you through several important decisions and require your acknowledgment of strict confidentiality requirements.</p>
+                            </div>
+
+                            <div class="summit-warning">
+                                <p><strong>Before you begin:</strong></p>
+                                <ul>
+                                    <li>You will need to review and sign confidentiality agreements</li>
+                                    <li>You must be able to upload signed PDF or image files</li>
+                                    <li>All checkboxes and agreements are required - no exceptions</li>
+                                    <li>This process should take 10-15 minutes to complete</li>
+                                </ul>
+                            </div>
+
+                            <button class="get-started-btn" onclick="startWizard()">
+                                Begin Registration <span>→</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="summit-warning">
-                    <p><strong>Before you begin:</strong></p>
-                    <ul>
-                        <li>You will need to review and sign confidentiality agreements</li>
-                        <li>You must be able to upload signed PDF or image files</li>
-                        <li>All checkboxes and agreements are required - no exceptions</li>
-                        <li>This process should take 10-15 minutes to complete</li>
-                    </ul>
-                </div>
-
-                <button class="btn btn-primary" onclick="startWizard()">Begin Registration</button>
-            </div>
 
             <!-- Step 1: Identity Verification -->
             <div id="step1Section" class="content-section">
@@ -425,10 +436,14 @@
                     <p>Please forward this link to your institution's primary CSC member. If you're unsure who that is, please contact <a href="mailto:info@campusstores.ca">info@campusstores.ca</a></p>
                 </div>
 
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
-                    <button class="btn btn-primary" id="step1NextBtn" onclick="nextStep()" disabled>Continue</button>
-                </div>
+                <button class="previous-btn" onclick="previousStep()">
+                    <span>←</span>
+                    Previous step
+                </button>
+                <button class="next-btn" id="step1NextBtn" onclick="nextStep()" disabled>
+                    Next step
+                    <span>→</span>
+                </button>
             </div>
 
             <!-- Step 2: Attendance Decision (Primary Member) -->
@@ -456,10 +471,14 @@
                     </div>
                 </div>
 
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
-                    <button class="btn btn-primary" id="step2NextBtn" onclick="nextStep()" disabled>Continue</button>
-                </div>
+                <button class="previous-btn" onclick="previousStep()">
+                    <span>←</span>
+                    Previous step
+                </button>
+                <button class="next-btn" id="step2NextBtn" onclick="nextStep()" disabled>
+                    Next step
+                    <span>→</span>
+                </button>
             </div>
 
             <!-- Step 3a: Attendance Format (Primary Member) -->
@@ -493,10 +512,14 @@
                     </div>
                 </div>
 
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
-                    <button class="btn btn-primary" id="step3aNextBtn" onclick="nextStep()" disabled>Continue</button>
-                </div>
+                <button class="previous-btn" onclick="previousStep()">
+                    <span>←</span>
+                    Previous step
+                </button>
+                <button class="next-btn" id="step3aNextBtn" onclick="nextStep()" disabled>
+                    Next step
+                    <span>→</span>
+                </button>
             </div>
 
             <!-- Step 3b: Primary Confidentiality Agreement -->
@@ -589,10 +612,14 @@
                     <div id="primaryAgreementFileName" class="file-name-display" style="display: none;"></div>
                 </div>
 
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
-                    <button class="btn btn-primary" id="step3bNextBtn" onclick="nextStep()" disabled>Continue</button>
-                </div>
+                <button class="previous-btn" onclick="previousStep()">
+                    <span>←</span>
+                    Previous step
+                </button>
+                <button class="next-btn" id="step3bNextBtn" onclick="nextStep()" disabled>
+                    Next step
+                    <span>→</span>
+                </button>
             </div>
 
             <!-- Step 3c: Virtual Protocol Agreement (Conditional) -->
@@ -635,10 +662,14 @@
                     </div>
                 </div>
 
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
-                    <button class="btn btn-primary" id="step3cNextBtn" onclick="nextStep()" disabled>Continue</button>
-                </div>
+                <button class="previous-btn" onclick="previousStep()">
+                    <span>←</span>
+                    Previous step
+                </button>
+                <button class="next-btn" id="step3cNextBtn" onclick="nextStep()" disabled>
+                    Next step
+                    <span>→</span>
+                </button>
             </div>
 
             <!-- Step 3d: Final Breach Acknowledgment -->
@@ -670,10 +701,14 @@
                     </div>
                 </div>
 
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
-                    <button class="btn btn-primary" id="step3dNextBtn" onclick="nextStep()" disabled>Continue</button>
-                </div>
+                <button class="previous-btn" onclick="previousStep()">
+                    <span>←</span>
+                    Previous step
+                </button>
+                <button class="next-btn" id="step3dNextBtn" onclick="nextStep()" disabled>
+                    Next step
+                    <span>→</span>
+                </button>
             </div>
 
             <!-- Step 4: Designate Alternate -->
@@ -709,10 +744,14 @@
                     <p>Thank you for your response. Click Continue to complete your registration.</p>
                 </div>
 
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
-                    <button class="btn btn-primary" id="step4NextBtn" onclick="nextStep()" disabled>Continue</button>
-                </div>
+                <button class="previous-btn" onclick="previousStep()">
+                    <span>←</span>
+                    Previous step
+                </button>
+                <button class="next-btn" id="step4NextBtn" onclick="nextStep()" disabled>
+                    Next step
+                    <span>→</span>
+                </button>
             </div>
 
             <!-- Step 5: Alternate Selection -->
@@ -766,10 +805,14 @@
                     </div>
                 </div>
 
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
-                    <button class="btn btn-primary" id="step5NextBtn" onclick="nextStep()" disabled>Continue</button>
-                </div>
+                <button class="previous-btn" onclick="previousStep()">
+                    <span>←</span>
+                    Previous step
+                </button>
+                <button class="next-btn" id="step5NextBtn" onclick="nextStep()" disabled>
+                    Next step
+                    <span>→</span>
+                </button>
             </div>
 
             <!-- Step 6: Alternate Attendance Format -->
@@ -803,10 +846,14 @@
                     </div>
                 </div>
 
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
-                    <button class="btn btn-primary" id="step6NextBtn" onclick="nextStep()" disabled>Continue</button>
-                </div>
+                <button class="previous-btn" onclick="previousStep()">
+                    <span>←</span>
+                    Previous step
+                </button>
+                <button class="next-btn" id="step6NextBtn" onclick="nextStep()" disabled>
+                    Next step
+                    <span>→</span>
+                </button>
             </div>
 
             <!-- Step 7: Primary Member Certification for Alternate -->
@@ -850,10 +897,14 @@
                     <p><strong>Next Step:</strong> After you submit this certification, <span id="emailAlternateName"></span> will receive an email with a unique link to complete their own confidentiality agreement.</p>
                 </div>
 
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">Back</button>
-                    <button class="btn btn-primary" id="step7NextBtn" onclick="nextStep()" disabled>Continue</button>
-                </div>
+                <button class="previous-btn" onclick="previousStep()">
+                    <span>←</span>
+                    Previous step
+                </button>
+                <button class="next-btn" id="step7NextBtn" onclick="nextStep()" disabled>
+                    Next step
+                    <span>→</span>
+                </button>
             </div>
 
             <!-- Step 8: Confirmation -->

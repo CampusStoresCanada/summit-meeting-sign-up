@@ -486,50 +486,39 @@
 
                 <div class="summit-critical">
                     <p><strong>Please read the following confidentiality requirements carefully.</strong></p>
-                    <p>You must scroll to the bottom, agree to all terms, download the agreement, sign it, and upload the signed copy to proceed.</p>
+                    <p>You must agree to all terms and provide your digital signature to proceed.</p>
                 </div>
 
-                <div class="agreement-container" id="primaryAgreementContainer" onscroll="checkPrimaryAgreementScroll()">
-                    <div class="agreement-text">
-                        <h3>Before you register, you need to understand what you're agreeing to.</h3>
+                <div class="agreement-text">
+                    <h3>Before you register, you need to understand what you're agreeing to.</h3>
 
-                        <p>This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.</p>
+                    <p>This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.</p>
 
-                        <h3>What We'll Be Discussing</h3>
-                        <p>Frank conversations about:</p>
-                        <ul>
-                            <li>The real financial situation of your campus store</li>
-                            <li>Staffing levels, changes, and expertise needs</li>
-                            <li>Operational challenges and solutions</li>
-                            <li>Strategic decisions your institution is requiring</li>
-                        </ul>
+                    <h3>What We'll Be Discussing</h3>
+                    <p>Frank conversations about:</p>
+                    <ul>
+                        <li>The real financial situation of your campus store</li>
+                        <li>Staffing levels, changes, and expertise needs</li>
+                        <li>Operational challenges and solutions</li>
+                        <li>Strategic decisions your institution is requiring</li>
+                    </ul>
 
-                        <h3>Who Can Attend</h3>
-                        <p>This meeting is designed for management-level staff who can speak candidly about their store's operations and strategic decisions.</p>
+                    <h3>Who Can Attend</h3>
+                    <p>This meeting is designed for management-level staff who can speak candidly about their store's operations and strategic decisions.</p>
 
-                        <p><strong>If you are the primary CSC member:</strong> You can attend yourself or designate someone else from your team.</p>
+                    <p><strong>If you are the primary CSC member:</strong> You can attend yourself or designate someone else from your team.</p>
 
-                        <p><strong>Important consideration about collective bargaining agreements:</strong> If you or your designee are covered by a collective bargaining agreement, you must review your contract to ensure there are no provisions that would require you to disclose information from this meeting. By registering, you assume full responsibility for any conflicts between this confidentiality agreement and your employment contract.</p>
+                    <p><strong>Important consideration about collective bargaining agreements:</strong> If you or your designee are covered by a collective bargaining agreement, you must review your contract to ensure there are no provisions that would require you to disclose information from this meeting. By registering, you assume full responsibility for any conflicts between this confidentiality agreement and your employment contract.</p>
 
-                        <p><strong>If you are designating someone else:</strong> You are personally responsible for ensuring they understand and will follow these rules. The CSC Board reserves the right to exclude any designee if they believe that person cannot contribute meaningfully to the conversation.</p>
+                    <p><strong>If you are designating someone else:</strong> You are personally responsible for ensuring they understand and will follow these rules. The CSC Board reserves the right to exclude any designee if they believe that person cannot contribute meaningfully to the conversation.</p>
 
-                        <h3>The Rules</h3>
-                        <p><strong>In-Person:</strong> "What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward."</p>
+                    <h3>The Rules</h3>
+                    <p><strong>In-Person:</strong> "What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward."</p>
 
-                        <p><strong>Virtual:</strong> You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.</p>
+                    <p><strong>Virtual:</strong> You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.</p>
 
-                        <h3>Consequences</h3>
-                        <p>Breaking confidentiality results in immediate membership termination with no appeals or refunds.</p>
-
-                        <div class="scroll-indicator">↓ Scroll to bottom to enable checkboxes ↓</div>
-                    </div>
-                </div>
-
-                <div class="download-agreement-section">
-                    <button type="button" class="download-btn" onclick="downloadPrimaryAgreement()">
-                        Download Agreement to Sign
-                    </button>
-                    <p style="color: #6c757d; font-size: 0.9em; margin-top: 0.5em;">Download, sign, and upload the signed copy below</p>
+                    <h3>Consequences</h3>
+                    <p>Breaking confidentiality results in immediate membership termination with no appeals or refunds.</p>
                 </div>
 
                 <div class="checkbox-group">
@@ -564,14 +553,17 @@
                     </div>
                 </div>
 
-                <div class="file-upload-area" id="primaryAgreementUploadArea">
-                    <label for="primaryAgreementFile" class="file-upload-label">
-                        <p style="font-weight: 600; margin-bottom: 0.5em;">Upload Signed Confidentiality Agreement</p>
-                        <p style="color: #6c757d; font-size: 0.9em;">Click to select a PDF or image file (JPG, PNG)</p>
-                        <p style="color: #6c757d; font-size: 0.85em; margin-top: 0.5em;">Maximum file size: 5MB</p>
-                    </label>
-                    <input type="file" id="primaryAgreementFile" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" onchange="handlePrimaryAgreementUpload(event)">
-                    <div id="primaryAgreementFileName" class="file-name-display" style="display: none;"></div>
+                <div class="signature-section">
+                    <h3 style="margin-top: 2em; margin-bottom: 0.5em;">Digital Signature</h3>
+                    <p style="color: #6c757d; margin-bottom: 1em;">Please sign below using your mouse or touchscreen</p>
+
+                    <div class="signature-pad-container">
+                        <canvas id="primarySignatureCanvas" class="signature-canvas"></canvas>
+                    </div>
+
+                    <button type="button" class="clear-signature-btn" onclick="clearPrimarySignature()">
+                        Clear Signature
+                    </button>
                 </div>
 
                 <button class="previous-btn" onclick="previousStep()">
@@ -946,12 +938,8 @@
             // Hide loading and show welcome screen
             hideLoading();
 
-            // Disable agreement checkboxes until scrolled to bottom
-            ['primaryAgree1', 'primaryAgree2', 'primaryAgree3', 'primaryAgree4', 'primaryAgree5', 'primaryAgree6']
-                .forEach(id => {
-                    const checkbox = document.getElementById(id);
-                    if (checkbox) checkbox.disabled = true;
-                });
+            // Initialize signature canvas
+            initPrimarySignatureCanvas();
         });
 
         async function loadOrganizationData() {
@@ -1029,92 +1017,96 @@
             document.getElementById('step3aNextBtn').disabled = false;
         }
 
-        // Step 3b: Primary Agreement
-        let primaryAgreementScrolledToBottom = false;
+        // Step 3b: Primary Agreement - Signature Canvas
+        let primarySignatureCanvas = null;
+        let primarySignatureCtx = null;
+        let primaryIsDrawing = false;
+        let primaryHasSignature = false;
 
-        function checkPrimaryAgreementScroll() {
-            const container = document.getElementById('primaryAgreementContainer');
-            const scrolledToBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 10;
+        function initPrimarySignatureCanvas() {
+            primarySignatureCanvas = document.getElementById('primarySignatureCanvas');
+            if (!primarySignatureCanvas) return;
 
-            if (scrolledToBottom && !primaryAgreementScrolledToBottom) {
-                primaryAgreementScrolledToBottom = true;
-                // Enable all checkboxes
-                ['primaryAgree1', 'primaryAgree2', 'primaryAgree3', 'primaryAgree4', 'primaryAgree5', 'primaryAgree6']
-                    .forEach(id => {
-                        const checkbox = document.getElementById(id);
-                        checkbox.disabled = false;
-                    });
-                // Hide scroll indicator
-                document.querySelector('.scroll-indicator').style.display = 'none';
+            primarySignatureCtx = primarySignatureCanvas.getContext('2d');
+
+            // Set canvas size
+            const rect = primarySignatureCanvas.getBoundingClientRect();
+            primarySignatureCanvas.width = rect.width;
+            primarySignatureCanvas.height = 200;
+
+            // Set drawing styles
+            primarySignatureCtx.strokeStyle = '#000000';
+            primarySignatureCtx.lineWidth = 2;
+            primarySignatureCtx.lineCap = 'round';
+            primarySignatureCtx.lineJoin = 'round';
+
+            // Mouse events
+            primarySignatureCanvas.addEventListener('mousedown', startPrimaryDrawing);
+            primarySignatureCanvas.addEventListener('mousemove', drawPrimary);
+            primarySignatureCanvas.addEventListener('mouseup', stopPrimaryDrawing);
+            primarySignatureCanvas.addEventListener('mouseleave', stopPrimaryDrawing);
+
+            // Touch events
+            primarySignatureCanvas.addEventListener('touchstart', handlePrimaryTouchStart);
+            primarySignatureCanvas.addEventListener('touchmove', handlePrimaryTouchMove);
+            primarySignatureCanvas.addEventListener('touchend', stopPrimaryDrawing);
+        }
+
+        function startPrimaryDrawing(e) {
+            primaryIsDrawing = true;
+            const rect = primarySignatureCanvas.getBoundingClientRect();
+            primarySignatureCtx.beginPath();
+            primarySignatureCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function drawPrimary(e) {
+            if (!primaryIsDrawing) return;
+            const rect = primarySignatureCanvas.getBoundingClientRect();
+            primarySignatureCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            primarySignatureCtx.stroke();
+            primaryHasSignature = true;
+            updatePrimaryAgreementState();
+        }
+
+        function stopPrimaryDrawing() {
+            if (primaryIsDrawing) {
+                primaryIsDrawing = false;
+                primarySignatureCtx.closePath();
             }
         }
 
-        function downloadPrimaryAgreement() {
-            // For now, create a simple text version. In production, this should be a proper PDF
-            const agreementText = `MANAGERS & DIRECTORS SUMMIT
-CONFIDENTIALITY AGREEMENT
+        function handlePrimaryTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = primarySignatureCanvas.getBoundingClientRect();
+            primaryIsDrawing = true;
+            primarySignatureCtx.beginPath();
+            primarySignatureCtx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+        }
 
-Before you register, you need to understand what you're agreeing to.
+        function handlePrimaryTouchMove(e) {
+            e.preventDefault();
+            if (!primaryIsDrawing) return;
+            const touch = e.touches[0];
+            const rect = primarySignatureCanvas.getBoundingClientRect();
+            primarySignatureCtx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            primarySignatureCtx.stroke();
+            primaryHasSignature = true;
+            updatePrimaryAgreementState();
+        }
 
-This summit operates under "Traffic Light Protocol Red" - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.
-
-WHAT WE'LL BE DISCUSSING
-
-Frank conversations about:
-- The real financial situation of your campus store
-- Staffing levels, changes, and expertise needs
-- Operational challenges and solutions
-- Strategic decisions your institution is requiring
-
-WHO CAN ATTEND
-
-This meeting is designed for management-level staff who can speak candidly about their store's operations and strategic decisions.
-
-If you are the primary CSC member: You can attend yourself or designate someone else from your team.
-
-Important consideration about collective bargaining agreements: If you or your designee are covered by a collective bargaining agreement, you must review your contract to ensure there are no provisions that would require you to disclose information from this meeting. By registering, you assume full responsibility for any conflicts between this confidentiality agreement and your employment contract.
-
-If you are designating someone else: You are personally responsible for ensuring they understand and will follow these rules. The CSC Board reserves the right to exclude any designee if they believe that person cannot contribute meaningfully to the conversation.
-
-THE RULES
-
-In-Person: "What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward."
-
-Virtual: You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.
-
-CONSEQUENCES
-
-Breaking confidentiality results in immediate membership termination with no appeals or refunds.
-
-BY SIGNING BELOW, I ACKNOWLEDGE THAT I HAVE READ AND AGREE TO ALL TERMS ABOVE.
-
-Signature: _________________________________
-
-Printed Name: _________________________________
-
-Organization: _________________________________
-
-Date: _________________________________
-`;
-
-            const blob = new Blob([agreementText], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'Summit_Confidentiality_Agreement.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+        function clearPrimarySignature() {
+            if (!primarySignatureCanvas || !primarySignatureCtx) return;
+            primarySignatureCtx.clearRect(0, 0, primarySignatureCanvas.width, primarySignatureCanvas.height);
+            primaryHasSignature = false;
+            updatePrimaryAgreementState();
         }
 
         function updatePrimaryAgreementState() {
             const allChecked = ['primaryAgree1', 'primaryAgree2', 'primaryAgree3', 'primaryAgree4', 'primaryAgree5', 'primaryAgree6']
                 .every(id => document.getElementById(id).checked);
 
-            const hasFile = registrationState.primaryAgreementFile !== null;
-
-            document.getElementById('step3bNextBtn').disabled = !(allChecked && hasFile);
+            document.getElementById('step3bNextBtn').disabled = !(allChecked && primaryHasSignature);
 
             // Update checkbox styling
             document.querySelectorAll('.checkbox-item').forEach(item => {
@@ -1125,27 +1117,6 @@ Date: _________________________________
                     item.classList.remove('checked');
                 }
             });
-        }
-
-        async function handlePrimaryAgreementUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // Validate file size (5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                alert('File size must be less than 5MB');
-                event.target.value = '';
-                return;
-            }
-
-            registrationState.primaryAgreementFile = file;
-
-            // Show file name
-            document.getElementById('primaryAgreementFileName').textContent = `✓ ${file.name}`;
-            document.getElementById('primaryAgreementFileName').style.display = 'block';
-            document.getElementById('primaryAgreementUploadArea').classList.add('has-file');
-
-            updatePrimaryAgreementState();
         }
 
         // Step 3c: Virtual Protocol
@@ -1601,17 +1572,15 @@ Date: _________________________________
         async function uploadFiles() {
             const files = [];
 
-            if (registrationState.primaryAgreementFile) {
-                const reader = new FileReader();
-                const primaryAgreementBase64 = await new Promise((resolve) => {
-                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
-                    reader.readAsDataURL(registrationState.primaryAgreementFile);
-                });
+            // Get signature from canvas if present
+            if (primaryHasSignature && primarySignatureCanvas) {
+                const signatureDataUrl = primarySignatureCanvas.toDataURL('image/png');
+                const signatureBase64 = signatureDataUrl.split(',')[1];
 
                 files.push({
-                    name: registrationState.primaryAgreementFile.name,
-                    content: primaryAgreementBase64,
-                    type: registrationState.primaryAgreementFile.type,
+                    name: `signature_${Date.now()}.png`,
+                    content: signatureBase64,
+                    type: 'image/png',
                     fieldName: 'primaryAgreement'
                 });
             }

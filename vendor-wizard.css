@@ -3747,3 +3747,70 @@ body::before {
     cursor: not-allowed;
 }
 
+
+/* Digital Signature Pad */
+.signature-section {
+    margin: 2em 0;
+}
+
+.signature-pad-container {
+    border: 2px solid #ba003b;
+    border-radius: 8px;
+    background: white;
+    padding: 1em;
+    margin-bottom: 1em;
+}
+
+.signature-canvas {
+    width: 100%;
+    height: 200px;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.clear-signature-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.6em 1.5em;
+    border-radius: 4px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.clear-signature-btn:hover {
+    background: #5a6268;
+}
+
+.agreement-text {
+    margin: 1.5em 0;
+}
+
+.agreement-text h3 {
+    color: #ba003b;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-size: 1.1em;
+}
+
+.agreement-text h3:first-child {
+    margin-top: 0;
+}
+
+.agreement-text p, .agreement-text ul {
+    margin-bottom: 1em;
+    line-height: 1.6;
+}
+
+.agreement-text ul {
+    padding-left: 2em;
+}
+
+.agreement-text li {
+    margin-bottom: 0.5em;
+}
+

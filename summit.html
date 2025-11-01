@@ -65,6 +65,40 @@
             margin-bottom: 1em;
         }
 
+        .agreement-content {
+            margin: 2em 0;
+            line-height: 1.7;
+            color: #333333;
+        }
+
+        .agreement-content h3 {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 1.1em;
+            color: #000000;
+            margin-top: 1.8em;
+            margin-bottom: 0.8em;
+        }
+
+        .agreement-content h3:first-child {
+            margin-top: 0;
+        }
+
+        .agreement-content p {
+            margin-bottom: 1.1em;
+            line-height: 1.7;
+        }
+
+        .agreement-content ul {
+            margin-bottom: 1.2em;
+            margin-left: 1.8em;
+        }
+
+        .agreement-content li {
+            margin-bottom: 0.5em;
+            line-height: 1.6;
+        }
+
         .checkbox-group {
             margin: 1.5em 0;
         }
@@ -490,7 +524,7 @@
                     <p class="step-subtitle">This meeting requires the highest level of confidentiality</p>
                 </div>
 
-                <div class="info-section">
+                <div class="agreement-content">
                     <h3>Before you register, you need to understand what you're agreeing to.</h3>
 
                     <p>This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.</p>
@@ -551,7 +585,7 @@
                     <p class="step-subtitle">Important consideration about collective bargaining agreements</p>
                 </div>
 
-                <div class="info-section">
+                <div class="agreement-content">
                     <p>If you or your designee are covered by a collective bargaining agreement, you must review your contract to ensure there are no provisions that would require you to disclose information from this meeting.</p>
 
                     <p>By registering, you assume full responsibility for any conflicts between this confidentiality agreement and your employment contract.</p>
@@ -585,12 +619,32 @@
 
                 <div class="step-header">
                     <h2 class="step-title-main">Sign Confidentiality Agreement</h2>
-                    <p class="step-subtitle">By signing below, you acknowledge that you have read and agree to all confidentiality terms</p>
+                    <p class="step-subtitle">Review the terms and sign below to complete your confidentiality acknowledgment</p>
+                </div>
+
+                <div class="agreement-content">
+                    <h3>Summary of Terms</h3>
+
+                    <p>By signing this agreement, you acknowledge and agree to the following:</p>
+
+                    <p><strong>Traffic Light Protocol Red Confidentiality:</strong> All information discussed at the Managers & Directors Summit is subject to the highest level of confidentiality. What is said in the meeting stays in the meeting. No recording of any kind is permitted. No sharing of information or notes afterward.</p>
+
+                    <p><strong>Attendance Requirements:</strong></p>
+                    <ul>
+                        <li><strong>In-Person:</strong> No recording devices, no note-sharing, complete confidentiality</li>
+                        <li><strong>Virtual:</strong> Must be alone with camera on and microphone active throughout the meeting</li>
+                    </ul>
+
+                    <p><strong>Employment Contract Responsibility:</strong> If you or your designee are covered by a collective bargaining agreement, you have reviewed your employment contract and accept full responsibility for any conflicts with this confidentiality agreement.</p>
+
+                    <p><strong>Consequences of Breach:</strong> Violation of this confidentiality agreement will result in immediate termination of CSC membership with no appeals process and no refunds.</p>
+
+                    <p><strong>Designee Responsibility:</strong> If you are designating someone else to attend, you are personally responsible for ensuring they understand and will comply with all of these terms. The CSC Board reserves the right to exclude any designee who cannot contribute meaningfully to the conversation.</p>
                 </div>
 
                 <div class="signature-section">
                     <h3>Digital Signature</h3>
-                    <p class="step-subtitle">Please sign below using your mouse or touchscreen</p>
+                    <p style="margin-bottom: 1em; color: #666;">Please sign below using your mouse or touchscreen</p>
 
                     <div class="signature-pad-container">
                         <canvas id="primarySignatureCanvas" class="signature-canvas"></canvas>

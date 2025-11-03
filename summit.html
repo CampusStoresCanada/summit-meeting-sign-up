@@ -1012,13 +1012,17 @@
                     </div>
                 </div>
 
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="primaryAgree1" onchange="updateStep3bState()" disabled>
-                        <label for="primaryAgree1">
-                            <span id="tlpRedCheckboxLabel">Please scroll to the bottom to enable this checkbox</span>
-                        </label>
+                <div class="signature-section" id="tlpRedSignatureSection" style="opacity: 0.4; pointer-events: none;">
+                    <h3>Sign to Acknowledge Agreement</h3>
+                    <p style="margin-bottom: 1em; color: #666;" id="tlpRedSignaturePrompt">Please scroll to the bottom to enable signature</p>
+
+                    <div class="signature-pad-container">
+                        <canvas id="tlpRedSignatureCanvas" class="signature-canvas"></canvas>
                     </div>
+
+                    <button type="button" class="clear-signature-btn" onclick="clearTLPRedSignature()">
+                        Clear Signature
+                    </button>
                 </div>
 
                 <button class="previous-btn" onclick="previousStep()">
@@ -1040,10 +1044,7 @@
                     </div>
                 </div>
 
-                <div class="step-header">
-                    <h2 class="step-title-main">Employment Contract Review</h2>
-                    <p class="step-subtitle">Important consideration about collective bargaining agreements</p>
-                </div>
+                <h1>Employment Contract Review</h1>
 
                 <div class="agreement-content">
                     <p>If you or your designee are covered by a collective bargaining agreement, you must review your contract to ensure there are no provisions that would require you to disclose information from this meeting.</p>
@@ -1051,66 +1052,15 @@
                     <p>By registering, you assume full responsibility for any conflicts between this confidentiality agreement and your employment contract.</p>
                 </div>
 
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="primaryAgree2" onchange="updateStep3cState()">
-                        <label for="primaryAgree2">I have reviewed applicable employment contracts and accept responsibility for any conflicts</label>
-                    </div>
-                </div>
-
-                <button class="previous-btn" onclick="previousStep()">
-                    <span>←</span>
-                    Previous step
-                </button>
-                <button class="next-btn" id="step3cNextBtn" onclick="nextStep()" disabled>
-                    Next step
-                    <span>→</span>
-                </button>
-            </div>
-
-            <!-- Step 3d: Digital Signature -->
-            <div id="step3dSection" class="content-section">
-                <div class="progress-indicator">
-                    <div class="progress-text">Step 2 of 4 - Sign Agreement</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 50%;"></div>
-                    </div>
-                </div>
-
-                <div class="step-header">
-                    <h2 class="step-title-main">Sign Confidentiality Agreement</h2>
-                    <p class="step-subtitle">Review the terms and sign below to complete your confidentiality acknowledgment</p>
-                </div>
-
-                <div class="agreement-content">
-                    <h3>Summary of Terms</h3>
-
-                    <p>By signing this agreement, you acknowledge and agree to the following:</p>
-
-                    <p><strong>Traffic Light Protocol Red Confidentiality:</strong> All information discussed at the Managers & Directors Summit is subject to the highest level of confidentiality. What is said in the meeting stays in the meeting. No recording of any kind is permitted. No sharing of information or notes afterward.</p>
-
-                    <p><strong>Attendance Requirements:</strong></p>
-                    <ul>
-                        <li><strong>In-Person:</strong> No recording devices, no note-sharing, complete confidentiality</li>
-                        <li><strong>Virtual:</strong> Must be alone with camera on and microphone active throughout the meeting</li>
-                    </ul>
-
-                    <p><strong>Employment Contract Responsibility:</strong> If you or your designee are covered by a collective bargaining agreement, you have reviewed your employment contract and accept full responsibility for any conflicts with this confidentiality agreement.</p>
-
-                    <p><strong>Consequences of Breach:</strong> Violation of this confidentiality agreement will result in immediate termination of CSC membership with no appeals process and no refunds.</p>
-
-                    <p><strong>Designee Responsibility:</strong> If you are designating someone else to attend, you are personally responsible for ensuring they understand and will comply with all of these terms. The CSC Board reserves the right to exclude any designee who cannot contribute meaningfully to the conversation.</p>
-                </div>
-
                 <div class="signature-section">
-                    <h3>Digital Signature</h3>
-                    <p style="margin-bottom: 1em; color: #666;">Please sign below using your mouse or touchscreen</p>
+                    <h3>Sign to Acknowledge Responsibility</h3>
+                    <p style="margin-bottom: 1em; color: #666;">I have reviewed applicable employment contracts and accept responsibility for any conflicts</p>
 
                     <div class="signature-pad-container">
-                        <canvas id="primarySignatureCanvas" class="signature-canvas"></canvas>
+                        <canvas id="employmentSignatureCanvas" class="signature-canvas"></canvas>
                     </div>
 
-                    <button type="button" class="clear-signature-btn" onclick="clearPrimarySignature()">
+                    <button type="button" class="clear-signature-btn" onclick="clearEmploymentSignature()">
                         Clear Signature
                     </button>
                 </div>
@@ -1119,7 +1069,7 @@
                     <span>←</span>
                     Previous step
                 </button>
-                <button class="next-btn" id="step3dNextBtn" onclick="nextStep()" disabled>
+                <button class="next-btn" id="step3cNextBtn" onclick="nextStep()" disabled>
                     Next step
                     <span>→</span>
                 </button>
@@ -1374,9 +1324,8 @@
             // Primary Member
             primaryIsAttending: null,
             primaryFormat: null,
-            primaryAgreementChecks: [],
-            primaryAgreementFile: null,
-            primaryAgreementUrl: null,
+            tlpRedSignatureUrl: null,
+            employmentSignatureUrl: null,
             primaryVirtualAgreed: false,
             primaryBreachAck: false,
 
@@ -1407,8 +1356,8 @@
             // Load organization data and primary member info on page load
             await loadOrganizationData();
 
-            // Initialize signature canvas
-            initPrimarySignatureCanvas();
+            // Initialize signature canvases
+            initSignaturePads();
 
             // Initialize scroll-to-accept for TLP Red page
             initTLPRedScrollDetection();
@@ -1691,10 +1640,8 @@
         function initTLPRedScrollDetection() {
             const scrollContainer = document.getElementById('tlpRedScrollContainer');
             const scrollIndicator = document.getElementById('tlpRedScrollIndicator');
-            const checkbox = document.getElementById('primaryAgree1');
-            const checkboxLabel = document.getElementById('tlpRedCheckboxLabel');
-            const checkboxItem = checkbox?.closest('.checkbox-item');
-            const nextButton = document.getElementById('step3bNextBtn');
+            const signatureSection = document.getElementById('tlpRedSignatureSection');
+            const signaturePrompt = document.getElementById('tlpRedSignaturePrompt');
 
             if (!scrollContainer) return;
 
@@ -1726,13 +1673,19 @@
                     // Hide scroll indicator
                     scrollIndicator.classList.add('hidden');
 
-                    // Enable checkbox
-                    checkbox.disabled = false;
-                    checkboxLabel.textContent = 'I understand and agree to Traffic Light Protocol Red confidentiality requirements';
+                    // Enable signature section
+                    signatureSection.style.opacity = '1';
+                    signatureSection.style.pointerEvents = 'auto';
+                    signaturePrompt.textContent = 'Please sign below using your mouse or touchscreen';
 
-                    // NOW pulse the checkbox to show it's the next step
-                    if (checkboxItem && !checkbox.checked) {
-                        checkboxItem.classList.add('pulse');
+                    // Pulse the signature section to show it's the next step
+                    signatureSection.classList.add('pulse');
+
+                    // Remove pulse when they start signing
+                    if (tlpRedSignaturePad) {
+                        tlpRedSignaturePad.addEventListener('beginStroke', () => {
+                            signatureSection.classList.remove('pulse');
+                        });
                     }
 
                     console.log('✅ User scrolled to bottom of TLP Red agreement');
@@ -1742,13 +1695,6 @@
             // Add scroll listener
             scrollContainer.addEventListener('scroll', checkScrollPosition);
 
-            // Listen for checkbox changes to remove pulse and enable Next button
-            checkbox.addEventListener('change', function() {
-                if (this.checked && checkboxItem) {
-                    checkboxItem.classList.remove('pulse');
-                }
-            });
-
             // Check initial position ONLY after content is fully loaded
             // Give time for DOM to fully render the content
             setTimeout(() => {
@@ -1757,7 +1703,7 @@
 
                 // Only auto-check if content is definitely short and fully rendered
                 if (scrollHeight > 100 && scrollHeight <= clientHeight + 10) {
-                    console.log('Content is short, auto-enabling checkbox');
+                    console.log('Content is short, auto-enabling signature');
                     checkScrollPosition();
                 }
                 // Otherwise, user MUST scroll - don't auto-enable
@@ -1805,57 +1751,82 @@
             document.getElementById('step3aNextBtn').disabled = false;
         }
 
-        // Step 3b: Primary Agreement - Signature Canvas
-        let primarySignaturePad = null;
-        let primaryHasSignature = false;
+        // Signature Pads
+        let tlpRedSignaturePad = null;
+        let employmentSignaturePad = null;
+        let tlpRedHasSignature = false;
+        let employmentHasSignature = false;
 
-        function initPrimarySignatureCanvas() {
-            const canvas = document.getElementById('primarySignatureCanvas');
-            if (!canvas) return;
+        function initSignaturePads() {
+            // Initialize TLP Red signature pad
+            const tlpRedCanvas = document.getElementById('tlpRedSignatureCanvas');
+            if (tlpRedCanvas) {
+                const rect = tlpRedCanvas.getBoundingClientRect();
+                tlpRedCanvas.width = rect.width;
+                tlpRedCanvas.height = 200;
 
-            // Set canvas size
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = 200;
+                tlpRedSignaturePad = new SignaturePad(tlpRedCanvas, {
+                    backgroundColor: 'rgb(255, 255, 255)',
+                    penColor: 'rgb(0, 0, 0)',
+                    minWidth: 1,
+                    maxWidth: 2.5,
+                    throttle: 16,
+                    velocityFilterWeight: 0.7
+                });
 
-            // Initialize SignaturePad
-            primarySignaturePad = new SignaturePad(canvas, {
-                backgroundColor: 'rgb(255, 255, 255)',
-                penColor: 'rgb(0, 0, 0)',
-                minWidth: 1,
-                maxWidth: 2.5,
-                throttle: 16,
-                velocityFilterWeight: 0.7
-            });
+                tlpRedSignaturePad.addEventListener('endStroke', () => {
+                    tlpRedHasSignature = !tlpRedSignaturePad.isEmpty();
+                    updateStep3bState();
+                });
 
-            // Listen for signature changes
-            primarySignaturePad.addEventListener('endStroke', () => {
-                primaryHasSignature = !primarySignaturePad.isEmpty();
-                updateStep3dState();
-            });
+                console.log('✅ TLP Red signature pad initialized');
+            }
 
-            console.log('✅ Signature pad initialized');
+            // Initialize Employment signature pad
+            const employmentCanvas = document.getElementById('employmentSignatureCanvas');
+            if (employmentCanvas) {
+                const rect = employmentCanvas.getBoundingClientRect();
+                employmentCanvas.width = rect.width;
+                employmentCanvas.height = 200;
+
+                employmentSignaturePad = new SignaturePad(employmentCanvas, {
+                    backgroundColor: 'rgb(255, 255, 255)',
+                    penColor: 'rgb(0, 0, 0)',
+                    minWidth: 1,
+                    maxWidth: 2.5,
+                    throttle: 16,
+                    velocityFilterWeight: 0.7
+                });
+
+                employmentSignaturePad.addEventListener('endStroke', () => {
+                    employmentHasSignature = !employmentSignaturePad.isEmpty();
+                    updateStep3cState();
+                });
+
+                console.log('✅ Employment signature pad initialized');
+            }
         }
 
-        function clearPrimarySignature() {
-            if (!primarySignaturePad) return;
-            primarySignaturePad.clear();
-            primaryHasSignature = false;
-            updateStep3dState();
+        function clearTLPRedSignature() {
+            if (!tlpRedSignaturePad) return;
+            tlpRedSignaturePad.clear();
+            tlpRedHasSignature = false;
+            updateStep3bState();
+        }
+
+        function clearEmploymentSignature() {
+            if (!employmentSignaturePad) return;
+            employmentSignaturePad.clear();
+            employmentHasSignature = false;
+            updateStep3cState();
         }
 
         function updateStep3bState() {
-            const checked = document.getElementById('primaryAgree1').checked;
-            document.getElementById('step3bNextBtn').disabled = !checked;
+            document.getElementById('step3bNextBtn').disabled = !tlpRedHasSignature;
         }
 
         function updateStep3cState() {
-            const checked = document.getElementById('primaryAgree2').checked;
-            document.getElementById('step3cNextBtn').disabled = !checked;
-        }
-
-        function updateStep3dState() {
-            document.getElementById('step3dNextBtn').disabled = !primaryHasSignature;
+            document.getElementById('step3cNextBtn').disabled = !employmentHasSignature;
         }
 
         // Step 3c: Virtual Protocol
@@ -2279,7 +2250,8 @@
                         organizationId: organizationData.id,
                         primaryIsAttending: registrationState.primaryIsAttending,
                         primaryFormat: registrationState.primaryFormat,
-                        primaryAgreementUrl: uploadedFiles.primaryAgreement,
+                        tlpRedSignatureUrl: uploadedFiles.tlpRedAgreement,
+                        employmentSignatureUrl: uploadedFiles.employmentAgreement,
                         hasDesignee: registrationState.hasDesignee,
                         designeeContact: registrationState.designeeContact,
                         designeeFormat: registrationState.designeeFormat,
@@ -2309,16 +2281,29 @@
         async function uploadFiles() {
             const files = [];
 
-            // Get signature from canvas if present
-            if (primaryHasSignature && primarySignaturePad) {
-                const signatureDataUrl = primarySignaturePad.toDataURL('image/png');
-                const signatureBase64 = signatureDataUrl.split(',')[1];
+            // Get TLP Red signature
+            if (tlpRedHasSignature && tlpRedSignaturePad) {
+                const tlpRedDataUrl = tlpRedSignaturePad.toDataURL('image/png');
+                const tlpRedBase64 = tlpRedDataUrl.split(',')[1];
 
                 files.push({
-                    name: `signature_${Date.now()}.png`,
-                    content: signatureBase64,
+                    name: `tlp_red_signature_${Date.now()}.png`,
+                    content: tlpRedBase64,
                     type: 'image/png',
-                    fieldName: 'primaryAgreement'
+                    fieldName: 'tlpRedAgreement'
+                });
+            }
+
+            // Get Employment signature
+            if (employmentHasSignature && employmentSignaturePad) {
+                const employmentDataUrl = employmentSignaturePad.toDataURL('image/png');
+                const employmentBase64 = employmentDataUrl.split(',')[1];
+
+                files.push({
+                    name: `employment_signature_${Date.now()}.png`,
+                    content: employmentBase64,
+                    type: 'image/png',
+                    fieldName: 'employmentAgreement'
                 });
             }
 

@@ -342,6 +342,259 @@
             background: linear-gradient(90deg, #0071bc, #00a4e4);
             transition: width 0.3s ease;
         }
+
+        /* Primary Member Verification Section */
+        .primary-member-section {
+            margin: 2em 0;
+            padding: 0;
+        }
+
+        .primary-member-section h3 {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 1em;
+        }
+
+        .primary-member-card {
+            background: #ffffff;
+            border: 2px solid #0071bc;
+            border-radius: 8px;
+            padding: 1.5em;
+            margin-bottom: 1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5em;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 1.2em;
+            color: #000000;
+            margin-bottom: 0.3em;
+        }
+
+        .member-title,
+        .member-email,
+        .member-phone {
+            font-size: 0.95em;
+            color: #495057;
+            margin-bottom: 0.25em;
+        }
+
+        .edit-details-btn {
+            background: #ffffff;
+            color: #0071bc;
+            border: 2px solid #0071bc;
+            padding: 0.7em 1.5em;
+            border-radius: 6px;
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .edit-details-btn:hover {
+            background: #0071bc;
+            color: #ffffff;
+        }
+
+        .verification-prompt {
+            font-size: 0.9em;
+            color: #6c757d;
+            font-style: italic;
+            margin-top: 0.5em;
+        }
+
+        /* Edit Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 2em;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5em;
+            padding-bottom: 1em;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .modal-title {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 1.4em;
+            color: #2c3e50;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: #000000;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5em;
+        }
+
+        .modal-field {
+            margin-bottom: 1.2em;
+        }
+
+        .modal-field label {
+            display: block;
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 500;
+            font-size: 0.95em;
+            color: #2c3e50;
+            margin-bottom: 0.5em;
+        }
+
+        .modal-field label .required {
+            color: #dc3545;
+        }
+
+        .modal-field input {
+            width: 100%;
+            padding: 0.8em;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 1em;
+            transition: border-color 0.2s ease;
+        }
+
+        .modal-field input:focus {
+            outline: none;
+            border-color: #0071bc;
+            box-shadow: 0 0 0 3px rgba(0, 113, 188, 0.1);
+        }
+
+        .modal-field input.error {
+            border-color: #dc3545;
+        }
+
+        .modal-field .error-message {
+            color: #dc3545;
+            font-size: 0.85em;
+            margin-top: 0.3em;
+            display: none;
+        }
+
+        .modal-field .error-message.visible {
+            display: block;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1em;
+            justify-content: flex-end;
+        }
+
+        .modal-cancel-btn,
+        .modal-save-btn {
+            padding: 0.8em 1.5em;
+            border-radius: 6px;
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid;
+        }
+
+        .modal-cancel-btn {
+            background: #ffffff;
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .modal-cancel-btn:hover {
+            background: #6c757d;
+            color: #ffffff;
+        }
+
+        .modal-save-btn {
+            background: #0071bc;
+            color: #ffffff;
+            border-color: #0071bc;
+        }
+
+        .modal-save-btn:hover {
+            background: #005a94;
+            border-color: #005a94;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .primary-member-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1em;
+            }
+
+            .edit-details-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .modal-content {
+                padding: 1.5em;
+            }
+
+            .modal-footer {
+                flex-direction: column-reverse;
+            }
+
+            .modal-cancel-btn,
+            .modal-save-btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -425,6 +678,23 @@
                                     <li>All checkboxes and agreements are required - no exceptions</li>
                                     <li>This process should take 10-15 minutes to complete</li>
                                 </ul>
+                            </div>
+
+                            <!-- Primary Member Verification -->
+                            <div id="primaryMemberSection" class="primary-member-section" style="display: none;">
+                                <h3>We're registering:</h3>
+                                <div class="primary-member-card">
+                                    <div class="member-info">
+                                        <div class="member-name" id="pmDisplayName">Loading...</div>
+                                        <div class="member-title" id="pmDisplayTitle">-</div>
+                                        <div class="member-email" id="pmDisplayEmail">-</div>
+                                        <div class="member-phone" id="pmDisplayPhone">-</div>
+                                    </div>
+                                    <button class="edit-details-btn" onclick="openPrimaryMemberModal()">
+                                        Edit Details
+                                    </button>
+                                </div>
+                                <p class="verification-prompt">Please verify your information is correct before proceeding.</p>
                             </div>
 
                             <button class="get-started-btn" onclick="startWizard()">
@@ -897,6 +1167,15 @@
         let organizationData = {};
         let organizationContacts = [];
 
+        // Primary Member State
+        let primaryMemberContact = null;
+        let primaryMemberEdits = {
+            name: null,
+            title: null,
+            email: null,
+            phone: null
+        };
+
         // Registration State
         let registrationState = {
             // Identity
@@ -935,8 +1214,8 @@
                 return;
             }
 
-            // Hide loading and show welcome screen
-            hideLoading();
+            // Load organization data and primary member info on page load
+            await loadOrganizationData();
 
             // Initialize signature canvas
             initPrimarySignatureCanvas();
@@ -962,10 +1241,20 @@
                     organizationLogoContainer.innerHTML = `<div class="organization-name">${data.organization.name}</div>`;
                 }
 
-                // Load contacts
+                // Load contacts and filter for primary member
                 const contactsResponse = await fetch(`/api/get-organization-contacts?token=${token}`);
                 const contactsData = await contactsResponse.json();
                 organizationContacts = contactsData.contacts || [];
+
+                // Find the primary contact (primary member)
+                primaryMemberContact = organizationContacts.find(contact => contact.isPrimaryContact);
+
+                if (primaryMemberContact) {
+                    console.log('✅ Found primary member:', primaryMemberContact.name);
+                    displayPrimaryMember();
+                } else {
+                    console.warn('⚠️ No primary member found in contacts');
+                }
 
                 hideLoading();
             } catch (error) {
@@ -984,12 +1273,224 @@
             document.getElementById('loadingState').classList.add('active');
         }
 
+        // ========================================
+        // Primary Member Functions
+        // ========================================
+
+        // Display primary member in the card
+        function displayPrimaryMember() {
+            if (!primaryMemberContact) return;
+
+            // Get current data (edits override original)
+            const currentData = {
+                name: primaryMemberEdits.name || primaryMemberContact.name,
+                title: primaryMemberEdits.title || primaryMemberContact.roleTitle,
+                email: primaryMemberEdits.email || primaryMemberContact.workEmail,
+                phone: primaryMemberEdits.phone || primaryMemberContact.workPhone
+            };
+
+            // Update display
+            document.getElementById('pmDisplayName').textContent = currentData.name || 'Unknown Name';
+            document.getElementById('pmDisplayTitle').textContent = currentData.title || 'No title provided';
+            document.getElementById('pmDisplayEmail').textContent = currentData.email || 'No email provided';
+            document.getElementById('pmDisplayPhone').textContent = formatPhoneForDisplay(currentData.phone) || 'No phone provided';
+
+            // Show the section
+            document.getElementById('primaryMemberSection').style.display = 'block';
+        }
+
+        // Format phone number for display: (XXX) XXX-XXXX
+        function formatPhoneForDisplay(phone) {
+            if (!phone) return '';
+
+            // Remove all non-digit characters
+            const digits = phone.replace(/\D/g, '');
+
+            // Format based on length
+            if (digits.length === 10) {
+                return `(${digits.substring(0, 3)}) ${digits.substring(3, 6)}-${digits.substring(6)}`;
+            } else if (digits.length === 11 && digits[0] === '1') {
+                return `+1 (${digits.substring(1, 4)}) ${digits.substring(4, 7)}-${digits.substring(7)}`;
+            }
+
+            // Return as-is if it doesn't match expected format
+            return phone;
+        }
+
+        // Format phone number as user types
+        function formatPhoneInput(input) {
+            // Remove all non-digit characters
+            let value = input.value.replace(/\D/g, '');
+
+            // Limit to 10 digits
+            value = value.substring(0, 10);
+
+            // Format progressively
+            let formatted = '';
+            if (value.length > 0) {
+                formatted = '(' + value.substring(0, 3);
+            }
+            if (value.length >= 4) {
+                formatted += ') ' + value.substring(3, 6);
+            }
+            if (value.length >= 7) {
+                formatted += '-' + value.substring(6, 10);
+            }
+
+            input.value = formatted;
+        }
+
+        // Open primary member edit modal
+        function openPrimaryMemberModal() {
+            if (!primaryMemberContact) return;
+
+            // Populate modal with current data (edits or original)
+            document.getElementById('pmName').value = primaryMemberEdits.name || primaryMemberContact.name || '';
+            document.getElementById('pmTitle').value = primaryMemberEdits.title || primaryMemberContact.roleTitle || '';
+            document.getElementById('pmEmail').value = primaryMemberEdits.email || primaryMemberContact.workEmail || '';
+
+            const currentPhone = primaryMemberEdits.phone || primaryMemberContact.workPhone || '';
+            document.getElementById('pmPhone').value = formatPhoneForDisplay(currentPhone);
+
+            // Clear any previous error states
+            clearModalErrors();
+
+            // Add phone formatting listener
+            const phoneInput = document.getElementById('pmPhone');
+            phoneInput.addEventListener('input', function() {
+                formatPhoneInput(this);
+            });
+
+            // Show modal
+            document.getElementById('primaryMemberModal').classList.add('active');
+        }
+
+        // Close primary member edit modal
+        function closePrimaryMemberModal() {
+            document.getElementById('primaryMemberModal').classList.remove('active');
+            clearModalErrors();
+        }
+
+        // Clear modal error messages
+        function clearModalErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.classList.remove('visible');
+            });
+            document.querySelectorAll('.modal-field input').forEach(el => {
+                el.classList.remove('error');
+            });
+        }
+
+        // Validate email format
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Validate phone format (must be 10 digits)
+        function isValidPhone(phone) {
+            const digits = phone.replace(/\D/g, '');
+            return digits.length === 10;
+        }
+
+        // Save primary member details
+        async function savePrimaryMemberDetails() {
+            // Get values
+            const name = document.getElementById('pmName').value.trim();
+            const title = document.getElementById('pmTitle').value.trim();
+            const email = document.getElementById('pmEmail').value.trim();
+            const phone = document.getElementById('pmPhone').value.trim();
+
+            // Clear previous errors
+            clearModalErrors();
+
+            // Validate all fields
+            let hasError = false;
+
+            if (!name) {
+                document.getElementById('pmName').classList.add('error');
+                document.getElementById('pmNameError').classList.add('visible');
+                hasError = true;
+            }
+
+            if (!title) {
+                document.getElementById('pmTitle').classList.add('error');
+                document.getElementById('pmTitleError').classList.add('visible');
+                hasError = true;
+            }
+
+            if (!email || !isValidEmail(email)) {
+                document.getElementById('pmEmail').classList.add('error');
+                document.getElementById('pmEmailError').classList.add('visible');
+                hasError = true;
+            }
+
+            if (!phone || !isValidPhone(phone)) {
+                document.getElementById('pmPhone').classList.add('error');
+                document.getElementById('pmPhoneError').classList.add('visible');
+                hasError = true;
+            }
+
+            if (hasError) {
+                return; // Don't save if validation fails
+            }
+
+            // Store edits
+            primaryMemberEdits.name = name;
+            primaryMemberEdits.title = title;
+            primaryMemberEdits.email = email;
+            primaryMemberEdits.phone = phone.replace(/\D/g, ''); // Store as digits only
+
+            // Update the display
+            displayPrimaryMember();
+
+            // Update the contact in Notion
+            await updatePrimaryMemberContact();
+
+            // Close modal
+            closePrimaryMemberModal();
+
+            console.log('✅ Primary member details saved:', primaryMemberEdits);
+        }
+
+        // Update primary member contact in Notion
+        async function updatePrimaryMemberContact() {
+            if (!primaryMemberContact || !primaryMemberContact.id) {
+                console.error('❌ No primary member contact to update');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/update-contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contactId: primaryMemberContact.id,
+                        updates: {
+                            name: primaryMemberEdits.name || primaryMemberContact.name,
+                            roleTitle: primaryMemberEdits.title || primaryMemberContact.roleTitle,
+                            workEmail: primaryMemberEdits.email || primaryMemberContact.workEmail,
+                            workPhone: primaryMemberEdits.phone || primaryMemberContact.workPhone
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    console.log('✅ Primary member contact updated in Notion');
+                } else {
+                    console.error('❌ Failed to update contact in Notion');
+                }
+            } catch (error) {
+                console.error('❌ Error updating contact:', error);
+            }
+        }
+
+        // ========================================
+        // End Primary Member Functions
+        // ========================================
+
         async function startWizard() {
-            showLoading();
-
-            // Load organization data
-            await loadOrganizationData();
-
+            // Data is already loaded on page load, just transition to first step
             document.getElementById('welcomeSection').classList.remove('active');
             document.getElementById('step2Section').classList.add('active');
             currentStep = 1;
@@ -1619,5 +2120,42 @@
             return result.urls || {};
         }
     </script>
+
+    <!-- Primary Member Edit Modal -->
+    <div id="primaryMemberModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Your Details</h2>
+                <button class="modal-close" onclick="closePrimaryMemberModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label>Name <span class="required">*</span></label>
+                    <input type="text" id="pmName" placeholder="Enter your full name">
+                    <div class="error-message" id="pmNameError">Name is required</div>
+                </div>
+                <div class="modal-field">
+                    <label>Title <span class="required">*</span></label>
+                    <input type="text" id="pmTitle" placeholder="Enter your title">
+                    <div class="error-message" id="pmTitleError">Title is required</div>
+                </div>
+                <div class="modal-field">
+                    <label>Email <span class="required">*</span></label>
+                    <input type="email" id="pmEmail" placeholder="Enter your email">
+                    <div class="error-message" id="pmEmailError">Valid email is required</div>
+                </div>
+                <div class="modal-field">
+                    <label>Phone <span class="required">*</span></label>
+                    <input type="tel" id="pmPhone" placeholder="(XXX) XXX-XXXX">
+                    <div class="error-message" id="pmPhoneError">Valid phone number is required</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-cancel-btn" onclick="closePrimaryMemberModal()">Cancel</button>
+                <button class="modal-save-btn" onclick="savePrimaryMemberDetails()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

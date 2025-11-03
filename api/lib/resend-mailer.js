@@ -14,6 +14,14 @@ export async function sendEmail({ to, subject, body, from }) {
   const apiKey = process.env.RESEND_API_KEY;
   const senderEmail = from || process.env.RESEND_SENDER_EMAIL || 'Summit <noreply@campusstores.ca>';
 
+  // TEST MODE: Override recipient email for testing
+  const testEmailOverride = process.env.TEST_EMAIL_OVERRIDE;
+  const originalTo = to;
+  if (testEmailOverride) {
+    to = testEmailOverride;
+    console.log(`🧪 TEST MODE: Overriding recipient ${originalTo} → ${to}`);
+  }
+
   if (!apiKey) {
     console.error('❌ Missing RESEND_API_KEY environment variable');
     return {
@@ -32,6 +40,9 @@ export async function sendEmail({ to, subject, body, from }) {
 
   try {
     console.log(`📧 Sending email via Resend to: ${to}`);
+    if (testEmailOverride && originalTo !== to) {
+      console.log(`📧 Original recipient: ${originalTo}`);
+    }
     console.log(`📧 Subject: ${subject}`);
 
     const response = await fetch('https://api.resend.com/emails', {

@@ -265,7 +265,8 @@ export default async function handler(req, res) {
       const expiresDate = new Date();
       expiresDate.setDate(expiresDate.getDate() + 14);
       designeeTokenExpires = expiresDate.toISOString();
-      console.log('🔑 Generated designee token (expires:', designeeTokenExpires, ')');
+      console.log('🔑 Generated designee token:', designeeToken);
+      console.log('🔑 Token expires:', designeeTokenExpires);
     }
 
     // Step 5: Build registration properties
@@ -521,6 +522,10 @@ export default async function handler(req, res) {
     // Step 8: Send designee invitation email if needed
     if (hasDesignee && designeeToken && designeeContact) {
       console.log('📧 Sending designee invitation email...');
+      console.log('📧 To:', designeeContact.email || designeeContact.workEmail);
+      console.log('📧 Name:', designeeContact.name);
+      console.log('📧 Token:', designeeToken);
+      console.log('📧 Format:', designeeFormat);
 
       try {
         const emailResponse = await fetch(`${req.headers.origin || 'http://localhost:3000'}/api/send-designee-invitation`, {

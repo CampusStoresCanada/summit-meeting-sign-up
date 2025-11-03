@@ -34,11 +34,11 @@ export default async function handler(req, res) {
     const { sendEmail } = await import('./lib/resend-mailer.js');
 
     // Construct designee registration URL
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
-
+    // Use production URL, not VERCEL_URL (which is preview URLs)
+    const baseUrl = process.env.PRODUCTION_URL || 'https://summit.campusstores.ca';
     const designeeUrl = `${baseUrl}/designee.html?token=${designeeToken}`;
+
+    console.log('🔗 Designee URL:', designeeUrl);
 
     // Build email body
     const emailBody = `

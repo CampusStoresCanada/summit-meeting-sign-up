@@ -39,11 +39,21 @@ export default async function handler(req, res) {
       virtualProtocolSignatureUrl,
       hasDesignee,
       designeeContact,
+      designeeIsNew,
       designeeFormat,
       certificationUrl
     } = req.body;
 
     console.log('🔍 Summit registration submission for token:', token);
+    console.log('📊 Registration data:', {
+      primaryIsAttending,
+      primaryFormat,
+      hasDesignee,
+      designeeIsNew,
+      designeeFormat,
+      primaryContactId: primaryContactId ? 'provided' : 'missing',
+      designeeContactId: designeeContact?.id ? 'provided' : 'missing'
+    });
 
     // Step 1: Get organization info
     const orgResponse = await fetch(`https://api.notion.com/v1/databases/${organizationsDbId}/query`, {
@@ -150,10 +160,10 @@ export default async function handler(req, res) {
     const existingRegData = await existingRegResponse.json();
     const existingRegistration = existingRegData.results[0];
 
-    // Step 3: Handle designee contact if needed
+    // Step 4: Handle designee contact if needed
     let designeeContactId = null;
     if (hasDesignee && designeeContact) {
-      if (designeeContact.isNew) {
+      if (designeeIsNew) {
         // Create new contact
         console.log('➕ Creating new designee contact:', designeeContact.name);
 

@@ -1123,6 +1123,84 @@
                 </button>
             </div>
 
+            <!-- Step 3bv: Virtual Protocol (Only for Virtual Attendees) -->
+            <div id="step3bvSection" class="content-section">
+                <div class="progress-indicator">
+                    <div class="progress-text">Step 2 of 4 - Virtual Attendance Protocol</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 50%;"></div>
+                    </div>
+                </div>
+
+                <h1>Virtual Attendance Protocol</h1>
+
+                <div class="summit-warning">
+                    <p><strong>CRITICAL:</strong> Virtual attendance requires strict compliance with the following rules. Failure to follow these rules will result in immediate removal from the meeting and potential membership termination.</p>
+                </div>
+
+                <div class="agreement-content">
+                    <h3>Mandatory Virtual Attendance Requirements</h3>
+
+                    <p><strong>1. Solo Environment - You Must Be Completely Alone:</strong></p>
+                    <ul>
+                        <li>You must be in a private room with a <strong>locked door</strong></li>
+                        <li>No other person may be present in the room at any time</li>
+                        <li>No one may overhear or view any part of the meeting</li>
+                    </ul>
+
+                    <p><strong>2. Camera On - Visual Verification Required:</strong></p>
+                    <ul>
+                        <li>Your camera must be <strong>on and facing you</strong> for the entire meeting</li>
+                        <li>You must be clearly visible at all times</li>
+                        <li>No virtual backgrounds</li>
+                    </ul>
+
+                    <p><strong>3. Microphone Active - Audio Verification Required:</strong></p>
+                    <ul>
+                        <li>Your microphone must be <strong>unmuted and active</strong> throughout the meeting</li>
+                        <li>We need to hear your environment to verify you are alone</li>
+                        <li>You may not mute except when instructed by the host</li>
+                    </ul>
+
+                    <p><strong>4. Immediate Drop-Out Rule - Zero Tolerance:</strong></p>
+                    <ul>
+                        <li>If <strong>anyone enters your room</strong> for any reason, you must <strong>IMMEDIATELY DROP OUT</strong> of the call</li>
+                        <li>Do NOT mute - you must <strong>LEAVE THE MEETING</strong> entirely</li>
+                        <li>You may not return until the intruder has left and your space is secure</li>
+                        <li>Examples: delivery person, family member, pet, cleaning staff, maintenance - ANYONE</li>
+                    </ul>
+
+                    <p><strong>5. No Recording or Notes:</strong></p>
+                    <ul>
+                        <li>Absolutely no audio or video recording of any kind</li>
+                        <li>No screenshots or screen recording</li>
+                        <li>No note-taking</li>
+                        <li>Close all other applications except the video conference</li>
+                    </ul>
+
+                    <h3>Consequences</h3>
+                    <p>Violation of any virtual protocol rule will result in:</p>
+                    <ul>
+                        <li>Immediate removal from the current meeting</li>
+                        <li>Possible termination of CSC membership</li>
+                        <li>No refunds or appeals</li>
+                    </ul>
+                </div>
+
+                <button class="sign-agreement-btn" id="virtualProtocolSignBtn" onclick="openVirtualProtocolSignatureModal()">
+                    <span id="virtualProtocolSignBtnText">Sign to Acknowledge Virtual Protocol</span>
+                </button>
+
+                <button class="previous-btn" onclick="previousStep()">
+                    <span>←</span>
+                    Previous step
+                </button>
+                <button class="next-btn" id="step3bvNextBtn" onclick="nextStep()" disabled>
+                    Next step
+                    <span>→</span>
+                </button>
+            </div>
+
             <!-- Step 3c: Employment Contracts -->
             <div id="step3cSection" class="content-section">
                 <div class="progress-indicator">
@@ -1165,26 +1243,32 @@
 
                 <h1>Designate an Alternate</h1>
 
-                <div class="summit-info">
-                    <p id="step4IntroText"></p>
+                <div class="summit-warning">
+                    <h3 style="margin-top: 0;">Critical: Your Responsibility</h3>
+                    <p><strong>If you designate an alternate, you are personally responsible for their conduct—whether you attend or not.</strong></p>
+
+                    <p>Your designee must be someone who:</p>
+                    <ul>
+                        <li><strong>Is of appropriate level</strong> to meaningfully contribute to the conversation</li>
+                        <li><strong>Is NOT attending just because you're traveling together</strong></li>
+                        <li><strong>Can share information independently</strong> without having to clear things with you or their collective bargaining agreement</li>
+                    </ul>
+
+                    <p style="margin-bottom: 0;"><strong>We're serious.</strong> This is not a casual invitation—your alternate must be able to participate fully and independently in sensitive, strategic discussions.</p>
                 </div>
 
                 <div class="radio-group">
-                    <p style="font-weight: 600; margin-bottom: 1em;" id="step4QuestionText"></p>
+                    <p style="font-weight: 600; margin-bottom: 1em;">Would you like to designate an alternate?</p>
 
                     <div class="radio-item" onclick="selectDesignateAlternate('yes')">
                         <input type="radio" name="designateAlternate" id="designateYes" value="yes">
-                        <label for="designateYes" id="designateYesLabel"></label>
+                        <label for="designateYes">Yes, I would like to designate an alternate</label>
                     </div>
 
                     <div class="radio-item" onclick="selectDesignateAlternate('no')">
                         <input type="radio" name="designateAlternate" id="designateNo" value="no">
-                        <label for="designateNo" id="designateNoLabel"></label>
+                        <label for="designateNo">No, there will not be an alternate</label>
                     </div>
-                </div>
-
-                <div id="noDesignateMessage" style="display: none;" class="summit-info">
-                    <p>Thank you for your response. Click Continue to complete your registration.</p>
                 </div>
 
                 <button class="previous-btn" onclick="previousStep()">
@@ -1405,6 +1489,7 @@
             primaryFormat: null,
             tlpRedSignatureUrl: null,
             employmentSignatureUrl: null,
+            virtualProtocolSignatureUrl: null,
             primaryVirtualAgreed: false,
             primaryBreachAck: false,
 
@@ -1830,8 +1915,10 @@
         // Signature Pads
         let tlpRedSignaturePad = null;
         let employmentSignaturePad = null;
+        let virtualProtocolSignaturePad = null;
         let tlpRedHasSignature = false;
         let employmentHasSignature = false;
+        let virtualProtocolHasSignature = false;
 
         function initSignaturePads() {
             // Signature pads will be initialized when modals open
@@ -1954,6 +2041,68 @@
             console.log('✅ Employment signature saved');
         }
 
+        // Virtual Protocol Signature Modal Functions
+        function openVirtualProtocolSignatureModal() {
+            const modal = document.getElementById('virtualProtocolSignatureModal');
+            modal.classList.add('active');
+
+            // Initialize signature pad if not already done
+            if (!virtualProtocolSignaturePad) {
+                const canvas = document.getElementById('virtualProtocolSignatureCanvas');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = 200;
+
+                virtualProtocolSignaturePad = new SignaturePad(canvas, {
+                    backgroundColor: 'rgb(255, 255, 255)',
+                    penColor: 'rgb(0, 0, 0)',
+                    minWidth: 1,
+                    maxWidth: 2.5,
+                    throttle: 16,
+                    velocityFilterWeight: 0.7
+                });
+
+                virtualProtocolSignaturePad.addEventListener('endStroke', () => {
+                    document.getElementById('virtualProtocolSaveBtn').disabled = virtualProtocolSignaturePad.isEmpty();
+                });
+
+                console.log('✅ Virtual protocol signature pad initialized');
+            }
+
+            // If they already signed, restore it
+            if (virtualProtocolHasSignature) {
+                document.getElementById('virtualProtocolSaveBtn').disabled = false;
+            }
+        }
+
+        function closeVirtualProtocolSignatureModal() {
+            document.getElementById('virtualProtocolSignatureModal').classList.remove('active');
+        }
+
+        function clearVirtualProtocolSignature() {
+            if (!virtualProtocolSignaturePad) return;
+            virtualProtocolSignaturePad.clear();
+            document.getElementById('virtualProtocolSaveBtn').disabled = true;
+        }
+
+        function saveVirtualProtocolSignature() {
+            if (!virtualProtocolSignaturePad || virtualProtocolSignaturePad.isEmpty()) return;
+
+            virtualProtocolHasSignature = true;
+            const btn = document.getElementById('virtualProtocolSignBtn');
+            const btnText = document.getElementById('virtualProtocolSignBtnText');
+            btn.classList.add('signed');
+            btnText.textContent = '✓ Signed - Click to view or re-sign';
+
+            updateStep3bvState();
+            closeVirtualProtocolSignatureModal();
+            console.log('✅ Virtual protocol signature saved');
+        }
+
+        function updateStep3bvState() {
+            document.getElementById('step3bvNextBtn').disabled = !virtualProtocolHasSignature;
+        }
+
         function updateStep3bState() {
             document.getElementById('step3bNextBtn').disabled = !tlpRedHasSignature;
         }
@@ -1992,19 +2141,8 @@
 
         // Step 4: Designate Alternate
         function initializeStep4() {
-            if (registrationState.primaryIsAttending) {
-                // Primary IS attending - ask if they want to ALSO bring someone
-                document.getElementById('step4IntroText').textContent = 'You can optionally designate an alternate from your institution to attend alongside you.';
-                document.getElementById('step4QuestionText').textContent = 'Would you like to designate an alternate to attend with you?';
-                document.getElementById('designateYesLabel').textContent = 'Yes, I would like to designate an alternate to attend with me';
-                document.getElementById('designateNoLabel').textContent = 'No, I will be the only attendee from my institution';
-            } else {
-                // Primary NOT attending - ask if they want someone else to go
-                document.getElementById('step4IntroText').textContent = 'Since you will not be attending, you can designate an alternate from your institution to attend in your place.';
-                document.getElementById('step4QuestionText').textContent = 'Would you like to designate an alternate to attend?';
-                document.getElementById('designateYesLabel').textContent = 'Yes, I would like to designate an alternate';
-                document.getElementById('designateNoLabel').textContent = 'No, no one from my institution will attend';
-            }
+            // Step 4 now has static content - no dynamic initialization needed
+            console.log('✅ Step 4 initialized');
         }
 
         function selectDesignateAlternate(answer) {
@@ -2018,12 +2156,6 @@
             selectedRadio.checked = true;
             selectedRadio.parentElement.classList.add('selected');
 
-            if (answer === 'no') {
-                document.getElementById('noDesignateMessage').style.display = 'block';
-            } else {
-                document.getElementById('noDesignateMessage').style.display = 'none';
-            }
-
             document.getElementById('step4NextBtn').disabled = false;
         }
 
@@ -2032,7 +2164,17 @@
             const container = document.getElementById('existingContacts');
             container.innerHTML = '';
 
-            organizationContacts.forEach(contact => {
+            // Filter out the primary member - they can't be their own alternate
+            const availableContacts = organizationContacts.filter(contact =>
+                !contact.isPrimaryContact && contact.id !== primaryMemberContact?.id
+            );
+
+            if (availableContacts.length === 0) {
+                container.innerHTML = '<p style="color: #666; font-style: italic;">No other contacts available. Please add a new person below.</p>';
+                return;
+            }
+
+            availableContacts.forEach(contact => {
                 const card = document.createElement('div');
                 card.className = 'contact-card';
                 card.onclick = () => selectExistingContact(contact);
@@ -2303,6 +2445,10 @@
                     return 'step3bSection';
 
                 case 'step3bSection':
+                    // If virtual, show virtual protocol; if in-person, go to employment
+                    return registrationState.primaryFormat === 'virtual' ? 'step3bvSection' : 'step3cSection';
+
+                case 'step3bvSection':
                     return 'step3cSection';
 
                 case 'step3cSection':
@@ -2340,8 +2486,12 @@
                 case 'step3bSection':
                     return 'step3aSection';
 
-                case 'step3cSection':
+                case 'step3bvSection':
                     return 'step3bSection';
+
+                case 'step3cSection':
+                    // If virtual, came from virtual protocol; otherwise came from TLP Red
+                    return registrationState.primaryFormat === 'virtual' ? 'step3bvSection' : 'step3bSection';
 
                 case 'step4Section':
                     // If primary attending, came from employment; otherwise came from step 2
@@ -2379,6 +2529,7 @@
                         primaryFormat: registrationState.primaryFormat,
                         tlpRedSignatureUrl: uploadedFiles.tlpRedAgreement,
                         employmentSignatureUrl: uploadedFiles.employmentAgreement,
+                        virtualProtocolSignatureUrl: uploadedFiles.virtualProtocol || null,
                         hasDesignee: registrationState.hasDesignee,
                         designeeContact: registrationState.designeeContact,
                         designeeFormat: registrationState.designeeFormat,
@@ -2431,6 +2582,19 @@
                     content: employmentBase64,
                     type: 'image/png',
                     fieldName: 'employmentAgreement'
+                });
+            }
+
+            // Get Virtual Protocol signature (only for virtual attendees)
+            if (virtualProtocolHasSignature && virtualProtocolSignaturePad) {
+                const virtualProtocolDataUrl = virtualProtocolSignaturePad.toDataURL('image/png');
+                const virtualProtocolBase64 = virtualProtocolDataUrl.split(',')[1];
+
+                files.push({
+                    name: `virtual_protocol_signature_${Date.now()}.png`,
+                    content: virtualProtocolBase64,
+                    type: 'image/png',
+                    fieldName: 'virtualProtocol'
                 });
             }
 
@@ -2501,6 +2665,26 @@
                 <button class="modal-cancel-btn" onclick="closeEmploymentSignatureModal()">Cancel</button>
                 <button class="clear-signature-btn" onclick="clearEmploymentSignature()">Clear</button>
                 <button class="modal-save-btn" onclick="saveEmploymentSignature()" id="employmentSaveBtn" disabled>Save Signature</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Virtual Protocol Signature Modal -->
+    <div id="virtualProtocolSignatureModal" class="signature-modal-overlay">
+        <div class="signature-modal-content">
+            <div class="signature-modal-header">
+                <h2 class="signature-modal-title">Sign Virtual Attendance Protocol</h2>
+                <p class="signature-modal-subtitle">I acknowledge and accept all mandatory virtual attendance requirements</p>
+            </div>
+            <div class="signature-modal-body">
+                <div class="signature-pad-container">
+                    <canvas id="virtualProtocolSignatureCanvas" class="signature-canvas"></canvas>
+                </div>
+            </div>
+            <div class="signature-modal-footer">
+                <button class="modal-cancel-btn" onclick="closeVirtualProtocolSignatureModal()">Cancel</button>
+                <button class="clear-signature-btn" onclick="clearVirtualProtocolSignature()">Clear</button>
+                <button class="modal-save-btn" onclick="saveVirtualProtocolSignature()" id="virtualProtocolSaveBtn" disabled>Save Signature</button>
             </div>
         </div>
     </div>

@@ -43,6 +43,56 @@
             margin-bottom: 2em;
         }
 
+        /* Scrollable Agreement Container */
+        .scroll-to-accept-container {
+            position: relative;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 2em;
+            margin: 2em 0;
+            background: #f8f9fa;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .scroll-to-accept-container .agreement-content {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            border: none;
+            max-height: none;
+            overflow: visible;
+        }
+
+        .scroll-indicator {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(248, 249, 250, 1) 60%, rgba(248, 249, 250, 0));
+            padding: 1.5em 1em 0.5em;
+            text-align: center;
+            font-weight: 600;
+            color: #0071bc;
+            font-size: 0.95em;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .scroll-indicator.hidden {
+            opacity: 0;
+        }
+
+        .checkbox-item input[type="checkbox"]:disabled + label {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .checkbox-item input[type="checkbox"]:disabled {
+            cursor: not-allowed;
+        }
+
         /* Serious/Confidential Tone Styling */
         .summit-warning {
             background: #fff3cd;
@@ -618,6 +668,11 @@
                 font-size: 6vw;
             }
 
+            .scroll-to-accept-container {
+                max-height: 300px;
+                padding: 1.5em;
+            }
+
             .primary-member-card {
                 flex-direction: column;
                 align-items: stretch;
@@ -666,7 +721,7 @@
 <body>
     <div class="wizard-container">
         <!-- Loading State -->
-        <div id="loadingState" class="loading">
+        <div id="loadingState" class="loading active">
             <div class="loading-title">
                 Loading<span class="dots">
                     <span class="dot">.</span>
@@ -860,40 +915,47 @@
                     <p class="step-subtitle">This meeting requires the highest level of confidentiality</p>
                 </div>
 
-                <div class="agreement-content">
-                    <h3>Before you register, you need to understand what you're agreeing to.</h3>
+                <div class="scroll-to-accept-container" id="tlpRedScrollContainer">
+                    <div class="agreement-content">
+                        <h3>Before you register, you need to understand what you're agreeing to.</h3>
 
-                    <p>This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.</p>
+                        <p>This summit operates under <strong>"Traffic Light Protocol Red"</strong> - the highest level of confidentiality. Everything discussed in this meeting stays in the room where it's discussed. No exceptions.</p>
 
-                    <h3>What We'll Be Discussing</h3>
-                    <p>Frank conversations about:</p>
-                    <ul>
-                        <li>The real financial situation of your campus store</li>
-                        <li>Staffing levels, changes, and expertise needs</li>
-                        <li>Operational challenges and solutions</li>
-                        <li>Strategic decisions your institution is requiring</li>
-                    </ul>
+                        <h3>What We'll Be Discussing</h3>
+                        <p>Frank conversations about:</p>
+                        <ul>
+                            <li>The real financial situation of your campus store</li>
+                            <li>Staffing levels, changes, and expertise needs</li>
+                            <li>Operational challenges and solutions</li>
+                            <li>Strategic decisions your institution is requiring</li>
+                        </ul>
 
-                    <h3>Who Can Attend</h3>
-                    <p>This meeting is designed for management-level staff who can speak candidly about their store's operations and strategic decisions.</p>
+                        <h3>Who Can Attend</h3>
+                        <p>This meeting is designed for management-level staff who can speak candidly about their store's operations and strategic decisions.</p>
 
-                    <p><strong>If you are the primary CSC member:</strong> You can attend yourself or designate someone else from your team.</p>
+                        <p><strong>If you are the primary CSC member:</strong> You can attend yourself or designate someone else from your team.</p>
 
-                    <p><strong>If you are designating someone else:</strong> You are personally responsible for ensuring they understand and will follow these rules. The CSC Board reserves the right to exclude any designee if they believe that person cannot contribute meaningfully to the conversation.</p>
+                        <p><strong>If you are designating someone else:</strong> You are personally responsible for ensuring they understand and will follow these rules. The CSC Board reserves the right to exclude any designee if they believe that person cannot contribute meaningfully to the conversation.</p>
 
-                    <h3>The Rules</h3>
-                    <p><strong>In-Person:</strong> "What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward."</p>
+                        <h3>The Rules</h3>
+                        <p><strong>In-Person:</strong> "What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward."</p>
 
-                    <p><strong>Virtual:</strong> You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.</p>
+                        <p><strong>Virtual:</strong> You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.</p>
 
-                    <h3>Consequences</h3>
-                    <p>Breaking confidentiality results in immediate membership termination with no appeals or refunds.</p>
+                        <h3>Consequences</h3>
+                        <p>Breaking confidentiality results in immediate membership termination with no appeals or refunds.</p>
+                    </div>
+                    <div class="scroll-indicator" id="tlpRedScrollIndicator">
+                        ↓ Scroll down to continue ↓
+                    </div>
                 </div>
 
                 <div class="checkbox-group">
                     <div class="checkbox-item">
-                        <input type="checkbox" id="primaryAgree1" onchange="updateStep3bState()">
-                        <label for="primaryAgree1">I understand and agree to Traffic Light Protocol Red confidentiality requirements</label>
+                        <input type="checkbox" id="primaryAgree1" onchange="updateStep3bState()" disabled>
+                        <label for="primaryAgree1">
+                            <span id="tlpRedCheckboxLabel">Please scroll to the bottom to enable this checkbox</span>
+                        </label>
                     </div>
                 </div>
 
@@ -1285,6 +1347,9 @@
 
             // Initialize signature canvas
             initPrimarySignatureCanvas();
+
+            // Initialize scroll-to-accept for TLP Red page
+            initTLPRedScrollDetection();
         });
 
         async function loadOrganizationData() {
@@ -1553,6 +1618,51 @@
 
         // ========================================
         // End Primary Member Functions
+        // ========================================
+
+        // ========================================
+        // Scroll-to-Accept for TLP Red
+        // ========================================
+
+        let tlpRedScrolledToBottom = false;
+
+        function initTLPRedScrollDetection() {
+            const scrollContainer = document.getElementById('tlpRedScrollContainer');
+            const scrollIndicator = document.getElementById('tlpRedScrollIndicator');
+            const checkbox = document.getElementById('primaryAgree1');
+            const checkboxLabel = document.getElementById('tlpRedCheckboxLabel');
+
+            if (!scrollContainer) return;
+
+            // Check if user has scrolled to bottom
+            function checkScrollPosition() {
+                const scrollTop = scrollContainer.scrollTop;
+                const scrollHeight = scrollContainer.scrollHeight;
+                const clientHeight = scrollContainer.clientHeight;
+
+                // Allow 5px tolerance for scroll detection
+                const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+
+                if (isAtBottom && !tlpRedScrolledToBottom) {
+                    tlpRedScrolledToBottom = true;
+                    scrollIndicator.classList.add('hidden');
+                    checkbox.disabled = false;
+                    checkboxLabel.textContent = 'I understand and agree to Traffic Light Protocol Red confidentiality requirements';
+                    console.log('✅ User scrolled to bottom of TLP Red agreement');
+                }
+            }
+
+            // Add scroll listener
+            scrollContainer.addEventListener('scroll', checkScrollPosition);
+
+            // Check initial position (in case content is short enough to not need scrolling)
+            setTimeout(() => {
+                checkScrollPosition();
+            }, 100);
+        }
+
+        // ========================================
+        // End Scroll-to-Accept
         // ========================================
 
         async function startWizard() {

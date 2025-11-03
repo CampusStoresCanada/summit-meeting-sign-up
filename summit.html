@@ -1704,8 +1704,15 @@
                 const scrollHeight = scrollContainer.scrollHeight;
                 const clientHeight = scrollContainer.clientHeight;
 
-                // Allow 5px tolerance for scroll detection
-                const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+                console.log('Scroll check:', { scrollTop, scrollHeight, clientHeight, needsScroll: scrollHeight > clientHeight });
+
+                // Only consider "at bottom" if:
+                // 1. Content is short enough to not need scrolling (scrollHeight <= clientHeight + 10)
+                //    AND content is fully loaded (scrollHeight > 100)
+                // 2. OR user has actually scrolled near the bottom
+                const contentIsShort = scrollHeight <= clientHeight + 10 && scrollHeight > 100;
+                const scrolledToBottom = scrollTop + clientHeight >= scrollHeight - 5 && scrollTop > 0;
+                const isAtBottom = contentIsShort || scrolledToBottom;
 
                 if (isAtBottom && !tlpRedScrolledToBottom) {
                     tlpRedScrolledToBottom = true;
@@ -1739,10 +1746,19 @@
                 }
             });
 
-            // Check initial position (in case content is short enough to not need scrolling)
+            // Check initial position ONLY after content is fully loaded
+            // Give time for DOM to fully render the content
             setTimeout(() => {
-                checkScrollPosition();
-            }, 100);
+                const scrollHeight = scrollContainer.scrollHeight;
+                const clientHeight = scrollContainer.clientHeight;
+
+                // Only auto-check if content is definitely short and fully rendered
+                if (scrollHeight > 100 && scrollHeight <= clientHeight + 10) {
+                    console.log('Content is short, auto-enabling checkbox');
+                    checkScrollPosition();
+                }
+                // Otherwise, user MUST scroll - don't auto-enable
+            }, 500);
         }
 
         // ========================================

@@ -1691,10 +1691,11 @@
             const checkbox = document.getElementById('primaryAgree1');
             const checkboxLabel = document.getElementById('tlpRedCheckboxLabel');
             const checkboxItem = checkbox?.closest('.checkbox-item');
+            const nextButton = document.getElementById('step3bNextBtn');
 
             if (!scrollContainer) return;
 
-            // Start pulsing the scroll container to indicate user needs to scroll
+            // Start pulsing the scroll container to encourage reading
             scrollContainer.classList.add('pulse');
 
             // Check if user has scrolled to bottom
@@ -1719,10 +1720,7 @@
                     checkbox.disabled = false;
                     checkboxLabel.textContent = 'I understand and agree to Traffic Light Protocol Red confidentiality requirements';
 
-                    // Start pulsing the checkbox to indicate it needs to be checked
-                    if (checkboxItem && !checkbox.checked) {
-                        checkboxItem.classList.add('pulse');
-                    }
+                    // DO NOT pulse checkbox automatically - let them read and decide
 
                     console.log('✅ User scrolled to bottom of TLP Red agreement');
                 }
@@ -1737,6 +1735,27 @@
                     checkboxItem.classList.remove('pulse');
                 }
             });
+
+            // If user tries to click Next without scrolling, pulse the scroll container
+            if (nextButton) {
+                nextButton.addEventListener('click', function(e) {
+                    if (!tlpRedScrolledToBottom) {
+                        // They haven't scrolled - pulse scroll container urgently
+                        scrollContainer.classList.add('pulse');
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    } else if (!checkbox.checked) {
+                        // They scrolled but didn't check - pulse checkbox
+                        if (checkboxItem) {
+                            checkboxItem.classList.add('pulse');
+                        }
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+                });
+            }
 
             // Check initial position (in case content is short enough to not need scrolling)
             setTimeout(() => {

@@ -157,8 +157,24 @@ export default async function handler(req, res) {
       })
     });
 
+    if (!existingRegResponse.ok) {
+      const errorText = await existingRegResponse.text();
+      console.error('❌ Existing registration lookup failed:', {
+        status: existingRegResponse.status,
+        statusText: existingRegResponse.statusText,
+        response: errorText
+      });
+      throw new Error(`Existing registration lookup failed: ${existingRegResponse.status} - ${errorText}`);
+    }
+
     const existingRegData = await existingRegResponse.json();
-    const existingRegistration = existingRegData.results[0];
+    const existingRegistration = existingRegData.results?.[0] || null;
+
+    if (existingRegistration) {
+      console.log('📋 Found existing registration, will update it');
+    } else {
+      console.log('📋 No existing registration found, will create new one');
+    }
 
     // Step 4: Handle designee contact if needed
     let designeeContactId = null;

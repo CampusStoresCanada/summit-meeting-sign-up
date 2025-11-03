@@ -1441,35 +1441,44 @@
 
                 <h1>Primary Member Certification</h1>
 
-                <div class="summit-warning">
-                    <p><strong>By designating <span id="certificationAlternateName"></span>, you certify the following:</strong></p>
-                </div>
+                <div class="scroll-to-accept-container" id="certificationScrollContainer">
+                    <div class="agreement-content">
+                        <div class="summit-warning" style="margin-top: 0;">
+                            <p><strong>By designating <span id="certificationAlternateName"></span>, you certify the following:</strong></p>
+                        </div>
 
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="certify1" onchange="updateCertificationState()">
-                        <label for="certify1">I certify that this person understands and will uphold confidentiality requirements</label>
+                        <h3>Certification of Alternate Designee</h3>
+
+                        <p><strong>1. Confidentiality Understanding:</strong></p>
+                        <p>I certify that <span id="certificationAlternateName2"></span> fully understands the Traffic Light Protocol Red confidentiality requirements and will uphold them without exception.</p>
+
+                        <p><strong>2. Personal Responsibility:</strong></p>
+                        <p>I understand that I am personally responsible for the conduct of my designee, whether I attend the summit or not. Any breach of confidentiality by my designee will be treated as if I committed the breach myself.</p>
+
+                        <p><strong>3. Appropriate Level:</strong></p>
+                        <p>I certify that my designee is of appropriate management level to meaningfully contribute to strategic discussions about campus store operations, finances, and challenges.</p>
+
+                        <p><strong>4. Independent Participation:</strong></p>
+                        <p>I certify that my designee can share information and participate in discussions independently, without needing to clear things with me or their collective bargaining agreement.</p>
+
+                        <p><strong>5. Board Discretion:</strong></p>
+                        <p>I understand and accept that the CSC Board reserves the right to exclude my designee if they determine that person cannot meaningfully contribute to the conversation.</p>
+
+                        <p><strong>6. No Refunds or Appeals:</strong></p>
+                        <p>I understand that if my designee is excluded for any reason, or if either of us breaches confidentiality, there will be no refunds and no appeals process.</p>
+
+                        <div class="summit-info" style="margin-top: 2em;">
+                            <p><strong>Next Step:</strong> After you sign this certification, <span id="emailAlternateName"></span> will receive an email with a unique link to complete their own confidentiality agreement.</p>
+                        </div>
                     </div>
-
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="certify2" onchange="updateCertificationState()">
-                        <label for="certify2">I understand the CSC Board may exclude this designee if they determine they cannot meaningfully contribute</label>
+                    <div class="scroll-indicator" id="certificationScrollIndicator">
+                        ↓ Scroll down to continue ↓
                     </div>
                 </div>
 
-                <div class="file-upload-area" id="certificationUploadArea">
-                    <label for="certificationFile" class="file-upload-label">
-                        <p style="font-weight: 600; margin-bottom: 0.5em;">Upload Signed Primary Member Certification</p>
-                        <p style="color: #6c757d; font-size: 0.9em;">Click to select a PDF or image file (JPG, PNG)</p>
-                        <p style="color: #6c757d; font-size: 0.85em; margin-top: 0.5em;">Maximum file size: 5MB</p>
-                    </label>
-                    <input type="file" id="certificationFile" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" onchange="handleCertificationUpload(event)">
-                    <div id="certificationFileName" class="file-name-display" style="display: none;"></div>
-                </div>
-
-                <div class="summit-info">
-                    <p><strong>Next Step:</strong> After you submit this certification, <span id="emailAlternateName"></span> will receive an email with a unique link to complete their own confidentiality agreement.</p>
-                </div>
+                <button class="sign-agreement-btn" id="certificationSignBtn" onclick="openCertificationSignatureModal()" disabled>
+                    <span id="certificationSignBtnText">Please scroll to the bottom to sign</span>
+                </button>
 
                 <button class="previous-btn" onclick="previousStep()">
                     <span>←</span>
@@ -1570,9 +1579,10 @@
             // Initialize signature canvases
             initSignaturePads();
 
-            // Initialize scroll-to-accept for TLP Red and Virtual Protocol pages
+            // Initialize scroll-to-accept for TLP Red, Virtual Protocol, and Certification pages
             initTLPRedScrollDetection();
             initVirtualProtocolScrollDetection();
+            initCertificationScrollDetection();
         });
 
         async function loadOrganizationData() {
@@ -1849,6 +1859,7 @@
 
         let tlpRedScrolledToBottom = false;
         let virtualProtocolScrolledToBottom = false;
+        let certificationScrolledToBottom = false;
 
         function initTLPRedScrollDetection() {
             const scrollContainer = document.getElementById('tlpRedScrollContainer');
@@ -1990,6 +2001,76 @@
             }, 500);
         }
 
+        function initCertificationScrollDetection() {
+            const scrollContainer = document.getElementById('certificationScrollContainer');
+            const scrollIndicator = document.getElementById('certificationScrollIndicator');
+            const signBtn = document.getElementById('certificationSignBtn');
+            const signBtnText = document.getElementById('certificationSignBtnText');
+
+            if (!scrollContainer) return;
+
+            // Start pulsing the scroll container to encourage reading
+            scrollContainer.classList.add('pulse');
+
+            // Check if user has scrolled to bottom
+            function checkScrollPosition() {
+                const scrollTop = scrollContainer.scrollTop;
+                const scrollHeight = scrollContainer.scrollHeight;
+                const clientHeight = scrollContainer.clientHeight;
+
+                console.log('Certification scroll check:', { scrollTop, scrollHeight, clientHeight });
+
+                // Only consider "at bottom" if:
+                // 1. Content is short enough to not need scrolling (scrollHeight <= clientHeight + 10)
+                //    AND content is fully loaded (scrollHeight > 100)
+                // 2. OR user has actually scrolled near the bottom
+                const contentIsShort = scrollHeight <= clientHeight + 10 && scrollHeight > 100;
+                const scrolledToBottom = scrollTop + clientHeight >= scrollHeight - 5 && scrollTop > 0;
+                const isAtBottom = contentIsShort || scrolledToBottom;
+
+                if (isAtBottom && !certificationScrolledToBottom) {
+                    certificationScrolledToBottom = true;
+
+                    // Stop pulsing scroll container
+                    scrollContainer.classList.remove('pulse');
+
+                    // Hide scroll indicator
+                    scrollIndicator.classList.add('hidden');
+
+                    // Enable sign button
+                    signBtn.disabled = false;
+                    signBtnText.textContent = 'Click to Sign Certification';
+
+                    // Pulse the sign button to show it's the next step
+                    signBtn.classList.add('pulse');
+
+                    // Remove pulse when they click to sign
+                    signBtn.addEventListener('click', () => {
+                        signBtn.classList.remove('pulse');
+                    }, { once: true });
+
+                    console.log('✅ User scrolled to bottom of Certification');
+                }
+            }
+
+            // Add scroll listener
+            scrollContainer.addEventListener('scroll', checkScrollPosition);
+
+            // Check initial position ONLY after content is fully loaded
+            // Give time for DOM to fully render the content
+            setTimeout(() => {
+                const scrollHeight = scrollContainer.scrollHeight;
+                const clientHeight = scrollContainer.clientHeight;
+
+                // Only auto-check if content is definitely short and fully rendered
+                if (scrollHeight > 100 && scrollHeight <= clientHeight + 10) {
+                    console.log('Certification content is short, auto-enabling sign button');
+                    checkScrollPosition();
+                }
+                // Otherwise, user MUST scroll - don't auto-enable
+            }, 500);
+        }
+
         // ========================================
         // End Scroll-to-Accept
         // ========================================
@@ -2035,9 +2116,11 @@
         let tlpRedSignaturePad = null;
         let employmentSignaturePad = null;
         let virtualProtocolSignaturePad = null;
+        let certificationSignaturePad = null;
         let tlpRedHasSignature = false;
         let employmentHasSignature = false;
         let virtualProtocolHasSignature = false;
+        let certificationHasSignature = false;
 
         function initSignaturePads() {
             // Signature pads will be initialized when modals open
@@ -2220,6 +2303,68 @@
 
         function updateStep3bvState() {
             document.getElementById('step3bvNextBtn').disabled = !virtualProtocolHasSignature;
+        }
+
+        // Certification Signature Modal Functions
+        function openCertificationSignatureModal() {
+            const modal = document.getElementById('certificationSignatureModal');
+            modal.classList.add('active');
+
+            // Initialize signature pad if not already done
+            if (!certificationSignaturePad) {
+                const canvas = document.getElementById('certificationSignatureCanvas');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = 200;
+
+                certificationSignaturePad = new SignaturePad(canvas, {
+                    backgroundColor: 'rgb(255, 255, 255)',
+                    penColor: 'rgb(0, 0, 0)',
+                    minWidth: 1,
+                    maxWidth: 2.5,
+                    throttle: 16,
+                    velocityFilterWeight: 0.7
+                });
+
+                certificationSignaturePad.addEventListener('endStroke', () => {
+                    document.getElementById('certificationSaveBtn').disabled = certificationSignaturePad.isEmpty();
+                });
+
+                console.log('✅ Certification signature pad initialized');
+            }
+
+            // If they already signed, restore it
+            if (certificationHasSignature) {
+                document.getElementById('certificationSaveBtn').disabled = false;
+            }
+        }
+
+        function closeCertificationSignatureModal() {
+            document.getElementById('certificationSignatureModal').classList.remove('active');
+        }
+
+        function clearCertificationSignature() {
+            if (!certificationSignaturePad) return;
+            certificationSignaturePad.clear();
+            document.getElementById('certificationSaveBtn').disabled = true;
+        }
+
+        function saveCertificationSignature() {
+            if (!certificationSignaturePad || certificationSignaturePad.isEmpty()) return;
+
+            certificationHasSignature = true;
+            const btn = document.getElementById('certificationSignBtn');
+            const btnText = document.getElementById('certificationSignBtnText');
+            btn.classList.add('signed');
+            btnText.textContent = '✓ Signed - Click to view or re-sign';
+
+            updateStep7State();
+            closeCertificationSignatureModal();
+            console.log('✅ Certification signature saved');
+        }
+
+        function updateStep7State() {
+            document.getElementById('step7NextBtn').disabled = !certificationHasSignature;
         }
 
         function updateStep3bState() {
@@ -2580,24 +2725,8 @@
         function initializeStep7() {
             const name = registrationState.designeeContact.name || 'your alternate';
             document.getElementById('certificationAlternateName').textContent = name;
+            document.getElementById('certificationAlternateName2').textContent = name;
             document.getElementById('emailAlternateName').textContent = name;
-        }
-
-        function updateCertificationState() {
-            const allChecked = ['certify1', 'certify2'].every(id => document.getElementById(id).checked);
-            const hasFile = registrationState.certificationFile !== null;
-
-            document.getElementById('step7NextBtn').disabled = !(allChecked && hasFile);
-
-            // Update checkbox styling
-            document.querySelectorAll('#step7Section .checkbox-item').forEach(item => {
-                const checkbox = item.querySelector('input[type="checkbox"]');
-                if (checkbox && checkbox.checked) {
-                    item.classList.add('checked');
-                } else {
-                    item.classList.remove('checked');
-                }
-            });
         }
 
         async function handleCertificationUpload(event) {
@@ -2904,17 +3033,15 @@
                 });
             }
 
-            if (registrationState.certificationFile) {
-                const reader = new FileReader();
-                const certificationBase64 = await new Promise((resolve) => {
-                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
-                    reader.readAsDataURL(registrationState.certificationFile);
-                });
+            // Get Certification signature (only if designee exists)
+            if (certificationHasSignature && certificationSignaturePad) {
+                const certificationDataUrl = certificationSignaturePad.toDataURL('image/png');
+                const certificationBase64 = certificationDataUrl.split(',')[1];
 
                 files.push({
-                    name: registrationState.certificationFile.name,
+                    name: `certification_signature_${Date.now()}.png`,
                     content: certificationBase64,
-                    type: registrationState.certificationFile.type,
+                    type: 'image/png',
                     fieldName: 'certification'
                 });
             }
@@ -2991,6 +3118,26 @@
                 <button class="modal-cancel-btn" onclick="closeVirtualProtocolSignatureModal()">Cancel</button>
                 <button class="clear-signature-btn" onclick="clearVirtualProtocolSignature()">Clear</button>
                 <button class="modal-save-btn" onclick="saveVirtualProtocolSignature()" id="virtualProtocolSaveBtn" disabled>Save Signature</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certification Signature Modal -->
+    <div id="certificationSignatureModal" class="signature-modal-overlay">
+        <div class="signature-modal-content">
+            <div class="signature-modal-header">
+                <h2 class="signature-modal-title">Sign Primary Member Certification</h2>
+                <p class="signature-modal-subtitle">I certify the statements above regarding my designated alternate</p>
+            </div>
+            <div class="signature-modal-body">
+                <div class="signature-pad-container">
+                    <canvas id="certificationSignatureCanvas" class="signature-canvas"></canvas>
+                </div>
+            </div>
+            <div class="signature-modal-footer">
+                <button class="modal-cancel-btn" onclick="closeCertificationSignatureModal()">Cancel</button>
+                <button class="clear-signature-btn" onclick="clearCertificationSignature()">Clear</button>
+                <button class="modal-save-btn" onclick="saveCertificationSignature()" id="certificationSaveBtn" disabled>Save Signature</button>
             </div>
         </div>
     </div>

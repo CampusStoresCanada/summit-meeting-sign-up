@@ -2238,6 +2238,9 @@
 
         // Step 5: Alternate Selection
         function initializeStep5() {
+            console.log('✅ Initializing Step 5 - Alternate Selection');
+            console.log('📋 Total contacts loaded:', organizationContacts.length);
+
             const container = document.getElementById('existingContacts');
             container.innerHTML = '';
 
@@ -2245,6 +2248,8 @@
             const availableContacts = organizationContacts.filter(contact =>
                 !contact.isPrimaryContact && contact.id !== primaryMemberContact?.id
             );
+
+            console.log('👥 Available contacts for selection:', availableContacts.length);
 
             if (availableContacts.length === 0) {
                 container.innerHTML = '<p style="color: #666; font-style: italic;">No other contacts available. Please add a new person below.</p>';
@@ -2460,23 +2465,23 @@
 
         // Navigation
         async function nextStep() {
-            // Initialize next step if needed
-            if (currentStep === 3 && registrationState.primaryIsAttending) {
-                initializeStep4();
-            } else if (currentStep === 4 && registrationState.hasDesignee) {
-                initializeStep5();
-            } else if (currentStep === 5 && registrationState.hasDesignee) {
-                initializeStep6();
-            } else if (currentStep === 6 && registrationState.hasDesignee) {
-                initializeStep7();
-            }
-
             // Handle conditional flow
             const nextStepSection = determineNextStep();
 
             if (nextStepSection === 'submit') {
                 await submitRegistration();
                 return;
+            }
+
+            // Initialize next step if needed based on the actual section we're going to
+            if (nextStepSection === 'step4Section') {
+                initializeStep4();
+            } else if (nextStepSection === 'step5Section') {
+                initializeStep5();
+            } else if (nextStepSection === 'step6Section') {
+                initializeStep6();
+            } else if (nextStepSection === 'step7Section') {
+                initializeStep7();
             }
 
             // Hide current step

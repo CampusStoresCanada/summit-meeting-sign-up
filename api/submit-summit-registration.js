@@ -27,6 +27,52 @@ export default async function handler(req, res) {
     return;
   }
 
+  // DIAGNOSTIC MODE: Check if this is a schema query request
+  if (req.body && req.body.diagnosticMode === 'getSchema') {
+    console.log('🔍 DIAGNOSTIC MODE: Fetching database schema...');
+    try {
+      const schemaResponse = await fetch(`https://api.notion.com/v1/databases/${summitRegistrationsDbId}`, {
+        headers: {
+          'Authorization': `Bearer ${notionToken}`,
+          'Notion-Version': '2022-06-28'
+        }
+      });
+
+      const schemaData = await schemaResponse.json();
+
+      if (!schemaResponse.ok) {
+        console.error('❌ Failed to get schema:', schemaData);
+        res.status(schemaResponse.status).json({
+          error: 'Failed to get database schema',
+          details: schemaData
+        });
+        return;
+      }
+
+      // Extract property names and types
+      const properties = {};
+      for (const [name, prop] of Object.entries(schemaData.properties)) {
+        properties[name] = prop.type;
+      }
+
+      console.log('✅ Database schema retrieved successfully');
+      console.log('Properties:', JSON.stringify(properties, null, 2));
+
+      res.status(200).json({
+        databaseTitle: schemaData.title?.[0]?.plain_text || 'Unknown',
+        databaseId: summitRegistrationsDbId,
+        properties: properties,
+        propertyCount: Object.keys(properties).length,
+        fullSchema: schemaData
+      });
+      return;
+    } catch (error) {
+      console.error('💥 Schema fetch error:', error);
+      res.status(500).json({ error: error.message });
+      return;
+    }
+  }
+
   try {
     const {
       token,

@@ -1720,7 +1720,10 @@
                     checkbox.disabled = false;
                     checkboxLabel.textContent = 'I understand and agree to Traffic Light Protocol Red confidentiality requirements';
 
-                    // DO NOT pulse checkbox automatically - let them read and decide
+                    // NOW pulse the checkbox to show it's the next step
+                    if (checkboxItem && !checkbox.checked) {
+                        checkboxItem.classList.add('pulse');
+                    }
 
                     console.log('✅ User scrolled to bottom of TLP Red agreement');
                 }
@@ -1729,33 +1732,12 @@
             // Add scroll listener
             scrollContainer.addEventListener('scroll', checkScrollPosition);
 
-            // Listen for checkbox changes to remove pulse when checked
+            // Listen for checkbox changes to remove pulse and enable Next button
             checkbox.addEventListener('change', function() {
                 if (this.checked && checkboxItem) {
                     checkboxItem.classList.remove('pulse');
                 }
             });
-
-            // If user tries to click Next without scrolling, pulse the scroll container
-            if (nextButton) {
-                nextButton.addEventListener('click', function(e) {
-                    if (!tlpRedScrolledToBottom) {
-                        // They haven't scrolled - pulse scroll container urgently
-                        scrollContainer.classList.add('pulse');
-                        e.preventDefault();
-                        e.stopPropagation();
-                        return false;
-                    } else if (!checkbox.checked) {
-                        // They scrolled but didn't check - pulse checkbox
-                        if (checkboxItem) {
-                            checkboxItem.classList.add('pulse');
-                        }
-                        e.preventDefault();
-                        e.stopPropagation();
-                        return false;
-                    }
-                });
-            }
 
             // Check initial position (in case content is short enough to not need scrolling)
             setTimeout(() => {

@@ -2960,6 +2960,7 @@
                     body: JSON.stringify({
                         token: token,
                         organizationId: organizationData.id,
+                        primaryContactId: primaryMemberContact?.id || null,
                         primaryIsAttending: registrationState.primaryIsAttending,
                         primaryFormat: registrationState.primaryFormat,
                         tlpRedSignatureUrl: uploadedFiles.tlpRedAgreement,

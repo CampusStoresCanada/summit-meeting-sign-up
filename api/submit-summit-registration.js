@@ -19,6 +19,7 @@ export default async function handler(req, res) {
   const organizationsDbId = process.env.NOTION_ORGANIZATIONS_DB_ID;
   const contactsDbId = process.env.NOTION_CONTACTS_DB_ID;
   const summitRegistrationsDbId = process.env.NOTION_SUMMIT_REGISTRATIONS_DB_ID;
+  const tagSystemDbId = process.env.NOTION_TAG_SYSTEM_DB_ID || '1f9a69bf0cfd8034b919f51b7c4f2c67';
 
   if (!notionToken || !organizationsDbId || !contactsDbId || !summitRegistrationsDbId) {
     console.error('❌ Missing environment variables!');
@@ -30,9 +31,12 @@ export default async function handler(req, res) {
     const {
       token,
       organizationId,
+      primaryContactId,
       primaryIsAttending,
       primaryFormat,
-      primaryAgreementUrl,
+      tlpRedSignatureUrl,
+      employmentSignatureUrl,
+      virtualProtocolSignatureUrl,
       hasDesignee,
       designeeContact,
       designeeFormat,
@@ -69,7 +73,65 @@ export default async function handler(req, res) {
 
     console.log(`🏢 Found organization: ${organizationName}`);
 
-    // Step 2: Check if registration already exists
+    // Step 2: Get summit tag IDs
+    console.log('🏷️ Looking up summit tags...');
+    let summitInPersonTagId = null;
+    let summitOnlineTagId = null;
+
+    try {
+      // Get "26 Summit - In-Person" tag
+      const inPersonTagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionToken}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28'
+        },
+        body: JSON.stringify({
+          filter: {
+            property: 'Name',
+            title: { equals: '26 Summit - In-Person' }
+          }
+        })
+      });
+
+      if (inPersonTagResponse.ok) {
+        const inPersonTagData = await inPersonTagResponse.json();
+        if (inPersonTagData.results.length > 0) {
+          summitInPersonTagId = inPersonTagData.results[0].id;
+          console.log('✅ Found 26 Summit - In-Person tag ID:', summitInPersonTagId);
+        }
+      }
+
+      // Get "26 Summit - Online" tag
+      const onlineTagResponse = await fetch(`https://api.notion.com/v1/databases/${tagSystemDbId}/query`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionToken}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28'
+        },
+        body: JSON.stringify({
+          filter: {
+            property: 'Name',
+            title: { equals: '26 Summit - Online' }
+          }
+        })
+      });
+
+      if (onlineTagResponse.ok) {
+        const onlineTagData = await onlineTagResponse.json();
+        if (onlineTagData.results.length > 0) {
+          summitOnlineTagId = onlineTagData.results[0].id;
+          console.log('✅ Found 26 Summit - Online tag ID:', summitOnlineTagId);
+        }
+      }
+
+    } catch (error) {
+      console.error('💥 Error finding summit tags:', error);
+    }
+
+    // Step 3: Check if registration already exists
     const existingRegResponse = await fetch(`https://api.notion.com/v1/databases/${summitRegistrationsDbId}/query`, {
       method: 'POST',
       headers: {
@@ -188,11 +250,26 @@ export default async function handler(req, res) {
       }
     };
 
-    // Add primary agreement URL if attending
-    if (primaryIsAttending && primaryAgreementUrl) {
-      registrationProperties["Primary Agreement URL"] = {
-        url: primaryAgreementUrl
+    // Add primary contact relation if provided
+    if (primaryContactId) {
+      registrationProperties["Primary Contact"] = {
+        relation: [{ id: primaryContactId }]
       };
+    }
+
+    // Add signature URLs if attending
+    if (primaryIsAttending) {
+      if (tlpRedSignatureUrl) {
+        registrationProperties["TLP Red Signature URL"] = {
+          url: tlpRedSignatureUrl
+        };
+      }
+
+      if (employmentSignatureUrl) {
+        registrationProperties["Employment Signature URL"] = {
+          url: employmentSignatureUrl
+        };
+      }
     }
 
     // Add virtual protocol if virtual
@@ -200,6 +277,12 @@ export default async function handler(req, res) {
       registrationProperties["Primary Virtual Protocol Acknowledged"] = {
         checkbox: true
       };
+
+      if (virtualProtocolSignatureUrl) {
+        registrationProperties["Virtual Protocol Signature URL"] = {
+          url: virtualProtocolSignatureUrl
+        };
+      }
     }
 
     // Add designee information if applicable
@@ -227,7 +310,7 @@ export default async function handler(req, res) {
       };
 
       if (certificationUrl) {
-        registrationProperties["Primary Certification URL"] = {
+        registrationProperties["Certification Signature URL"] = {
           url: certificationUrl
         };
       }
@@ -304,7 +387,118 @@ export default async function handler(req, res) {
       console.log('✅ Created registration:', registrationTitle);
     }
 
-    // Step 7: Send designee invitation email if needed
+    // Step 7: Tag contacts with summit tags
+    console.log('🏷️ Tagging contacts...');
+
+    // Tag primary member if attending
+    if (primaryIsAttending && primaryContactId && (summitInPersonTagId || summitOnlineTagId)) {
+      try {
+        const tagId = primaryFormat === 'in-person' ? summitInPersonTagId : summitOnlineTagId;
+        const tagName = primaryFormat === 'in-person' ? '26 Summit - In-Person' : '26 Summit - Online';
+
+        if (tagId) {
+          // Get current contact to preserve existing tags
+          const contactResponse = await fetch(`https://api.notion.com/v1/pages/${primaryContactId}`, {
+            headers: {
+              'Authorization': `Bearer ${notionToken}`,
+              'Notion-Version': '2022-06-28'
+            }
+          });
+
+          if (contactResponse.ok) {
+            const contactData = await contactResponse.json();
+            const existingTags = contactData.properties['Personal Tag']?.relation || [];
+
+            // Check if tag already exists
+            const hasTag = existingTags.some(tag => tag.id === tagId);
+
+            if (!hasTag) {
+              // Add new tag to existing tags
+              const updatedTags = [...existingTags, { id: tagId }];
+
+              await fetch(`https://api.notion.com/v1/pages/${primaryContactId}`, {
+                method: 'PATCH',
+                headers: {
+                  'Authorization': `Bearer ${notionToken}`,
+                  'Content-Type': 'application/json',
+                  'Notion-Version': '2022-06-28'
+                },
+                body: JSON.stringify({
+                  properties: {
+                    'Personal Tag': {
+                      relation: updatedTags
+                    }
+                  }
+                })
+              });
+
+              console.log(`✅ Tagged primary contact with ${tagName}`);
+            } else {
+              console.log(`ℹ️ Primary contact already has ${tagName} tag`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('💥 Error tagging primary contact:', error);
+        // Don't fail registration if tagging fails
+      }
+    }
+
+    // Tag designee if they exist
+    if (hasDesignee && designeeContactId && (summitInPersonTagId || summitOnlineTagId)) {
+      try {
+        const tagId = designeeFormat === 'in-person' ? summitInPersonTagId : summitOnlineTagId;
+        const tagName = designeeFormat === 'in-person' ? '26 Summit - In-Person' : '26 Summit - Online';
+
+        if (tagId) {
+          // Get current contact to preserve existing tags
+          const contactResponse = await fetch(`https://api.notion.com/v1/pages/${designeeContactId}`, {
+            headers: {
+              'Authorization': `Bearer ${notionToken}`,
+              'Notion-Version': '2022-06-28'
+            }
+          });
+
+          if (contactResponse.ok) {
+            const contactData = await contactResponse.json();
+            const existingTags = contactData.properties['Personal Tag']?.relation || [];
+
+            // Check if tag already exists
+            const hasTag = existingTags.some(tag => tag.id === tagId);
+
+            if (!hasTag) {
+              // Add new tag to existing tags
+              const updatedTags = [...existingTags, { id: tagId }];
+
+              await fetch(`https://api.notion.com/v1/pages/${designeeContactId}`, {
+                method: 'PATCH',
+                headers: {
+                  'Authorization': `Bearer ${notionToken}`,
+                  'Content-Type': 'application/json',
+                  'Notion-Version': '2022-06-28'
+                },
+                body: JSON.stringify({
+                  properties: {
+                    'Personal Tag': {
+                      relation: updatedTags
+                    }
+                  }
+                })
+              });
+
+              console.log(`✅ Tagged designee contact with ${tagName}`);
+            } else {
+              console.log(`ℹ️ Designee contact already has ${tagName} tag`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('💥 Error tagging designee contact:', error);
+        // Don't fail registration if tagging fails
+      }
+    }
+
+    // Step 8: Send designee invitation email if needed
     if (hasDesignee && designeeToken && designeeContact) {
       console.log('📧 Sending designee invitation email...');
 

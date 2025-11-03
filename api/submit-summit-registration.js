@@ -142,39 +142,10 @@ export default async function handler(req, res) {
     }
 
     // Step 3: Check if registration already exists
-    const existingRegResponse = await fetch(`https://api.notion.com/v1/databases/${summitRegistrationsDbId}/query`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${notionToken}`,
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28'
-      },
-      body: JSON.stringify({
-        filter: {
-          property: 'Token',
-          rich_text: { equals: token }
-        }
-      })
-    });
-
-    if (!existingRegResponse.ok) {
-      const errorText = await existingRegResponse.text();
-      console.error('❌ Existing registration lookup failed:', {
-        status: existingRegResponse.status,
-        statusText: existingRegResponse.statusText,
-        response: errorText
-      });
-      throw new Error(`Existing registration lookup failed: ${existingRegResponse.status} - ${errorText}`);
-    }
-
-    const existingRegData = await existingRegResponse.json();
-    const existingRegistration = existingRegData.results?.[0] || null;
-
-    if (existingRegistration) {
-      console.log('📋 Found existing registration, will update it');
-    } else {
-      console.log('📋 No existing registration found, will create new one');
-    }
+    // NOTE: Temporarily skipping this check due to database access issues
+    // Will always create new registrations for now
+    console.log('📋 Skipping existing registration check, will create new registration');
+    const existingRegistration = null;
 
     // Step 4: Handle designee contact if needed
     let designeeContactId = null;

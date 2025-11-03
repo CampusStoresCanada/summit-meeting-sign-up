@@ -46,12 +46,12 @@
         /* Scrollable Agreement Container */
         .scroll-to-accept-container {
             position: relative;
-            max-height: 350px;
+            max-height: 400px;
             overflow-y: auto;
             border: 2px solid #dee2e6;
             border-radius: 8px;
             padding: 2em;
-            margin: 1em 0 1.5em 0;
+            margin: 0.5em 0 1.5em 0;
             background: #f8f9fa;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
         }
@@ -78,19 +78,59 @@
             font-size: 0.95em;
             pointer-events: none;
             transition: opacity 0.3s ease;
+            animation: pulse-scroll 2s ease-in-out infinite;
         }
 
         .scroll-indicator.hidden {
             opacity: 0;
+            animation: none;
+        }
+
+        /* Pulse animation for scroll indicator */
+        @keyframes pulse-scroll {
+            0%, 100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            50% {
+                opacity: 0.6;
+                transform: translateY(-3px);
+            }
+        }
+
+        /* Pulse animation for checkbox */
+        @keyframes pulse-checkbox {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(0, 113, 188, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(0, 113, 188, 0);
+            }
+        }
+
+        .checkbox-item {
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item.pulse {
+            animation: pulse-checkbox 2s ease-in-out infinite;
+            border-radius: 8px;
         }
 
         .checkbox-item input[type="checkbox"]:disabled + label {
-            opacity: 0.6;
+            opacity: 0.4;
             cursor: not-allowed;
+            color: #999;
         }
 
         .checkbox-item input[type="checkbox"]:disabled {
             cursor: not-allowed;
+            opacity: 0.4;
+        }
+
+        .checkbox-item input[type="checkbox"]:not(:disabled) + label {
+            opacity: 1;
+            color: inherit;
         }
 
         /* Serious/Confidential Tone Styling */
@@ -669,9 +709,9 @@
             }
 
             .scroll-to-accept-container {
-                max-height: 250px;
+                max-height: 300px;
                 padding: 1.5em;
-                margin: 0.8em 0 1em 0;
+                margin: 0.5em 0 1em 0;
             }
 
             .primary-member-card {
@@ -1629,6 +1669,7 @@
             const scrollIndicator = document.getElementById('tlpRedScrollIndicator');
             const checkbox = document.getElementById('primaryAgree1');
             const checkboxLabel = document.getElementById('tlpRedCheckboxLabel');
+            const checkboxItem = checkbox?.closest('.checkbox-item');
 
             if (!scrollContainer) return;
 
@@ -1646,12 +1687,25 @@
                     scrollIndicator.classList.add('hidden');
                     checkbox.disabled = false;
                     checkboxLabel.textContent = 'I understand and agree to Traffic Light Protocol Red confidentiality requirements';
+
+                    // Start pulsing the checkbox to indicate it needs to be checked
+                    if (checkboxItem && !checkbox.checked) {
+                        checkboxItem.classList.add('pulse');
+                    }
+
                     console.log('✅ User scrolled to bottom of TLP Red agreement');
                 }
             }
 
             // Add scroll listener
             scrollContainer.addEventListener('scroll', checkScrollPosition);
+
+            // Listen for checkbox changes to remove pulse when checked
+            checkbox.addEventListener('change', function() {
+                if (this.checked && checkboxItem) {
+                    checkboxItem.classList.remove('pulse');
+                }
+            });
 
             // Check initial position (in case content is short enough to not need scrolling)
             setTimeout(() => {

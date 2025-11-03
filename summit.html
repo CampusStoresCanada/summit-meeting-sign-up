@@ -860,6 +860,60 @@
             }
         }
 
+        /* Designate Button Styling */
+        .designate-button-wrapper {
+            width: 8vw;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-top: 0.1vw;
+            position: relative;
+            z-index: 2;
+            pointer-events: auto;
+        }
+
+        .designate-btn {
+            background: #0071bc;
+            color: white;
+            border: 2px solid #0071bc;
+            padding: 0.4vw 0.8vw;
+            border-radius: 4px;
+            font-family: 'davis-sans', sans-serif;
+            font-size: 0.85vw;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .designate-btn:hover {
+            background: #005a94;
+            border-color: #005a94;
+        }
+
+        .designate-btn.designated {
+            background: #28a745;
+            border-color: #28a745;
+        }
+
+        .designate-btn.designated:hover {
+            background: #218838;
+            border-color: #218838;
+        }
+
+        /* Dietary Restrictions Display */
+        .contact-dietary {
+            font-family: 'davis-sans', sans-serif;
+            font-size: 0.8vw;
+            color: #999;
+            font-style: italic;
+            margin-top: 0.2vw;
+            grid-column: 1 / -1;
+            grid-row: 3;
+        }
+
         /* Tablet responsive adjustments */
         @media (min-width: 769px) and (max-width: 1024px) {
             .welcome-section {
@@ -876,6 +930,15 @@
 
             .content-section h1 {
                 font-size: 3vw;
+            }
+
+            .designate-btn {
+                font-size: 1.1vw;
+                padding: 0.5vw 1vw;
+            }
+
+            .contact-dietary {
+                font-size: 1vw;
             }
         }
     </style>
@@ -1298,42 +1361,21 @@
                 <h1>Select Your Alternate</h1>
 
                 <div class="summit-info">
-                    <p>Choose an existing contact or add a new person from your team:</p>
+                    <p>Choose who you would like to designate as your alternate from your team:</p>
                 </div>
 
-                <div class="contact-selection" id="existingContacts">
-                    <!-- Existing contacts will be populated here -->
-                </div>
-
-                <div class="add-new-person-btn" onclick="toggleNewPersonForm()">
-                    <p style="font-weight: 600;">+ Add a New Person</p>
-                </div>
-
-                <div id="newPersonForm" class="new-person-form" style="display: none;">
-                    <h3 style="margin-top: 0;">New Alternate Information</h3>
-
-                    <div class="form-field">
-                        <label for="alternateName">Full Name *</label>
-                        <input type="text" id="alternateName" placeholder="Jane Smith">
-                        <div class="field-error" id="alternateNameError">Name is required</div>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="alternateTitle">Title/Position *</label>
-                        <input type="text" id="alternateTitle" placeholder="Assistant Manager">
-                        <div class="field-error" id="alternateTitleError">Title is required</div>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="alternateEmail">Email Address *</label>
-                        <input type="email" id="alternateEmail" placeholder="jane.smith@university.edu">
-                        <div class="field-error" id="alternateEmailError">Valid email is required</div>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="alternatePhone">Phone Number *</label>
-                        <input type="tel" id="alternatePhone" placeholder="(555) 123-4567">
-                        <div class="field-error" id="alternatePhoneError">Phone number is required</div>
+                <div class="team-container">
+                    <div class="team-list-wrapper">
+                        <div class="team-list" id="alternateList">
+                            <!-- Contacts will be dynamically added here -->
+                        </div>
+                        <div class="team-list-fade"></div>
+                        <div class="team-list-shadow"></div>
+                        <div class="custom-scrollbar" id="alternateScrollbar">
+                            <div class="scrollbar-track">
+                                <div class="scrollbar-thumb" id="alternateScrollbarThumb"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2241,8 +2283,16 @@
             console.log('✅ Initializing Step 5 - Alternate Selection');
             console.log('📋 Total contacts loaded:', organizationContacts.length);
 
-            const container = document.getElementById('existingContacts');
-            container.innerHTML = '';
+            populateAlternateList();
+            setupAlternateScrollbar();
+        }
+
+        function populateAlternateList() {
+            const alternateList = document.getElementById('alternateList');
+            if (!alternateList) return;
+
+            // Clear existing content
+            alternateList.innerHTML = '';
 
             // Filter out the primary member - they can't be their own alternate
             const availableContacts = organizationContacts.filter(contact =>
@@ -2252,26 +2302,200 @@
             console.log('👥 Available contacts for selection:', availableContacts.length);
 
             if (availableContacts.length === 0) {
-                container.innerHTML = '<p style="color: #666; font-style: italic;">No other contacts available. Please add a new person below.</p>';
+                alternateList.innerHTML = '<p style="color: #666; font-style: italic; padding: 1vw;">No other contacts available.</p>';
                 return;
             }
 
-            availableContacts.forEach(contact => {
-                const card = document.createElement('div');
-                card.className = 'contact-card';
-                card.onclick = () => selectExistingContact(contact);
-
-                card.innerHTML = `
-                    <input type="radio" name="alternateContact" id="contact-${contact.id}" style="margin-right: 1em;">
-                    <div>
-                        <div class="contact-name">${contact.name}</div>
-                        <div class="contact-details">${contact.roleTitle || ''}</div>
-                        <div class="contact-details">${contact.workEmail || ''}</div>
-                    </div>
-                `;
-
-                container.appendChild(card);
+            // Add each contact
+            availableContacts.forEach((contact, index) => {
+                const contactDiv = createAlternateContactElement(contact, index);
+                alternateList.appendChild(contactDiv);
             });
+
+            // Update scrollbar after adding contacts
+            setTimeout(() => {
+                updateAlternateScrollbar();
+            }, 100);
+
+            console.log(`👥 Populated ${availableContacts.length} contacts`);
+        }
+
+        function createAlternateContactElement(contact, index) {
+            const contactDiv = document.createElement('div');
+            contactDiv.className = 'contact-item';
+            contactDiv.dataset.contactId = contact.id;
+            contactDiv.dataset.index = index;
+
+            // Format phone number for display
+            const phone = contact.workPhone || '';
+            const formattedPhone = phone ? formatPhoneForDisplay(phone) : '';
+
+            // Get dietary restrictions from Notion contact data
+            const dietaryRestrictions = contact.dietaryRestrictions || 'Dietary Restrictions Unknown';
+
+            const isSelected = registrationState.designeeContact?.id === contact.id;
+
+            contactDiv.innerHTML = `
+                <div class="designate-button-wrapper" onclick="selectAlternateContact('${contact.id}'); event.stopPropagation();" title="Click to designate as alternate">
+                    <button class="designate-btn ${isSelected ? 'designated' : ''}">
+                        ${isSelected ? '✓ Designated' : 'Designate'}
+                    </button>
+                </div>
+                <div class="contact-info">
+                    <div class="contact-name">${contact.name}</div>
+                    <div class="contact-title">${contact.roleTitle || ''}</div>
+                    <div class="contact-email">${contact.workEmail || ''}</div>
+                    <div class="contact-phone">${formattedPhone}</div>
+                    <div class="contact-dietary">${dietaryRestrictions}</div>
+                </div>
+            `;
+
+            return contactDiv;
+        }
+
+        function selectAlternateContact(contactId) {
+            const contact = organizationContacts.find(c => c.id === contactId);
+            if (!contact) return;
+
+            registrationState.designeeContact = contact;
+            registrationState.designeeIsNew = false;
+
+            // Update all buttons
+            document.querySelectorAll('.designate-btn').forEach(btn => {
+                btn.classList.remove('designated');
+                btn.textContent = 'Designate';
+            });
+
+            // Highlight selected
+            const selectedBtn = document.querySelector(`[data-contact-id="${contactId}"] .designate-btn`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('designated');
+                selectedBtn.textContent = '✓ Designated';
+            }
+
+            // Enable next button
+            document.getElementById('step5NextBtn').disabled = false;
+
+            console.log(`✅ Designated ${contact.name} as alternate`);
+        }
+
+        function formatPhoneForDisplay(phone) {
+            // Remove all non-digit characters
+            const digits = phone.replace(/\D/g, '');
+
+            // Format as (XXX) XXX-XXXX if 10 digits, otherwise return as-is
+            if (digits.length === 10) {
+                return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+            }
+            return phone;
+        }
+
+        function setupAlternateScrollbar() {
+            const alternateList = document.getElementById('alternateList');
+            const scrollbar = document.getElementById('alternateScrollbar');
+            const scrollbarThumb = document.getElementById('alternateScrollbarThumb');
+
+            if (!alternateList || !scrollbar || !scrollbarThumb) return;
+
+            function updateScrollbarVisibility() {
+                const scrollHeight = alternateList.scrollHeight;
+                const clientHeight = alternateList.clientHeight;
+
+                if (scrollHeight <= clientHeight) {
+                    scrollbar.style.display = 'none';
+                    return false;
+                } else {
+                    scrollbar.style.display = 'block';
+                    return true;
+                }
+            }
+
+            function updateAlternateScrollbarFunc() {
+                const scrollHeight = alternateList.scrollHeight;
+                const clientHeight = alternateList.clientHeight;
+
+                if (!updateScrollbarVisibility()) {
+                    return;
+                }
+
+                // Calculate thumb height as proportion of visible area
+                const thumbHeight = (clientHeight / scrollHeight) * clientHeight;
+                scrollbarThumb.style.height = thumbHeight + 'px';
+
+                // Calculate thumb position
+                const scrollTop = alternateList.scrollTop;
+                const maxScroll = scrollHeight - clientHeight;
+                const thumbMaxTop = clientHeight - thumbHeight;
+                const thumbTop = maxScroll > 0 ? (scrollTop / maxScroll) * thumbMaxTop : 0;
+
+                scrollbarThumb.style.top = thumbTop + 'px';
+            }
+
+            // Set up event listeners
+            alternateList.addEventListener('scroll', updateAlternateScrollbarFunc);
+            window.addEventListener('resize', updateAlternateScrollbarFunc);
+
+            // Dragging scrollbar thumb
+            let isDragging = false;
+            let startY = 0;
+            let startScrollTop = 0;
+
+            scrollbarThumb.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startY = e.clientY;
+                startScrollTop = alternateList.scrollTop;
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+
+                const deltaY = e.clientY - startY;
+                const scrollHeight = alternateList.scrollHeight;
+                const clientHeight = alternateList.clientHeight;
+                const thumbHeight = scrollbarThumb.offsetHeight;
+                const thumbMaxTop = clientHeight - thumbHeight;
+
+                const scrollRatio = deltaY / thumbMaxTop;
+                const scrollAmount = scrollRatio * (scrollHeight - clientHeight);
+
+                alternateList.scrollTop = startScrollTop + scrollAmount;
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            // Initial update
+            updateAlternateScrollbarFunc();
+        }
+
+        function updateAlternateScrollbar() {
+            const alternateList = document.getElementById('alternateList');
+            const scrollbar = document.getElementById('alternateScrollbar');
+            const scrollbarThumb = document.getElementById('alternateScrollbarThumb');
+
+            if (!alternateList || !scrollbar || !scrollbarThumb) return;
+
+            const scrollHeight = alternateList.scrollHeight;
+            const clientHeight = alternateList.clientHeight;
+
+            if (scrollHeight <= clientHeight) {
+                scrollbar.style.display = 'none';
+                return;
+            }
+
+            scrollbar.style.display = 'block';
+
+            const thumbHeight = (clientHeight / scrollHeight) * clientHeight;
+            scrollbarThumb.style.height = thumbHeight + 'px';
+
+            const scrollTop = alternateList.scrollTop;
+            const maxScroll = scrollHeight - clientHeight;
+            const thumbMaxTop = clientHeight - thumbHeight;
+            const thumbTop = maxScroll > 0 ? (scrollTop / maxScroll) * thumbMaxTop : 0;
+
+            scrollbarThumb.style.top = thumbTop + 'px';
         }
 
         function selectExistingContact(contact) {

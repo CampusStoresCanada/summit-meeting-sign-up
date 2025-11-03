@@ -2306,9 +2306,6 @@
                     return 'step3cSection';
 
                 case 'step3cSection':
-                    return 'step3dSection';
-
-                case 'step3dSection':
                     return 'step4Section';
 
                 case 'step4Section':
@@ -2346,12 +2343,9 @@
                 case 'step3cSection':
                     return 'step3bSection';
 
-                case 'step3dSection':
-                    return 'step3cSection';
-
                 case 'step4Section':
-                    // If primary attending, came from breach ack; otherwise came from step 2
-                    return registrationState.primaryIsAttending ? 'step3dSection' : 'step2Section';
+                    // If primary attending, came from employment; otherwise came from step 2
+                    return registrationState.primaryIsAttending ? 'step3cSection' : 'step2Section';
 
                 case 'step5Section':
                     return 'step4Section';

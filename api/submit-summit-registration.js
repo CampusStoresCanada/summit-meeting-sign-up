@@ -270,9 +270,6 @@ export default async function handler(req, res) {
 
     // Step 5: Build registration properties
     const registrationProperties = {
-      "Token": {
-        rich_text: [{ text: { content: token } }]
-      },
       "Organization": {
         relation: [{ id: orgId }]
       },
@@ -282,7 +279,7 @@ export default async function handler(req, res) {
       "Primary Attendance Format": {
         select: primaryIsAttending ? { name: primaryFormat === 'in-person' ? 'In-Person' : 'Virtual' } : { name: 'Not Attending' }
       },
-      "Primary Breach Acknowledgment": {
+      "Primary Breach Acknowledgement": {
         checkbox: true
       },
       "Has Designee": {
@@ -303,14 +300,8 @@ export default async function handler(req, res) {
     // Add signature URLs if attending
     if (primaryIsAttending) {
       if (tlpRedSignatureUrl) {
-        registrationProperties["TLP Red Signature URL"] = {
+        registrationProperties["Primary Agreement URL"] = {
           url: tlpRedSignatureUrl
-        };
-      }
-
-      if (employmentSignatureUrl) {
-        registrationProperties["Employment Signature URL"] = {
-          url: employmentSignatureUrl
         };
       }
     }
@@ -320,40 +311,26 @@ export default async function handler(req, res) {
       registrationProperties["Primary Virtual Protocol Acknowledged"] = {
         checkbox: true
       };
-
-      if (virtualProtocolSignatureUrl) {
-        registrationProperties["Virtual Protocol Signature URL"] = {
-          url: virtualProtocolSignatureUrl
-        };
-      }
     }
 
     // Add designee information if applicable
     if (hasDesignee) {
-      registrationProperties["Designee Token"] = {
-        rich_text: [{ text: { content: designeeToken } }]
-      };
+      // NOTE: The following fields are missing from the database schema:
+      // - "Designee Contact" (relation) - designee contact is created but not linked to registration
+      // - "Designee Token" (this is a formula field, cannot write to it)
+      // - "Designee Is Attending" (doesn't exist)
+      // The designee token is generated and emailed but not stored in the database.
 
       registrationProperties["Designee Token Expires"] = {
         date: { start: designeeTokenExpires }
       };
 
-      if (designeeContactId) {
-        registrationProperties["Designee Contact"] = {
-          relation: [{ id: designeeContactId }]
-        };
-      }
-
       registrationProperties["Designee Attendance Format"] = {
         select: { name: designeeFormat === 'in-person' ? 'In-Person' : 'Virtual' }
       };
 
-      registrationProperties["Designee Is Attending"] = {
-        checkbox: true
-      };
-
       if (certificationUrl) {
-        registrationProperties["Certification Signature URL"] = {
+        registrationProperties["Primary Certification URL"] = {
           url: certificationUrl
         };
       }
@@ -562,7 +539,7 @@ export default async function handler(req, res) {
         if (emailResponse.ok) {
           console.log('✅ Designee invitation email sent');
 
-          // Update registration with invitation sent timestamp
+          // Update registration with invitation sent timestamp and checkbox
           await fetch(`https://api.notion.com/v1/pages/${registrationId}`, {
             method: 'PATCH',
             headers: {
@@ -574,6 +551,9 @@ export default async function handler(req, res) {
               properties: {
                 "Designee Invitation Sent At": {
                   date: { start: new Date().toISOString() }
+                },
+                "Designee Invitation Sent": {
+                  checkbox: true
                 }
               }
             })

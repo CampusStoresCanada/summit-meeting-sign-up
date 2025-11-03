@@ -12,6 +12,9 @@
     <!-- Custom Stylesheet -->
     <link rel="stylesheet" href="vendor-wizard.css">
 
+    <!-- Signature Pad Library -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
     <!-- Summit-Specific Styles -->
     <style>
         /* Layout Adjustments for Summit Registration */
@@ -1803,86 +1806,40 @@
         }
 
         // Step 3b: Primary Agreement - Signature Canvas
-        let primarySignatureCanvas = null;
-        let primarySignatureCtx = null;
-        let primaryIsDrawing = false;
+        let primarySignaturePad = null;
         let primaryHasSignature = false;
 
         function initPrimarySignatureCanvas() {
-            primarySignatureCanvas = document.getElementById('primarySignatureCanvas');
-            if (!primarySignatureCanvas) return;
-
-            primarySignatureCtx = primarySignatureCanvas.getContext('2d');
+            const canvas = document.getElementById('primarySignatureCanvas');
+            if (!canvas) return;
 
             // Set canvas size
-            const rect = primarySignatureCanvas.getBoundingClientRect();
-            primarySignatureCanvas.width = rect.width;
-            primarySignatureCanvas.height = 200;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = 200;
 
-            // Set drawing styles
-            primarySignatureCtx.strokeStyle = '#000000';
-            primarySignatureCtx.lineWidth = 2;
-            primarySignatureCtx.lineCap = 'round';
-            primarySignatureCtx.lineJoin = 'round';
+            // Initialize SignaturePad
+            primarySignaturePad = new SignaturePad(canvas, {
+                backgroundColor: 'rgb(255, 255, 255)',
+                penColor: 'rgb(0, 0, 0)',
+                minWidth: 1,
+                maxWidth: 2.5,
+                throttle: 16,
+                velocityFilterWeight: 0.7
+            });
 
-            // Mouse events
-            primarySignatureCanvas.addEventListener('mousedown', startPrimaryDrawing);
-            primarySignatureCanvas.addEventListener('mousemove', drawPrimary);
-            primarySignatureCanvas.addEventListener('mouseup', stopPrimaryDrawing);
-            primarySignatureCanvas.addEventListener('mouseleave', stopPrimaryDrawing);
+            // Listen for signature changes
+            primarySignaturePad.addEventListener('endStroke', () => {
+                primaryHasSignature = !primarySignaturePad.isEmpty();
+                updateStep3dState();
+            });
 
-            // Touch events
-            primarySignatureCanvas.addEventListener('touchstart', handlePrimaryTouchStart);
-            primarySignatureCanvas.addEventListener('touchmove', handlePrimaryTouchMove);
-            primarySignatureCanvas.addEventListener('touchend', stopPrimaryDrawing);
-        }
-
-        function startPrimaryDrawing(e) {
-            primaryIsDrawing = true;
-            const rect = primarySignatureCanvas.getBoundingClientRect();
-            primarySignatureCtx.beginPath();
-            primarySignatureCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-        }
-
-        function drawPrimary(e) {
-            if (!primaryIsDrawing) return;
-            const rect = primarySignatureCanvas.getBoundingClientRect();
-            primarySignatureCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-            primarySignatureCtx.stroke();
-            primaryHasSignature = true;
-            updateStep3dState();
-        }
-
-        function stopPrimaryDrawing() {
-            if (primaryIsDrawing) {
-                primaryIsDrawing = false;
-                primarySignatureCtx.closePath();
-            }
-        }
-
-        function handlePrimaryTouchStart(e) {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const rect = primarySignatureCanvas.getBoundingClientRect();
-            primaryIsDrawing = true;
-            primarySignatureCtx.beginPath();
-            primarySignatureCtx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
-        }
-
-        function handlePrimaryTouchMove(e) {
-            e.preventDefault();
-            if (!primaryIsDrawing) return;
-            const touch = e.touches[0];
-            const rect = primarySignatureCanvas.getBoundingClientRect();
-            primarySignatureCtx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-            primarySignatureCtx.stroke();
-            primaryHasSignature = true;
-            updateStep3dState();
+            console.log('✅ Signature pad initialized');
         }
 
         function clearPrimarySignature() {
-            if (!primarySignatureCanvas || !primarySignatureCtx) return;
-            primarySignatureCtx.clearRect(0, 0, primarySignatureCanvas.width, primarySignatureCanvas.height);
+            if (!primarySignaturePad) return;
+            primarySignaturePad.clear();
             primaryHasSignature = false;
             updateStep3dState();
         }
@@ -2353,8 +2310,8 @@
             const files = [];
 
             // Get signature from canvas if present
-            if (primaryHasSignature && primarySignatureCanvas) {
-                const signatureDataUrl = primarySignatureCanvas.toDataURL('image/png');
+            if (primaryHasSignature && primarySignaturePad) {
+                const signatureDataUrl = primarySignaturePad.toDataURL('image/png');
                 const signatureBase64 = signatureDataUrl.split(',')[1];
 
                 files.push({

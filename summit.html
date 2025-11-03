@@ -712,6 +712,103 @@
             border-color: #005a94;
         }
 
+        /* Signature Modal */
+        .signature-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .signature-modal-overlay.active {
+            display: flex;
+        }
+
+        .signature-modal-content {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 2em;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .signature-modal-header {
+            margin-bottom: 1.5em;
+            padding-bottom: 1em;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .signature-modal-title {
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 1.4em;
+            color: #2c3e50;
+            margin-bottom: 0.5em;
+        }
+
+        .signature-modal-subtitle {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .signature-modal-body {
+            margin-bottom: 1.5em;
+        }
+
+        .signature-modal-footer {
+            display: flex;
+            gap: 1em;
+            justify-content: flex-end;
+        }
+
+        .sign-agreement-btn {
+            background: #0071bc;
+            color: #ffffff;
+            border: 2px solid #0071bc;
+            padding: 1em 2em;
+            border-radius: 6px;
+            font-family: 'davis-sans', sans-serif;
+            font-weight: 600;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 1.5em 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        .sign-agreement-btn:hover:not(:disabled) {
+            background: #005a94;
+            border-color: #005a94;
+        }
+
+        .sign-agreement-btn:disabled {
+            background: #cccccc;
+            border-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .sign-agreement-btn.signed {
+            background: #28a745;
+            border-color: #28a745;
+        }
+
+        .sign-agreement-btn.signed:hover {
+            background: #218838;
+            border-color: #218838;
+        }
+
         /* Mobile responsive adjustments */
         @media (max-width: 768px) {
             .welcome-section {
@@ -1012,18 +1109,9 @@
                     </div>
                 </div>
 
-                <div class="signature-section" id="tlpRedSignatureSection" style="opacity: 0.4; pointer-events: none;">
-                    <h3>Sign to Acknowledge Agreement</h3>
-                    <p style="margin-bottom: 1em; color: #666;" id="tlpRedSignaturePrompt">Please scroll to the bottom to enable signature</p>
-
-                    <div class="signature-pad-container">
-                        <canvas id="tlpRedSignatureCanvas" class="signature-canvas"></canvas>
-                    </div>
-
-                    <button type="button" class="clear-signature-btn" onclick="clearTLPRedSignature()">
-                        Clear Signature
-                    </button>
-                </div>
+                <button class="sign-agreement-btn" id="tlpRedSignBtn" onclick="openTLPRedSignatureModal()" disabled>
+                    <span id="tlpRedSignBtnText">Please scroll to the bottom to sign</span>
+                </button>
 
                 <button class="previous-btn" onclick="previousStep()">
                     <span>←</span>
@@ -1052,18 +1140,9 @@
                     <p>By registering, you assume full responsibility for any conflicts between this confidentiality agreement and your employment contract.</p>
                 </div>
 
-                <div class="signature-section">
-                    <h3>Sign to Acknowledge Responsibility</h3>
-                    <p style="margin-bottom: 1em; color: #666;">I have reviewed applicable employment contracts and accept responsibility for any conflicts</p>
-
-                    <div class="signature-pad-container">
-                        <canvas id="employmentSignatureCanvas" class="signature-canvas"></canvas>
-                    </div>
-
-                    <button type="button" class="clear-signature-btn" onclick="clearEmploymentSignature()">
-                        Clear Signature
-                    </button>
-                </div>
+                <button class="sign-agreement-btn" id="employmentSignBtn" onclick="openEmploymentSignatureModal()">
+                    <span id="employmentSignBtnText">Sign to Acknowledge Responsibility</span>
+                </button>
 
                 <button class="previous-btn" onclick="previousStep()">
                     <span>←</span>
@@ -1640,8 +1719,8 @@
         function initTLPRedScrollDetection() {
             const scrollContainer = document.getElementById('tlpRedScrollContainer');
             const scrollIndicator = document.getElementById('tlpRedScrollIndicator');
-            const signatureSection = document.getElementById('tlpRedSignatureSection');
-            const signaturePrompt = document.getElementById('tlpRedSignaturePrompt');
+            const signBtn = document.getElementById('tlpRedSignBtn');
+            const signBtnText = document.getElementById('tlpRedSignBtnText');
 
             if (!scrollContainer) return;
 
@@ -1673,20 +1752,17 @@
                     // Hide scroll indicator
                     scrollIndicator.classList.add('hidden');
 
-                    // Enable signature section
-                    signatureSection.style.opacity = '1';
-                    signatureSection.style.pointerEvents = 'auto';
-                    signaturePrompt.textContent = 'Please sign below using your mouse or touchscreen';
+                    // Enable sign button
+                    signBtn.disabled = false;
+                    signBtnText.textContent = 'Click to Sign Agreement';
 
-                    // Pulse the signature section to show it's the next step
-                    signatureSection.classList.add('pulse');
+                    // Pulse the sign button to show it's the next step
+                    signBtn.classList.add('pulse');
 
-                    // Remove pulse when they start signing
-                    if (tlpRedSignaturePad) {
-                        tlpRedSignaturePad.addEventListener('beginStroke', () => {
-                            signatureSection.classList.remove('pulse');
-                        });
-                    }
+                    // Remove pulse when they click to sign
+                    signBtn.addEventListener('click', () => {
+                        signBtn.classList.remove('pulse');
+                    }, { once: true });
 
                     console.log('✅ User scrolled to bottom of TLP Red agreement');
                 }
@@ -1703,7 +1779,7 @@
 
                 // Only auto-check if content is definitely short and fully rendered
                 if (scrollHeight > 100 && scrollHeight <= clientHeight + 10) {
-                    console.log('Content is short, auto-enabling signature');
+                    console.log('Content is short, auto-enabling sign button');
                     checkScrollPosition();
                 }
                 // Otherwise, user MUST scroll - don't auto-enable
@@ -1758,14 +1834,23 @@
         let employmentHasSignature = false;
 
         function initSignaturePads() {
-            // Initialize TLP Red signature pad
-            const tlpRedCanvas = document.getElementById('tlpRedSignatureCanvas');
-            if (tlpRedCanvas) {
-                const rect = tlpRedCanvas.getBoundingClientRect();
-                tlpRedCanvas.width = rect.width;
-                tlpRedCanvas.height = 200;
+            // Signature pads will be initialized when modals open
+            console.log('✅ Signature pads ready to initialize on modal open');
+        }
 
-                tlpRedSignaturePad = new SignaturePad(tlpRedCanvas, {
+        // TLP Red Signature Modal Functions
+        function openTLPRedSignatureModal() {
+            const modal = document.getElementById('tlpRedSignatureModal');
+            modal.classList.add('active');
+
+            // Initialize signature pad if not already done
+            if (!tlpRedSignaturePad) {
+                const canvas = document.getElementById('tlpRedSignatureCanvas');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = 200;
+
+                tlpRedSignaturePad = new SignaturePad(canvas, {
                     backgroundColor: 'rgb(255, 255, 255)',
                     penColor: 'rgb(0, 0, 0)',
                     minWidth: 1,
@@ -1775,21 +1860,55 @@
                 });
 
                 tlpRedSignaturePad.addEventListener('endStroke', () => {
-                    tlpRedHasSignature = !tlpRedSignaturePad.isEmpty();
-                    updateStep3bState();
+                    document.getElementById('tlpRedSaveBtn').disabled = tlpRedSignaturePad.isEmpty();
                 });
 
                 console.log('✅ TLP Red signature pad initialized');
             }
 
-            // Initialize Employment signature pad
-            const employmentCanvas = document.getElementById('employmentSignatureCanvas');
-            if (employmentCanvas) {
-                const rect = employmentCanvas.getBoundingClientRect();
-                employmentCanvas.width = rect.width;
-                employmentCanvas.height = 200;
+            // If they already signed, restore it
+            if (tlpRedHasSignature) {
+                document.getElementById('tlpRedSaveBtn').disabled = false;
+            }
+        }
 
-                employmentSignaturePad = new SignaturePad(employmentCanvas, {
+        function closeTLPRedSignatureModal() {
+            document.getElementById('tlpRedSignatureModal').classList.remove('active');
+        }
+
+        function clearTLPRedSignature() {
+            if (!tlpRedSignaturePad) return;
+            tlpRedSignaturePad.clear();
+            document.getElementById('tlpRedSaveBtn').disabled = true;
+        }
+
+        function saveTLPRedSignature() {
+            if (!tlpRedSignaturePad || tlpRedSignaturePad.isEmpty()) return;
+
+            tlpRedHasSignature = true;
+            const btn = document.getElementById('tlpRedSignBtn');
+            const btnText = document.getElementById('tlpRedSignBtnText');
+            btn.classList.add('signed');
+            btnText.textContent = '✓ Signed - Click to view or re-sign';
+
+            updateStep3bState();
+            closeTLPRedSignatureModal();
+            console.log('✅ TLP Red signature saved');
+        }
+
+        // Employment Signature Modal Functions
+        function openEmploymentSignatureModal() {
+            const modal = document.getElementById('employmentSignatureModal');
+            modal.classList.add('active');
+
+            // Initialize signature pad if not already done
+            if (!employmentSignaturePad) {
+                const canvas = document.getElementById('employmentSignatureCanvas');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = 200;
+
+                employmentSignaturePad = new SignaturePad(canvas, {
                     backgroundColor: 'rgb(255, 255, 255)',
                     penColor: 'rgb(0, 0, 0)',
                     minWidth: 1,
@@ -1799,26 +1918,40 @@
                 });
 
                 employmentSignaturePad.addEventListener('endStroke', () => {
-                    employmentHasSignature = !employmentSignaturePad.isEmpty();
-                    updateStep3cState();
+                    document.getElementById('employmentSaveBtn').disabled = employmentSignaturePad.isEmpty();
                 });
 
                 console.log('✅ Employment signature pad initialized');
             }
+
+            // If they already signed, restore it
+            if (employmentHasSignature) {
+                document.getElementById('employmentSaveBtn').disabled = false;
+            }
         }
 
-        function clearTLPRedSignature() {
-            if (!tlpRedSignaturePad) return;
-            tlpRedSignaturePad.clear();
-            tlpRedHasSignature = false;
-            updateStep3bState();
+        function closeEmploymentSignatureModal() {
+            document.getElementById('employmentSignatureModal').classList.remove('active');
         }
 
         function clearEmploymentSignature() {
             if (!employmentSignaturePad) return;
             employmentSignaturePad.clear();
-            employmentHasSignature = false;
+            document.getElementById('employmentSaveBtn').disabled = true;
+        }
+
+        function saveEmploymentSignature() {
+            if (!employmentSignaturePad || employmentSignaturePad.isEmpty()) return;
+
+            employmentHasSignature = true;
+            const btn = document.getElementById('employmentSignBtn');
+            const btnText = document.getElementById('employmentSignBtnText');
+            btn.classList.add('signed');
+            btnText.textContent = '✓ Signed - Click to view or re-sign';
+
             updateStep3cState();
+            closeEmploymentSignatureModal();
+            console.log('✅ Employment signature saved');
         }
 
         function updateStep3bState() {
@@ -2338,6 +2471,45 @@
             return result.urls || {};
         }
     </script>
+
+    <!-- Signature Modals -->
+    <div id="tlpRedSignatureModal" class="signature-modal-overlay">
+        <div class="signature-modal-content">
+            <div class="signature-modal-header">
+                <h2 class="signature-modal-title">Sign Traffic Light Protocol Red Agreement</h2>
+                <p class="signature-modal-subtitle">Please sign below to acknowledge your agreement</p>
+            </div>
+            <div class="signature-modal-body">
+                <div class="signature-pad-container">
+                    <canvas id="tlpRedSignatureCanvas" class="signature-canvas"></canvas>
+                </div>
+            </div>
+            <div class="signature-modal-footer">
+                <button class="modal-cancel-btn" onclick="closeTLPRedSignatureModal()">Cancel</button>
+                <button class="clear-signature-btn" onclick="clearTLPRedSignature()">Clear</button>
+                <button class="modal-save-btn" onclick="saveTLPRedSignature()" id="tlpRedSaveBtn" disabled>Save Signature</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="employmentSignatureModal" class="signature-modal-overlay">
+        <div class="signature-modal-content">
+            <div class="signature-modal-header">
+                <h2 class="signature-modal-title">Sign Employment Contract Acknowledgment</h2>
+                <p class="signature-modal-subtitle">I have reviewed applicable employment contracts and accept responsibility for any conflicts</p>
+            </div>
+            <div class="signature-modal-body">
+                <div class="signature-pad-container">
+                    <canvas id="employmentSignatureCanvas" class="signature-canvas"></canvas>
+                </div>
+            </div>
+            <div class="signature-modal-footer">
+                <button class="modal-cancel-btn" onclick="closeEmploymentSignatureModal()">Cancel</button>
+                <button class="clear-signature-btn" onclick="clearEmploymentSignature()">Clear</button>
+                <button class="modal-save-btn" onclick="saveEmploymentSignature()" id="employmentSaveBtn" disabled>Save Signature</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Primary Member Edit Modal -->
     <div id="primaryMemberModal" class="modal-overlay">

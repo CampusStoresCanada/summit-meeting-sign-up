@@ -1134,61 +1134,66 @@
 
                 <h1>Virtual Attendance Protocol</h1>
 
-                <div class="summit-warning">
-                    <p><strong>CRITICAL:</strong> Virtual attendance requires strict compliance with the following rules. Failure to follow these rules will result in immediate removal from the meeting and potential membership termination.</p>
+                <div class="scroll-to-accept-container" id="virtualProtocolScrollContainer">
+                    <div class="agreement-content">
+                        <div class="summit-warning" style="margin-top: 0;">
+                            <p><strong>CRITICAL:</strong> Virtual attendance requires strict compliance with the following rules. Failure to follow these rules will result in immediate removal from the meeting and potential membership termination.</p>
+                        </div>
+
+                        <h3>Mandatory Virtual Attendance Requirements</h3>
+
+                        <p><strong>1. Solo Environment - You Must Be Completely Alone:</strong></p>
+                        <ul>
+                            <li>You must be in a private room with a <strong>locked door</strong></li>
+                            <li>No other person may be present in the room at any time</li>
+                            <li>No one may overhear or view any part of the meeting</li>
+                        </ul>
+
+                        <p><strong>2. Camera On - Visual Verification Required:</strong></p>
+                        <ul>
+                            <li>Your camera must be <strong>on and facing you</strong> for the entire meeting</li>
+                            <li>You must be clearly visible at all times</li>
+                            <li>No virtual backgrounds</li>
+                        </ul>
+
+                        <p><strong>3. Microphone Active - Audio Verification Required:</strong></p>
+                        <ul>
+                            <li>Your microphone must be <strong>unmuted and active</strong> throughout the meeting</li>
+                            <li>We need to hear your environment to verify you are alone</li>
+                            <li>You may not mute except when instructed by the host</li>
+                        </ul>
+
+                        <p><strong>4. Immediate Drop-Out Rule - Zero Tolerance:</strong></p>
+                        <ul>
+                            <li>If <strong>anyone enters your room</strong> for any reason, you must <strong>IMMEDIATELY DROP OUT</strong> of the call</li>
+                            <li>Do NOT mute - you must <strong>LEAVE THE MEETING</strong> entirely</li>
+                            <li>You may not return until the intruder has left and your space is secure</li>
+                            <li>Examples: delivery person, family member, pet, cleaning staff, maintenance - ANYONE</li>
+                        </ul>
+
+                        <p><strong>5. No Recording or Notes:</strong></p>
+                        <ul>
+                            <li>Absolutely no audio or video recording of any kind</li>
+                            <li>No screenshots or screen recording</li>
+                            <li>No note-taking</li>
+                            <li>Close all other applications except the video conference</li>
+                        </ul>
+
+                        <h3>Consequences</h3>
+                        <p>Violation of any virtual protocol rule will result in:</p>
+                        <ul>
+                            <li>Immediate removal from the current meeting</li>
+                            <li>Possible termination of CSC membership</li>
+                            <li>No refunds or appeals</li>
+                        </ul>
+                    </div>
+                    <div class="scroll-indicator" id="virtualProtocolScrollIndicator">
+                        ↓ Scroll down to continue ↓
+                    </div>
                 </div>
 
-                <div class="agreement-content">
-                    <h3>Mandatory Virtual Attendance Requirements</h3>
-
-                    <p><strong>1. Solo Environment - You Must Be Completely Alone:</strong></p>
-                    <ul>
-                        <li>You must be in a private room with a <strong>locked door</strong></li>
-                        <li>No other person may be present in the room at any time</li>
-                        <li>No one may overhear or view any part of the meeting</li>
-                    </ul>
-
-                    <p><strong>2. Camera On - Visual Verification Required:</strong></p>
-                    <ul>
-                        <li>Your camera must be <strong>on and facing you</strong> for the entire meeting</li>
-                        <li>You must be clearly visible at all times</li>
-                        <li>No virtual backgrounds</li>
-                    </ul>
-
-                    <p><strong>3. Microphone Active - Audio Verification Required:</strong></p>
-                    <ul>
-                        <li>Your microphone must be <strong>unmuted and active</strong> throughout the meeting</li>
-                        <li>We need to hear your environment to verify you are alone</li>
-                        <li>You may not mute except when instructed by the host</li>
-                    </ul>
-
-                    <p><strong>4. Immediate Drop-Out Rule - Zero Tolerance:</strong></p>
-                    <ul>
-                        <li>If <strong>anyone enters your room</strong> for any reason, you must <strong>IMMEDIATELY DROP OUT</strong> of the call</li>
-                        <li>Do NOT mute - you must <strong>LEAVE THE MEETING</strong> entirely</li>
-                        <li>You may not return until the intruder has left and your space is secure</li>
-                        <li>Examples: delivery person, family member, pet, cleaning staff, maintenance - ANYONE</li>
-                    </ul>
-
-                    <p><strong>5. No Recording or Notes:</strong></p>
-                    <ul>
-                        <li>Absolutely no audio or video recording of any kind</li>
-                        <li>No screenshots or screen recording</li>
-                        <li>No note-taking</li>
-                        <li>Close all other applications except the video conference</li>
-                    </ul>
-
-                    <h3>Consequences</h3>
-                    <p>Violation of any virtual protocol rule will result in:</p>
-                    <ul>
-                        <li>Immediate removal from the current meeting</li>
-                        <li>Possible termination of CSC membership</li>
-                        <li>No refunds or appeals</li>
-                    </ul>
-                </div>
-
-                <button class="sign-agreement-btn" id="virtualProtocolSignBtn" onclick="openVirtualProtocolSignatureModal()">
-                    <span id="virtualProtocolSignBtnText">Sign to Acknowledge Virtual Protocol</span>
+                <button class="sign-agreement-btn" id="virtualProtocolSignBtn" onclick="openVirtualProtocolSignatureModal()" disabled>
+                    <span id="virtualProtocolSignBtnText">Please scroll to the bottom to sign</span>
                 </button>
 
                 <button class="previous-btn" onclick="previousStep()">
@@ -1523,8 +1528,9 @@
             // Initialize signature canvases
             initSignaturePads();
 
-            // Initialize scroll-to-accept for TLP Red page
+            // Initialize scroll-to-accept for TLP Red and Virtual Protocol pages
             initTLPRedScrollDetection();
+            initVirtualProtocolScrollDetection();
         });
 
         async function loadOrganizationData() {
@@ -1800,6 +1806,7 @@
         // ========================================
 
         let tlpRedScrolledToBottom = false;
+        let virtualProtocolScrolledToBottom = false;
 
         function initTLPRedScrollDetection() {
             const scrollContainer = document.getElementById('tlpRedScrollContainer');
@@ -1865,6 +1872,76 @@
                 // Only auto-check if content is definitely short and fully rendered
                 if (scrollHeight > 100 && scrollHeight <= clientHeight + 10) {
                     console.log('Content is short, auto-enabling sign button');
+                    checkScrollPosition();
+                }
+                // Otherwise, user MUST scroll - don't auto-enable
+            }, 500);
+        }
+
+        function initVirtualProtocolScrollDetection() {
+            const scrollContainer = document.getElementById('virtualProtocolScrollContainer');
+            const scrollIndicator = document.getElementById('virtualProtocolScrollIndicator');
+            const signBtn = document.getElementById('virtualProtocolSignBtn');
+            const signBtnText = document.getElementById('virtualProtocolSignBtnText');
+
+            if (!scrollContainer) return;
+
+            // Start pulsing the scroll container to encourage reading
+            scrollContainer.classList.add('pulse');
+
+            // Check if user has scrolled to bottom
+            function checkScrollPosition() {
+                const scrollTop = scrollContainer.scrollTop;
+                const scrollHeight = scrollContainer.scrollHeight;
+                const clientHeight = scrollContainer.clientHeight;
+
+                console.log('Virtual Protocol scroll check:', { scrollTop, scrollHeight, clientHeight });
+
+                // Only consider "at bottom" if:
+                // 1. Content is short enough to not need scrolling (scrollHeight <= clientHeight + 10)
+                //    AND content is fully loaded (scrollHeight > 100)
+                // 2. OR user has actually scrolled near the bottom
+                const contentIsShort = scrollHeight <= clientHeight + 10 && scrollHeight > 100;
+                const scrolledToBottom = scrollTop + clientHeight >= scrollHeight - 5 && scrollTop > 0;
+                const isAtBottom = contentIsShort || scrolledToBottom;
+
+                if (isAtBottom && !virtualProtocolScrolledToBottom) {
+                    virtualProtocolScrolledToBottom = true;
+
+                    // Stop pulsing scroll container
+                    scrollContainer.classList.remove('pulse');
+
+                    // Hide scroll indicator
+                    scrollIndicator.classList.add('hidden');
+
+                    // Enable sign button
+                    signBtn.disabled = false;
+                    signBtnText.textContent = 'Click to Sign Virtual Protocol';
+
+                    // Pulse the sign button to show it's the next step
+                    signBtn.classList.add('pulse');
+
+                    // Remove pulse when they click to sign
+                    signBtn.addEventListener('click', () => {
+                        signBtn.classList.remove('pulse');
+                    }, { once: true });
+
+                    console.log('✅ User scrolled to bottom of Virtual Protocol agreement');
+                }
+            }
+
+            // Add scroll listener
+            scrollContainer.addEventListener('scroll', checkScrollPosition);
+
+            // Check initial position ONLY after content is fully loaded
+            // Give time for DOM to fully render the content
+            setTimeout(() => {
+                const scrollHeight = scrollContainer.scrollHeight;
+                const clientHeight = scrollContainer.clientHeight;
+
+                // Only auto-check if content is definitely short and fully rendered
+                if (scrollHeight > 100 && scrollHeight <= clientHeight + 10) {
+                    console.log('Virtual Protocol content is short, auto-enabling sign button');
                     checkScrollPosition();
                 }
                 // Otherwise, user MUST scroll - don't auto-enable

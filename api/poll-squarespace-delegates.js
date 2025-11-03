@@ -1,7 +1,7 @@
 // api/poll-squarespace-delegates.js - Poll Squarespace for new delegate orders
 // This runs every 5 minutes via Vercel cron
 
-import { sendErrorNotification } from './lib/ses-mailer.js';
+import { sendErrorNotification } from './lib/resend-mailer.js';
 
 export default async function handler(req, res) {
   console.log('🔄 Starting Squarespace delegate order polling...');

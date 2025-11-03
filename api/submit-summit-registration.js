@@ -571,7 +571,7 @@ export default async function handler(req, res) {
     console.log('📧 Sending confirmation email to primary member...');
 
     try {
-      const { sendEmail } = await import('./lib/ses-mailer.js');
+      const { sendEmail } = await import('./lib/resend-mailer.js');
 
       const primaryEmail = org.properties["Primary Email"]?.email ||
                           org.properties["Contact Email"]?.email ||

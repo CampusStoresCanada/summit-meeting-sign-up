@@ -1,5 +1,5 @@
 // api/squarespace-delegate-webhook.js - Process conference delegate registrations from Squarespace
-import { sendErrorNotification } from './lib/ses-mailer.js';
+import { sendErrorNotification } from './lib/resend-mailer.js';
 
 export default async function handler(req, res) {
   // Squarespace webhooks are always POST

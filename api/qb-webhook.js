@@ -1,6 +1,6 @@
 // api/qb-webhook.js - Receive QuickBooks webhook notifications for payments
 import crypto from 'crypto';
-import { sendErrorNotification } from './lib/ses-mailer.js';
+import { sendErrorNotification } from './lib/resend-mailer.js';
 
 export default async function handler(req, res) {
   // QB webhooks are always POST

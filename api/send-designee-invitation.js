@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     console.log('📧 Sending designee invitation to:', designeeEmail);
 
     // Import email utility
-    const { sendEmail } = await import('./lib/ses-mailer.js');
+    const { sendEmail } = await import('./lib/resend-mailer.js');
 
     // Construct designee registration URL
     const baseUrl = process.env.VERCEL_URL

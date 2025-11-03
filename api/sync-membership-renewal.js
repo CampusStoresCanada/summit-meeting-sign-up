@@ -1,5 +1,5 @@
 // api/sync-membership-renewal.js - Batch sync all membership renewal data to Notion
-import { sendErrorNotification } from './lib/ses-mailer.js';
+import { sendErrorNotification } from './lib/resend-mailer.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', 'https://membershiprenewal.campusstores.ca');

@@ -151,7 +151,7 @@ export default async function handler(req, res) {
 
     // Step 5: Send confirmation emails
     try {
-      const { sendEmail } = await import('./lib/ses-mailer.js');
+      const { sendEmail } = await import('./lib/resend-mailer.js');
 
       // Email to designee
       if (designeeEmail) {

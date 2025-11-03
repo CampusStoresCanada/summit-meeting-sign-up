@@ -14,6 +14,18 @@
 
     <!-- Summit-Specific Styles -->
     <style>
+        /* Layout Adjustments for Summit Registration */
+        .welcome-section {
+            width: 65% !important;
+            max-width: 800px;
+            margin-top: 80px !important;
+        }
+
+        .welcome-title {
+            font-size: 2.5vw !important;
+            margin-bottom: 25px !important;
+        }
+
         /* Serious/Confidential Tone Styling */
         .summit-warning {
             background: #fff3cd;
@@ -571,6 +583,15 @@
 
         /* Mobile responsive adjustments */
         @media (max-width: 768px) {
+            .welcome-section {
+                width: 100% !important;
+                margin-top: 40px !important;
+            }
+
+            .welcome-title {
+                font-size: 6vw !important;
+            }
+
             .primary-member-card {
                 flex-direction: column;
                 align-items: stretch;
@@ -593,6 +614,17 @@
             .modal-cancel-btn,
             .modal-save-btn {
                 width: 100%;
+            }
+        }
+
+        /* Tablet responsive adjustments */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .welcome-section {
+                width: 70% !important;
+            }
+
+            .welcome-title {
+                font-size: 3vw !important;
             }
         }
     </style>

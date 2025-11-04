@@ -45,14 +45,23 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         filter: {
           property: 'Designee Token',
-          rich_text: { equals: token }
+          rich_text: { contains: token }
         }
       })
     });
 
+    console.log('🔍 Query response status:', regResponse.status);
+
     const regData = await regResponse.json();
 
+    if (!regResponse.ok) {
+      console.error('❌ Failed to query registrations:', regData);
+      res.status(regResponse.status).json({ error: 'Failed to load registration', details: regData });
+      return;
+    }
+
     if (regData.results.length === 0) {
+      console.error('❌ No registration found for token:', token.substring(0, 20) + '...');
       res.status(404).json({ error: 'Registration not found or token invalid' });
       return;
     }
@@ -101,6 +110,8 @@ export default async function handler(req, res) {
     }
 
     // Step 4: Get designee contact info
+    // NOTE: "Designee Contact" field doesn't exist in the database schema yet
+    // Until it's added, we can't link the designee contact to the registration
     const designeeRelation = registration.properties["Designee Contact"]?.relation?.[0]?.id;
     let designeeName = 'Unknown Designee';
 
@@ -115,6 +126,8 @@ export default async function handler(req, res) {
 
       const contactData = await contactResponse.json();
       designeeName = contactData.properties.Name?.title?.[0]?.text?.content || designeeName;
+    } else {
+      console.log('⚠️ Designee Contact field missing - add this field to Summit Meeting Registration database as a Relation to Contacts');
     }
 
     // Step 5: Get attendance format

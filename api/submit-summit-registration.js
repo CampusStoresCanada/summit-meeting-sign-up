@@ -317,10 +317,11 @@ export default async function handler(req, res) {
     // Add designee information if applicable
     if (hasDesignee) {
       // NOTE: The following fields are missing from the database schema:
-      // - "Designee Contact" (relation) - designee contact is created but not linked to registration
-      // - "Designee Token" (this is a formula field, cannot write to it)
       // - "Designee Is Attending" (doesn't exist)
-      // The designee token is generated and emailed but not stored in the database.
+
+      registrationProperties["Designee Token"] = {
+        rich_text: [{ text: { content: designeeToken } }]
+      };
 
       registrationProperties["Designee Token Expires"] = {
         date: { start: designeeTokenExpires }
@@ -329,6 +330,14 @@ export default async function handler(req, res) {
       registrationProperties["Designee Attendance Format"] = {
         select: { name: designeeFormat === 'in-person' ? 'In-Person' : 'Virtual' }
       };
+
+      // Link to designee contact if we have an ID
+      // NOTE: This will only work if "Designee Contact" relation field exists in the database
+      if (designeeContactId) {
+        registrationProperties["Designee Contact"] = {
+          relation: [{ id: designeeContactId }]
+        };
+      }
 
       if (certificationUrl) {
         registrationProperties["Primary Certification URL"] = {

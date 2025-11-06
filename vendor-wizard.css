@@ -243,6 +243,21 @@ body::before {
     background: rgba(255, 255, 255, 0.3);
 }
 
+.step-indicator.completed {
+    opacity: 0.8;
+    text-decoration: line-through;
+}
+
+.step-indicator.completed .step-number {
+    background: #28a745;
+    color: white;
+}
+
+.step-indicator.completed .step-number::after {
+    content: '✓';
+    position: absolute;
+}
+
 .step-number {
     width: 32px;
     height: 32px;

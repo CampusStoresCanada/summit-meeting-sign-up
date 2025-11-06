@@ -1162,10 +1162,10 @@
                         <h3>The Rules</h3>
                         <p><strong>In-Person:</strong> "What's said in the room stays in the room. No recording of any kind. No sharing notes or information afterward."</p>
 
-                        <p><strong>Virtual:</strong> You must be alone, camera on, microphone active throughout, no recording, no sharing information afterward.</p>
+                        <p><strong>Virtual:</strong> You must be alone, camera on, microphone available and tested prior to the meeting starting, no recording, no sharing information afterward.</p>
 
                         <h3>Consequences</h3>
-                        <p>Breaking confidentiality results in immediate membership termination with no appeals or refunds.</p>
+                        <p>Breaking confidentiality may result in immediate membership termination with no appeals or refunds.</p>
                     </div>
                     <div class="scroll-indicator" id="tlpRedScrollIndicator">
                         ↓ Scroll down to continue ↓
@@ -1219,11 +1219,11 @@
                             <li>No virtual backgrounds</li>
                         </ul>
 
-                        <p><strong>3. Microphone Active - Audio Verification Required:</strong></p>
+                        <p><strong>3. Microphone Available - Audio Verification Required:</strong></p>
                         <ul>
-                            <li>Your microphone must be <strong>unmuted and active</strong> throughout the meeting</li>
-                            <li>We need to hear your environment to verify you are alone</li>
-                            <li>You may not mute except when instructed by the host</li>
+                            <li>Your microphone must be <strong>available and tested</strong> prior to the meeting starting</li>
+                            <li>We need to verify your audio is working properly</li>
+                            <li>Follow host instructions regarding muting during the meeting</li>
                         </ul>
 
                         <p><strong>4. Immediate Drop-Out Rule - Zero Tolerance:</strong></p>
@@ -1234,16 +1234,16 @@
                             <li>Examples: delivery person, family member, pet, cleaning staff, maintenance - ANYONE</li>
                         </ul>
 
-                        <p><strong>5. No Recording or Notes:</strong></p>
+                        <p><strong>5. No Recording:</strong></p>
                         <ul>
                             <li>Absolutely no audio or video recording of any kind</li>
                             <li>No screenshots or screen recording</li>
-                            <li>No note-taking</li>
+                            <li>Notes must be personal, accounted for, and disposed of appropriately if they contain sensitive materials</li>
                             <li>Close all other applications except the video conference</li>
                         </ul>
 
                         <h3>Consequences</h3>
-                        <p>Violation of any virtual protocol rule will result in:</p>
+                        <p>Violation of any virtual protocol rule may result in:</p>
                         <ul>
                             <li>Immediate removal from the current meeting</li>
                             <li>Possible termination of CSC membership</li>
@@ -1322,7 +1322,7 @@
                         <li><strong>Can share information independently</strong> without having to clear things with you or their collective bargaining agreement</li>
                     </ul>
 
-                    <p style="margin-bottom: 0;"><strong>We're serious.</strong> This is not a casual invitation—your alternate must be able to participate fully and independently in sensitive, strategic discussions.</p>
+                    <p style="margin-bottom: 0;">This is not a casual invitation—your alternate must be able to participate fully and independently in sensitive, strategic discussions.</p>
                 </div>
 
                 <div class="radio-group">
@@ -2816,15 +2816,63 @@
             document.getElementById('nextStepsMessage').innerHTML = nextSteps;
         }
 
+        // Helper function to map section IDs to step numbers
+        function getSidebarStepNumber(sectionId) {
+            // Map section IDs to sidebar step numbers
+            if (sectionId === 'step1Section' || sectionId === 'step2Section') return 1;
+            if (sectionId.startsWith('step3')) return 2; // step3aSection, step3bSection, step3bvSection, step3cSection
+            if (sectionId === 'step4Section') return 3;
+            if (sectionId === 'step5Section' || sectionId === 'step6Section' || sectionId === 'step7Section') return 4;
+            return null;
+        }
+
+        // Update sidebar navigation
+        function updateSidebarNavigation(currentSectionId, nextSectionId) {
+            const currentStep = getSidebarStepNumber(currentSectionId);
+            const nextStep = getSidebarStepNumber(nextSectionId);
+
+            // Mark current step as completed
+            if (currentStep) {
+                const currentStepIndicator = document.querySelector(`.step-indicator[data-step="${currentStep}"]`);
+                if (currentStepIndicator) {
+                    currentStepIndicator.classList.remove('active');
+                    currentStepIndicator.classList.add('completed');
+                }
+            }
+
+            // Mark next step as active
+            if (nextStep) {
+                const nextStepIndicator = document.querySelector(`.step-indicator[data-step="${nextStep}"]`);
+                if (nextStepIndicator) {
+                    nextStepIndicator.classList.add('active');
+                    nextStepIndicator.classList.remove('completed');
+                }
+            }
+        }
+
         // Navigation
         async function nextStep() {
             // Handle conditional flow
+            const currentSection = document.querySelector('.content-section.active');
+            const currentSectionId = currentSection.id;
             const nextStepSection = determineNextStep();
 
             if (nextStepSection === 'submit') {
+                // Mark current step as completed before submitting
+                const currentStep = getSidebarStepNumber(currentSectionId);
+                if (currentStep) {
+                    const currentStepIndicator = document.querySelector(`.step-indicator[data-step="${currentStep}"]`);
+                    if (currentStepIndicator) {
+                        currentStepIndicator.classList.remove('active');
+                        currentStepIndicator.classList.add('completed');
+                    }
+                }
                 await submitRegistration();
                 return;
             }
+
+            // Update sidebar navigation
+            updateSidebarNavigation(currentSectionId, nextStepSection);
 
             // Initialize next step if needed based on the actual section we're going to
             if (nextStepSection === 'step4Section') {

@@ -244,18 +244,24 @@ body::before {
 }
 
 .step-indicator.completed {
-    opacity: 0.8;
+    opacity: 1;
     text-decoration: line-through;
 }
 
 .step-indicator.completed .step-number {
-    background: #28a745;
-    color: white;
+    background: #ba003b;
+    color: transparent;
+    position: relative;
 }
 
-.step-indicator.completed .step-number::after {
+.step-indicator.completed .step-number::before {
     content: '✓';
+    color: white;
     position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.1em;
 }
 
 .step-number {

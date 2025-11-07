@@ -295,7 +295,7 @@
 
         <div class="summit-critical">
             <p><strong>Please read the following confidentiality requirements carefully.</strong></p>
-            <p>You must agree to all terms and upload a signed copy to proceed.</p>
+            <p>You must agree to all terms to proceed.</p>
         </div>
 
         <div class="agreement-text">
@@ -416,19 +416,6 @@
             </div>
         </div>
 
-        <!-- File Upload -->
-        <h2>Upload Signed Agreement</h2>
-
-        <div class="file-upload-area" id="agreementUploadArea">
-            <label for="agreementFile" class="file-upload-label">
-                <p style="font-weight: 600; margin-bottom: 0.5em;">Upload Your Signed Confidentiality Agreement</p>
-                <p style="color: #6c757d; font-size: 0.9em;">Click to select a PDF or image file (JPG, PNG)</p>
-                <p style="color: #6c757d; font-size: 0.85em; margin-top: 0.5em;">Maximum file size: 5MB</p>
-            </label>
-            <input type="file" id="agreementFile" class="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileUpload(event)">
-            <div id="agreementFileName" class="file-name-display" style="display: none;"></div>
-        </div>
-
         <!-- Submit Button -->
         <div style="text-align: center; margin-top: 3em;">
             <button class="btn btn-primary" id="submitBtn" onclick="submitDesigneeAgreement()" disabled style="padding: 1em 3em; font-size: 1.1em;">
@@ -452,7 +439,6 @@
         // Global State
         let designeeToken = '';
         let registrationData = {};
-        let uploadedFile = null;
         let isVirtual = false;
 
         // Initialize on page load
@@ -524,9 +510,8 @@
             const allChecks = [...baseChecks, ...virtualCheck];
 
             const allChecked = allChecks.every(id => document.getElementById(id).checked);
-            const hasFile = uploadedFile !== null;
 
-            document.getElementById('submitBtn').disabled = !(allChecked && hasFile);
+            document.getElementById('submitBtn').disabled = !allChecked;
 
             // Update checkbox styling
             document.querySelectorAll('.checkbox-item').forEach(item => {
@@ -539,27 +524,6 @@
             });
         }
 
-        async function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // Validate file size (5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                alert('File size must be less than 5MB');
-                event.target.value = '';
-                return;
-            }
-
-            uploadedFile = file;
-
-            // Show file name
-            document.getElementById('agreementFileName').textContent = `✓ ${file.name}`;
-            document.getElementById('agreementFileName').style.display = 'block';
-            document.getElementById('agreementUploadArea').classList.add('has-file');
-
-            updateAgreementState();
-        }
-
         async function submitDesigneeAgreement() {
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
@@ -568,41 +532,12 @@
             document.getElementById('uploadingState').style.display = 'flex';
 
             try {
-                // Upload file first
-                const reader = new FileReader();
-                const fileBase64 = await new Promise((resolve) => {
-                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
-                    reader.readAsDataURL(uploadedFile);
-                });
-
-                const uploadResponse = await fetch('/api/upload-summit-files', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        files: [{
-                            name: uploadedFile.name,
-                            content: fileBase64,
-                            type: uploadedFile.type,
-                            fieldName: 'designeeAgreement'
-                        }],
-                        organizationName: registrationData.institutionName,
-                        token: designeeToken
-                    })
-                });
-
-                const uploadResult = await uploadResponse.json();
-
-                if (!uploadResult.success) {
-                    throw new Error('File upload failed');
-                }
-
                 // Submit agreement
                 const submitResponse = await fetch('/api/submit-designee-agreement', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         designeeToken: designeeToken,
-                        agreementUrl: uploadResult.urls.designeeAgreement,
                         virtualProtocolAcknowledged: isVirtual
                     })
                 });
@@ -613,7 +548,7 @@
                     // Show confirmation
                     document.querySelector('.designee-container').scrollTop = 0;
                     document.getElementById('confirmationSection').style.display = 'block';
-                    document.querySelectorAll('h2, .designation-info, .summit-critical, .summit-warning, .agreement-text, .checkbox-group, .file-upload-area, #submitBtn').forEach(el => {
+                    document.querySelectorAll('h2, .designation-info, .summit-critical, .summit-warning, .agreement-text, .checkbox-group, #submitBtn').forEach(el => {
                         el.style.display = 'none';
                     });
                 } else {

@@ -1357,10 +1357,10 @@
                     </div>
                 </div>
 
-                <h1>Select Your Alternate</h1>
+                <h1>Select Your Alternate(s)</h1>
 
                 <div class="summit-info">
-                    <p>Choose who you would like to designate as your alternate from your team:</p>
+                    <p>You may select up to 2 people from your team to designate as alternates. Click their name to toggle selection.</p>
                 </div>
 
                 <div class="team-container">
@@ -1397,26 +1397,14 @@
                     </div>
                 </div>
 
-                <h1>Alternate Attendance Format</h1>
+                <h1>Alternate Attendance Formats</h1>
 
-                <div class="radio-group">
-                    <p style="font-weight: 600; margin-bottom: 1em;">How will <span id="alternateNameDisplay"></span> attend?</p>
+                <div class="summit-info">
+                    <p>Please select how each designee will attend the summit:</p>
+                </div>
 
-                    <div class="radio-item" onclick="selectAlternateFormat('in-person')">
-                        <input type="radio" name="alternateFormat" id="alternateFormatInPerson" value="in-person">
-                        <label for="alternateFormatInPerson">
-                            In Person
-                            <div class="explanation-text">They will attend the summit in person at the Fallsview Sheraton Hotel, in Niagara Falls, Ontario</div>
-                        </label>
-                    </div>
-
-                    <div class="radio-item" onclick="selectAlternateFormat('virtual')">
-                        <input type="radio" name="alternateFormat" id="alternateFormatVirtual" value="virtual">
-                        <label for="alternateFormatVirtual">
-                            Virtual (Online)
-                            <div class="explanation-text">They will attend the summit remotely via video conference</div>
-                        </label>
-                    </div>
+                <div id="designeeFormatsContainer">
+                    <!-- Designee format selections will be dynamically added here -->
                 </div>
 
                 <button class="previous-btn" onclick="previousStep()">
@@ -1550,11 +1538,11 @@
             primaryVirtualAgreed: false,
             primaryBreachAck: false,
 
-            // Designee
+            // Designee(s) - support up to 2
             hasDesignee: null,
-            designeeContact: null,
-            designeeIsNew: false,
-            designeeFormat: null,
+            designeeContacts: [], // Array of selected contacts
+            designeeFormats: {}, // Object mapping contact ID to format
+            newDesignees: [], // Array of new designee contacts to create
 
             // Certification
             certificationChecks: [],
@@ -2520,7 +2508,7 @@
             // Get dietary restrictions from Notion contact data
             const dietaryRestrictions = contact.dietaryRestrictions || 'Dietary Restrictions Unknown';
 
-            const isSelected = registrationState.designeeContact?.id === contact.id;
+            const isSelected = registrationState.designeeContacts.some(d => d.id === contact.id);
 
             contactDiv.innerHTML = `
                 <div class="designate-button-wrapper" onclick="selectAlternateContact('${contact.id}'); event.stopPropagation();" title="Click to designate as alternate">
@@ -2544,26 +2532,32 @@
             const contact = organizationContacts.find(c => c.id === contactId);
             if (!contact) return;
 
-            registrationState.designeeContact = contact;
-            registrationState.designeeIsNew = false;
+            const currentIndex = registrationState.designeeContacts.findIndex(d => d.id === contactId);
 
-            // Update all buttons
-            document.querySelectorAll('.designate-btn').forEach(btn => {
-                btn.classList.remove('designated');
-                btn.textContent = 'Designate';
-            });
-
-            // Highlight selected
-            const selectedBtn = document.querySelector(`[data-contact-id="${contactId}"] .designate-btn`);
-            if (selectedBtn) {
-                selectedBtn.classList.add('designated');
-                selectedBtn.textContent = '✓ Designated';
+            if (currentIndex >= 0) {
+                // Already selected - remove it
+                registrationState.designeeContacts.splice(currentIndex, 1);
+                delete registrationState.designeeFormats[contactId];
+            } else {
+                // Not selected - add it if under max limit
+                if (registrationState.designeeContacts.length >= 2) {
+                    alert('You can only select up to 2 designees. Please deselect one first.');
+                    return;
+                }
+                registrationState.designeeContacts.push(contact);
             }
 
-            // Enable next button
-            document.getElementById('step5NextBtn').disabled = false;
+            // Refresh the list to update button states
+            populateAlternateList();
 
-            console.log(`✅ Designated ${contact.name} as alternate`);
+            // Enable/disable next button based on selection
+            const step5NextBtn = document.getElementById('step5NextBtn');
+            if (step5NextBtn) {
+                step5NextBtn.disabled = registrationState.designeeContacts.length === 0;
+            }
+
+            const action = currentIndex >= 0 ? 'Removed' : 'Added';
+            console.log(`✅ ${action} ${contact.name} - Total designees: ${registrationState.designeeContacts.length}`);
         }
 
         function formatPhoneForDisplay(phone) {

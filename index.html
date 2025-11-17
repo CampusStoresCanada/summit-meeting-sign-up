@@ -2559,6 +2559,8 @@
         }
 
         function formatPhoneForDisplay(phone) {
+            if (!phone) return '';
+
             // Remove all non-digit characters
             const digits = phone.replace(/\D/g, '');
 

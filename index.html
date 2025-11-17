@@ -1607,7 +1607,15 @@
                     organizationData = data;
 
                     // Set primary member contact to the designee's info
-                    primaryMemberContact = data.contact;
+                    // Map API field names to expected field names
+                    primaryMemberContact = {
+                        id: data.contact?.id,
+                        name: data.contact?.name,
+                        firstName: data.contact?.firstName,
+                        roleTitle: data.contact?.title,
+                        workEmail: data.contact?.email,
+                        workPhone: data.contact?.phone
+                    };
 
                     // Pre-select their attendance format
                     registrationState.primaryFormat = data.attendanceFormat;

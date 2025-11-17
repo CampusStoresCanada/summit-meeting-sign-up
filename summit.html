@@ -3102,7 +3102,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     files: files,
-                    organizationName: organizationData.organizationName,
+                    organizationName: organizationData.organization?.name,
                     token: token
                 })
             });

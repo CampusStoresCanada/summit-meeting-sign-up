@@ -27,11 +27,14 @@ export default async function handler(req, res) {
   try {
     const {
       designeeToken,
-      agreementUrl,
-      virtualProtocolAcknowledged
+      registrationId,
+      tlpRedSignatureUrl,
+      employmentSignatureUrl,
+      virtualProtocolSignatureUrl,
+      attendanceFormat
     } = req.body;
 
-    if (!designeeToken || !agreementUrl) {
+    if (!designeeToken || !tlpRedSignatureUrl || !employmentSignatureUrl) {
       res.status(400).json({ error: 'Missing required fields' });
       return;
     }
@@ -71,12 +74,18 @@ export default async function handler(req, res) {
       return;
     }
 
-    // Step 3: Update registration with designee agreement
+    // Step 3: Update registration with designee signatures and acknowledgments
     const updateProperties = {
-      "Designee Agreement URL": {
-        url: agreementUrl
+      "Designee TLP Red Signature URL": {
+        url: tlpRedSignatureUrl
+      },
+      "Designee Employment Signature URL": {
+        url: employmentSignatureUrl
       },
       "Designee Breach Acknowledgment": {
+        checkbox: true
+      },
+      "Designee Registration Complete": {
         checkbox: true
       },
       "Designee Completed At": {
@@ -84,9 +93,20 @@ export default async function handler(req, res) {
       }
     };
 
-    if (virtualProtocolAcknowledged) {
+    // Add virtual protocol signature if provided
+    if (virtualProtocolSignatureUrl) {
+      updateProperties["Designee Virtual Protocol Signature URL"] = {
+        url: virtualProtocolSignatureUrl
+      };
       updateProperties["Designee Virtual Protocol Acknowledged"] = {
         checkbox: true
+      };
+    }
+
+    // Update attendance format if provided
+    if (attendanceFormat) {
+      updateProperties["Designee Attendance Format"] = {
+        select: { name: attendanceFormat === 'in-person' ? 'In-Person' : 'Virtual' }
       };
     }
 

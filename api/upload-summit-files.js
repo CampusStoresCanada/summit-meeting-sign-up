@@ -21,10 +21,17 @@ export default async function handler(req, res) {
 
     console.log('🔍 Summit file upload - Organization:', organizationName);
     console.log('🔍 Summit file upload - Files:', files?.length);
+    console.log('🔍 Summit file upload - Token:', token);
 
     if (!files || !Array.isArray(files) || files.length === 0) {
       console.log('❌ No files provided');
       res.status(400).json({ error: 'No files provided' });
+      return;
+    }
+
+    if (!organizationName && !token) {
+      console.log('❌ No organization identifier provided');
+      res.status(400).json({ error: 'Organization name or token required' });
       return;
     }
 
@@ -43,7 +50,12 @@ export default async function handler(req, res) {
       designeeAgreement: null
     };
 
-    const basePath = `summit/${organizationName.replace(/[^a-zA-Z0-9 ]/g, '-').replace(/\s+/g, '-')}/`;
+    // Use organization name if available, otherwise use token as folder name
+    const folderName = organizationName
+      ? organizationName.replace(/[^a-zA-Z0-9 ]/g, '-').replace(/\s+/g, '-')
+      : token?.replace(/[^a-zA-Z0-9-]/g, '-').substring(0, 50) || 'unknown';
+
+    const basePath = `summit/${folderName}/`;
 
     // Upload each file to S3
     for (const fileData of files) {

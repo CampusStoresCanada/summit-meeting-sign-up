@@ -540,8 +540,8 @@ export default async function handler(req, res) {
         const { sendEmail } = await import('./lib/resend-mailer.js');
 
         // Construct designee registration URL
-        const baseUrl = process.env.PRODUCTION_URL || 'https://summit.campusstores.ca';
-        const designeeUrl = `${baseUrl}/designee.html?token=${designeeToken}`;
+        const baseUrl = process.env.PRODUCTION_URL || 'https://summit26.campusstores.ca';
+        const designeeUrl = `${baseUrl}/?token=${designeeToken}`;
 
         console.log('🔗 Designee URL:', designeeUrl);
 

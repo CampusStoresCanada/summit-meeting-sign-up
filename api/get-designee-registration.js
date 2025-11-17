@@ -110,10 +110,8 @@ export default async function handler(req, res) {
     }
 
     // Step 4: Get designee contact info
-    // NOTE: "Designee Contact" field doesn't exist in the database schema yet
-    // Until it's added, we can't link the designee contact to the registration
     const designeeRelation = registration.properties["Designee Contact"]?.relation?.[0]?.id;
-    let designeeName = 'Unknown Designee';
+    let designeeContact = null;
 
     if (designeeRelation) {
       const contactResponse = await fetch(`https://api.notion.com/v1/pages/${designeeRelation}`, {
@@ -125,9 +123,16 @@ export default async function handler(req, res) {
       });
 
       const contactData = await contactResponse.json();
-      designeeName = contactData.properties.Name?.title?.[0]?.text?.content || designeeName;
+      designeeContact = {
+        id: contactData.id,
+        name: contactData.properties.Name?.title?.[0]?.text?.content || '',
+        firstName: contactData.properties["First Name"]?.rich_text?.[0]?.text?.content || '',
+        email: contactData.properties["Work Email"]?.email || '',
+        phone: contactData.properties["Work Phone Number"]?.phone_number || '',
+        title: contactData.properties["Role/Title"]?.rich_text?.[0]?.text?.content || ''
+      };
     } else {
-      console.log('⚠️ Designee Contact field missing - add this field to Summit Meeting Registration database as a Relation to Contacts');
+      console.log('⚠️ No Designee Contact linked to registration');
     }
 
     // Step 5: Get attendance format
@@ -136,12 +141,17 @@ export default async function handler(req, res) {
     // Step 6: Check if already completed
     const alreadyCompleted = registration.properties["Designee Registration Complete"]?.checkbox || false;
 
-    console.log('✅ Loaded designee data for:', designeeName);
+    console.log('✅ Loaded designee data for:', designeeContact?.name || 'Unknown');
 
+    // Return data in same structure as get-organization.js for compatibility
     res.status(200).json({
       registrationId: registration.id,
-      designeeName: designeeName,
-      institutionName: organizationName,
+      organizationId: orgRelation,
+      isDesignee: true,
+      contact: designeeContact,
+      organization: {
+        name: organizationName
+      },
       primaryMemberName: primaryMemberName,
       attendanceFormat: attendanceFormat.includes('virtual') ? 'virtual' : 'in-person',
       alreadyCompleted: alreadyCompleted

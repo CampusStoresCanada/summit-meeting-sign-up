@@ -45,9 +45,10 @@ export default async function handler(req, res) {
     });
 
     const uploadedUrls = {
-      primaryAgreement: null,
-      certification: null,
-      designeeAgreement: null
+      tlpRedAgreement: null,
+      employmentAgreement: null,
+      virtualProtocol: null,
+      certification: null
     };
 
     // Use organization name if available, otherwise use token as folder name
@@ -69,15 +70,18 @@ export default async function handler(req, res) {
         let subFolder = '';
         let urlField = null;
 
-        if (fileData.fieldName === 'primaryAgreement') {
-          subFolder = 'primary-agreements/';
-          urlField = 'primaryAgreement';
+        if (fileData.fieldName === 'tlpRedAgreement') {
+          subFolder = 'tlp-red-agreements/';
+          urlField = 'tlpRedAgreement';
+        } else if (fileData.fieldName === 'employmentAgreement') {
+          subFolder = 'employment-agreements/';
+          urlField = 'employmentAgreement';
+        } else if (fileData.fieldName === 'virtualProtocol') {
+          subFolder = 'virtual-protocols/';
+          urlField = 'virtualProtocol';
         } else if (fileData.fieldName === 'certification') {
           subFolder = 'certifications/';
           urlField = 'certification';
-        } else if (fileData.fieldName === 'designeeAgreement') {
-          subFolder = 'designee-agreements/';
-          urlField = 'designeeAgreement';
         }
 
         const s3Key = `${basePath}${subFolder}${timestamp}_${fileName}`;

@@ -3172,6 +3172,12 @@
             });
 
             const result = await response.json();
+
+            if (!response.ok) {
+                console.error('❌ File upload failed:', result);
+                throw new Error(result.error || 'File upload failed');
+            }
+
             return result.urls || {};
         }
     </script>

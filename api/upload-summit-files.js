@@ -36,6 +36,13 @@ export default async function handler(req, res) {
     }
 
     // Initialize S3 client
+    console.log('🔍 AWS Config:', {
+      region: process.env.AWS_REGION,
+      bucket: process.env.AWS_S3_BUCKET,
+      hasAccessKey: !!process.env.AWS_ACCESS_KEY_ID,
+      hasSecretKey: !!process.env.AWS_SECRET_ACCESS_KEY
+    });
+
     const s3Client = new S3Client({
       region: process.env.AWS_REGION,
       credentials: {
@@ -124,9 +131,19 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('💥 Summit file upload error:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       error: 'Failed to upload files',
-      details: error.message
+      details: error.message,
+      errorName: error.name,
+      awsConfig: {
+        hasRegion: !!process.env.AWS_REGION,
+        hasBucket: !!process.env.AWS_S3_BUCKET,
+        region: process.env.AWS_REGION,
+        bucket: process.env.AWS_S3_BUCKET
+      }
     });
   }
 }

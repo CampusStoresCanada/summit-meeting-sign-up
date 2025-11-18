@@ -1400,6 +1400,10 @@
                 <h1>Alternate Attendance Formats</h1>
 
                 <div class="summit-info">
+                    <p><strong>Selected Alternates:</strong></p>
+                    <div id="selectedDesigneesDisplay" style="margin-top: 0.5em; margin-bottom: 1.5em;">
+                        <!-- Selected designees list will be shown here -->
+                    </div>
                     <p>Please select how each designee will attend the summit:</p>
                 </div>
 
@@ -2743,6 +2747,19 @@
         function initializeStep6() {
             const container = document.getElementById('designeeFormatsContainer');
             if (!container) return;
+
+            // Show selected designees list
+            const selectedDisplay = document.getElementById('selectedDesigneesDisplay');
+            if (selectedDisplay) {
+                const designeeList = registrationState.designeeContacts.map((d, i) =>
+                    `<div style="padding: 0.5em 0; border-bottom: 1px solid #dee2e6;">
+                        ${i + 1}. <strong>${d.name}</strong>
+                        ${d.roleTitle ? ` - ${d.roleTitle}` : ''}
+                        ${d.workEmail ? `<br><span style="font-size: 0.9em; color: #6c757d;">${d.workEmail}</span>` : ''}
+                    </div>`
+                ).join('');
+                selectedDisplay.innerHTML = designeeList;
+            }
 
             container.innerHTML = '';
 

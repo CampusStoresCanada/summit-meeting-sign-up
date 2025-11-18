@@ -84,9 +84,7 @@ export default async function handler(req, res) {
       employmentSignatureUrl,
       virtualProtocolSignatureUrl,
       hasDesignee,
-      designeeContact,
-      designeeIsNew,
-      designeeFormat,
+      designees, // Array of {contact, format, isNew}
       certificationUrl
     } = req.body;
 
@@ -95,10 +93,8 @@ export default async function handler(req, res) {
       primaryIsAttending,
       primaryFormat,
       hasDesignee,
-      designeeIsNew,
-      designeeFormat,
-      primaryContactId: primaryContactId ? 'provided' : 'missing',
-      designeeContactId: designeeContact?.id ? 'provided' : 'missing'
+      designeeCount: designees?.length || 0,
+      primaryContactId: primaryContactId ? 'provided' : 'missing'
     });
 
     // Step 1: Get organization info
@@ -193,80 +189,91 @@ export default async function handler(req, res) {
     console.log('📋 Skipping existing registration check, will create new registration');
     const existingRegistration = null;
 
-    // Step 4: Handle designee contact if needed
-    let designeeContactId = null;
-    if (hasDesignee && designeeContact) {
-      if (designeeIsNew) {
-        // Create new contact
-        console.log('➕ Creating new designee contact:', designeeContact.name);
+    // Step 4: Process each designee contact and generate tokens
+    const processedDesignees = [];
 
-        const contactData = {
-          parent: { database_id: contactsDbId },
-          properties: {
-            "Name": {
-              title: [{ text: { content: designeeContact.name } }]
-            },
-            "First Name": {
-              rich_text: [{ text: { content: designeeContact.name.split(' ')[0] || '' } }]
-            },
-            "Work Email": {
-              email: designeeContact.email
-            },
-            "Work Phone Number": {
-              phone_number: designeeContact.phone || null
-            },
-            "Role/Title": {
-              rich_text: [{ text: { content: designeeContact.title || '' } }]
-            },
-            "Contact Type": {
-              multi_select: [{ name: "Vendor Partner" }]
-            },
-            "Organization": {
-              relation: [{ id: orgId }]
-            },
-            "Notes": {
-              rich_text: [{ text: { content: "Designated for Managers & Directors Summit" } }]
+    if (hasDesignee && designees && designees.length > 0) {
+      console.log(`📋 Processing ${designees.length} designee(s)...`);
+
+      for (const designeeData of designees) {
+        const { contact, format, isNew } = designeeData;
+        let contactId = null;
+
+        if (isNew) {
+          // Create new contact
+          console.log('➕ Creating new designee contact:', contact.name);
+
+          const contactData = {
+            parent: { database_id: contactsDbId },
+            properties: {
+              "Name": {
+                title: [{ text: { content: contact.name } }]
+              },
+              "First Name": {
+                rich_text: [{ text: { content: contact.name.split(' ')[0] || '' } }]
+              },
+              "Work Email": {
+                email: contact.email
+              },
+              "Work Phone Number": {
+                phone_number: contact.phone || null
+              },
+              "Role/Title": {
+                rich_text: [{ text: { content: contact.title || '' } }]
+              },
+              "Contact Type": {
+                multi_select: [{ name: "Vendor Partner" }]
+              },
+              "Organization": {
+                relation: [{ id: orgId }]
+              },
+              "Notes": {
+                rich_text: [{ text: { content: "Designated for Managers & Directors Summit" } }]
+              }
             }
+          };
+
+          const createContactResponse = await fetch('https://api.notion.com/v1/pages', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${notionToken}`,
+              'Content-Type': 'application/json',
+              'Notion-Version': '2022-06-28'
+            },
+            body: JSON.stringify(contactData)
+          });
+
+          if (createContactResponse.ok) {
+            const createdContact = await createContactResponse.json();
+            contactId = createdContact.id;
+            console.log(`✅ Created designee contact: ${contact.name}`);
+          } else {
+            const errorData = await createContactResponse.json();
+            console.error('❌ Failed to create designee contact:', errorData);
+            throw new Error(`Failed to create designee contact: ${contact.name}`);
           }
-        };
-
-        const createContactResponse = await fetch('https://api.notion.com/v1/pages', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${notionToken}`,
-            'Content-Type': 'application/json',
-            'Notion-Version': '2022-06-28'
-          },
-          body: JSON.stringify(contactData)
-        });
-
-        if (createContactResponse.ok) {
-          const createdContact = await createContactResponse.json();
-          designeeContactId = createdContact.id;
-          console.log(`✅ Created designee contact: ${designeeContact.name}`);
         } else {
-          const errorData = await createContactResponse.json();
-          console.error('❌ Failed to create designee contact:', errorData);
-          throw new Error('Failed to create designee contact');
+          // Use existing contact
+          contactId = contact.id;
+          console.log('✅ Using existing designee contact:', contact.name);
         }
-      } else {
-        // Use existing contact
-        designeeContactId = designeeContact.id;
-        console.log('✅ Using existing designee contact:', designeeContact.name);
-      }
-    }
 
-    // Step 4: Generate designee token if needed
-    let designeeToken = null;
-    let designeeTokenExpires = null;
-    if (hasDesignee) {
-      designeeToken = `designee-${crypto.randomBytes(32).toString('hex')}`;
-      // Set expiration to 14 days from now
-      const expiresDate = new Date();
-      expiresDate.setDate(expiresDate.getDate() + 14);
-      designeeTokenExpires = expiresDate.toISOString();
-      console.log('🔑 Generated designee token:', designeeToken);
-      console.log('🔑 Token expires:', designeeTokenExpires);
+        // Generate token for this designee
+        const token = `designee-${crypto.randomBytes(32).toString('hex')}`;
+        const expiresDate = new Date();
+        expiresDate.setDate(expiresDate.getDate() + 14);
+        const tokenExpires = expiresDate.toISOString();
+
+        console.log(`🔑 Generated token for ${contact.name}: ${token.substring(0, 30)}...`);
+
+        processedDesignees.push({
+          contact,
+          contactId,
+          token,
+          tokenExpires,
+          format
+        });
+      }
     }
 
     // Step 5: Build registration properties
@@ -314,36 +321,11 @@ export default async function handler(req, res) {
       };
     }
 
-    // Add designee information if applicable
-    if (hasDesignee) {
-      // NOTE: The following fields are missing from the database schema:
-      // - "Designee Is Attending" (doesn't exist)
-
-      registrationProperties["Designee Token"] = {
-        rich_text: [{ text: { content: designeeToken } }]
+    // Add certification URL if designees exist
+    if (hasDesignee && certificationUrl) {
+      registrationProperties["Primary Certification URL"] = {
+        url: certificationUrl
       };
-
-      registrationProperties["Designee Token Expires"] = {
-        date: { start: designeeTokenExpires }
-      };
-
-      registrationProperties["Designee Attendance Format"] = {
-        select: { name: designeeFormat === 'in-person' ? 'In-Person' : 'Virtual' }
-      };
-
-      // Link to designee contact if we have an ID
-      // NOTE: This will only work if "Designee Contact" relation field exists in the database
-      if (designeeContactId) {
-        registrationProperties["Designee Contact"] = {
-          relation: [{ id: designeeContactId }]
-        };
-      }
-
-      if (certificationUrl) {
-        registrationProperties["Primary Certification URL"] = {
-          url: certificationUrl
-        };
-      }
     }
 
     // Step 6: Create or update registration
@@ -474,180 +456,252 @@ export default async function handler(req, res) {
       }
     }
 
-    // Tag designee if they exist
-    if (hasDesignee && designeeContactId && (summitInPersonTagId || summitOnlineTagId)) {
+    // Step 7.5: Create separate registration records for each designee
+    const designeeRegistrationIds = [];
+
+    for (const designee of processedDesignees) {
       try {
-        const tagId = designeeFormat === 'in-person' ? summitInPersonTagId : summitOnlineTagId;
-        const tagName = designeeFormat === 'in-person' ? '26 Summit - In-Person' : '26 Summit - Online';
+        console.log(`➕ Creating registration record for designee: ${designee.contact.name}`);
 
-        if (tagId) {
-          // Get current contact to preserve existing tags
-          const contactResponse = await fetch(`https://api.notion.com/v1/pages/${designeeContactId}`, {
-            headers: {
-              'Authorization': `Bearer ${notionToken}`,
-              'Notion-Version': '2022-06-28'
-            }
-          });
+        const designeeRegId = `REG-DESIGNEE-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
-          if (contactResponse.ok) {
-            const contactData = await contactResponse.json();
-            const existingTags = contactData.properties['Personal Tag']?.relation || [];
-
-            // Check if tag already exists
-            const hasTag = existingTags.some(tag => tag.id === tagId);
-
-            if (!hasTag) {
-              // Add new tag to existing tags
-              const updatedTags = [...existingTags, { id: tagId }];
-
-              await fetch(`https://api.notion.com/v1/pages/${designeeContactId}`, {
-                method: 'PATCH',
-                headers: {
-                  'Authorization': `Bearer ${notionToken}`,
-                  'Content-Type': 'application/json',
-                  'Notion-Version': '2022-06-28'
-                },
-                body: JSON.stringify({
-                  properties: {
-                    'Personal Tag': {
-                      relation: updatedTags
-                    }
-                  }
-                })
-              });
-
-              console.log(`✅ Tagged designee contact with ${tagName}`);
-            } else {
-              console.log(`ℹ️ Designee contact already has ${tagName} tag`);
-            }
+        const designeeRegProperties = {
+          "Registration ID": {
+            title: [{ text: { content: designeeRegId } }]
+          },
+          "Organization": {
+            relation: [{ id: orgId }]
+          },
+          "Designee Contact": {
+            relation: [{ id: designee.contactId }]
+          },
+          "Designee Token": {
+            rich_text: [{ text: { content: designee.token } }]
+          },
+          "Designee Token Expires": {
+            date: { start: designee.tokenExpires }
+          },
+          "Designee Attendance Format": {
+            select: { name: designee.format === 'in-person' ? 'In-Person' : 'Virtual' }
+          },
+          "Has Designee": {
+            checkbox: false  // This IS the designee record
+          },
+          "Primary Is Attending": {
+            checkbox: false  // Designee records don't have primary attendance
+          },
+          "Created At": {
+            date: { start: new Date().toISOString() }
+          },
+          "Updated At": {
+            date: { start: new Date().toISOString() }
           }
+        };
+
+        const createDesigneeRegResponse = await fetch('https://api.notion.com/v1/pages', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${notionToken}`,
+            'Content-Type': 'application/json',
+            'Notion-Version': '2022-06-28'
+          },
+          body: JSON.stringify({
+            parent: { database_id: summitRegistrationsDbId },
+            properties: designeeRegProperties
+          })
+        });
+
+        if (!createDesigneeRegResponse.ok) {
+          const errorData = await createDesigneeRegResponse.json();
+          console.error('❌ Failed to create designee registration:', errorData);
+          throw new Error(`Failed to create designee registration for ${designee.contact.name}`);
         }
+
+        const createdDesigneeReg = await createDesigneeRegResponse.json();
+        designeeRegistrationIds.push(createdDesigneeReg.id);
+        console.log(`✅ Created designee registration: ${designeeRegId}`);
+
       } catch (error) {
-        console.error('💥 Error tagging designee contact:', error);
-        // Don't fail registration if tagging fails
+        console.error(`💥 Error creating designee registration for ${designee.contact.name}:`, error);
+        throw error;
       }
     }
 
-    // Step 8: Send designee invitation email if needed
-    if (hasDesignee && designeeToken && designeeContact) {
-      console.log('📧 Sending designee invitation email...');
-      console.log('📧 To:', designeeContact.email || designeeContact.workEmail);
-      console.log('📧 Name:', designeeContact.name);
-      console.log('📧 Token:', designeeToken);
-      console.log('📧 Format:', designeeFormat);
+    // Tag designee contacts
+    for (const designee of processedDesignees) {
+      if (summitInPersonTagId || summitOnlineTagId) {
+        try {
+          const tagId = designee.format === 'in-person' ? summitInPersonTagId : summitOnlineTagId;
+          const tagName = designee.format === 'in-person' ? '26 Summit - In-Person' : '26 Summit - Online';
 
-      try {
-        const { sendEmail } = await import('./lib/resend-mailer.js');
-
-        // Construct designee registration URL
-        const baseUrl = process.env.PRODUCTION_URL || 'https://summit26.campusstores.ca';
-        const designeeUrl = `${baseUrl}/?token=${designeeToken}`;
-
-        console.log('🔗 Designee URL:', designeeUrl);
-
-        const designeeEmail = designeeContact.email || designeeContact.workEmail;
-
-        // Build email body
-        const emailBody = `
-          <h2>You've Been Designated to Attend the Managers & Directors Summit</h2>
-
-          <p>Hello ${designeeContact.name},</p>
-
-          <p>${organizationName} has designated you to attend the CSC Managers & Directors Summit.</p>
-
-          <h3>Your Attendance Format:</h3>
-          <p><strong>${designeeFormat === 'in-person' ? 'In-Person' : 'Virtual (Online)'}</strong></p>
-
-          <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1em; margin: 1.5em 0;">
-            <p><strong>Important: This meeting requires strict confidentiality</strong></p>
-            <p>Before you can attend, you must review and sign a confidentiality agreement. This is not optional.</p>
-          </div>
-
-          <h3>Next Steps:</h3>
-          <ol>
-            <li>Click the link below to access your personalized registration form</li>
-            <li>Review the confidentiality agreement carefully</li>
-            <li>Sign the agreement and upload the signed PDF or image</li>
-            <li>Complete all required acknowledgments</li>
-          </ol>
-
-          <div style="text-align: center; margin: 2em 0;">
-            <a href="${designeeUrl}" style="background: #0071bc; color: white; padding: 1em 2em; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600;">
-              Complete Your Registration
-            </a>
-          </div>
-
-          <p><strong>This link will expire in 14 days.</strong> If you need a new link, please contact your primary member or <a href="mailto:info@campusstores.ca">info@campusstores.ca</a></p>
-
-          <h3>What is the Managers & Directors Summit?</h3>
-          <p>This is a highly confidential meeting where campus store managers and directors discuss:</p>
-          <ul>
-            <li>Real financial situations</li>
-            <li>Staffing challenges and expertise needs</li>
-            <li>Operational challenges and solutions</li>
-            <li>Strategic decisions and institutional requirements</li>
-          </ul>
-
-          <p>Everything discussed operates under "Traffic Light Protocol Red" - the highest level of confidentiality.</p>
-
-          <div style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 1em; margin: 1.5em 0;">
-            <p><strong>Breach of Confidentiality = Immediate Membership Termination</strong></p>
-            <p>Even accidental disclosure or sharing rumors will result in immediate termination of your institution's CSC membership with no appeals or refunds.</p>
-          </div>
-
-          <p>If you have any questions about this invitation or the summit, please contact:</p>
-          <p><a href="mailto:info@campusstores.ca">info@campusstores.ca</a></p>
-
-          <p>—<br>Campus Stores Canada</p>
-
-          <hr style="margin: 2em 0; border: none; border-top: 1px solid #dee2e6;">
-
-          <p style="font-size: 0.85em; color: #6c757d;">
-            <strong>Registration Link:</strong><br>
-            ${designeeUrl}
-          </p>
-
-          <p style="font-size: 0.85em; color: #6c757d;">
-            This link is unique to you and should not be shared. If you did not expect this invitation, please contact <a href="mailto:info@campusstores.ca">info@campusstores.ca</a>
-          </p>
-        `;
-
-        // Send email
-        const emailResult = await sendEmail({
-          to: designeeEmail,
-          subject: `You've Been Designated for the CSC Managers & Directors Summit`,
-          body: emailBody,
-          from: process.env.AWS_SES_SENDER_EMAIL || 'noreply@campusstores.ca'
-        });
-
-        if (emailResult.success) {
-          console.log('✅ Designee invitation email sent successfully');
-
-          // Update registration with invitation sent timestamp and checkbox
-          await fetch(`https://api.notion.com/v1/pages/${registrationId}`, {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${notionToken}`,
-              'Content-Type': 'application/json',
-              'Notion-Version': '2022-06-28'
-            },
-            body: JSON.stringify({
-              properties: {
-                "Designee Invitation Sent At": {
-                  date: { start: new Date().toISOString() }
-                },
-                "Designee Invitation Sent": {
-                  checkbox: true
-                }
+          if (tagId) {
+            // Get current contact to preserve existing tags
+            const contactResponse = await fetch(`https://api.notion.com/v1/pages/${designee.contactId}`, {
+              headers: {
+                'Authorization': `Bearer ${notionToken}`,
+                'Notion-Version': '2022-06-28'
               }
-            })
-          });
-        } else {
-          console.error('⚠️ Failed to send designee invitation email:', emailResult.error);
+            });
+
+            if (contactResponse.ok) {
+              const contactData = await contactResponse.json();
+              const existingTags = contactData.properties['Personal Tag']?.relation || [];
+
+              // Check if tag already exists
+              const hasTag = existingTags.some(tag => tag.id === tagId);
+
+              if (!hasTag) {
+                // Add new tag to existing tags
+                const updatedTags = [...existingTags, { id: tagId }];
+
+                await fetch(`https://api.notion.com/v1/pages/${designee.contactId}`, {
+                  method: 'PATCH',
+                  headers: {
+                    'Authorization': `Bearer ${notionToken}`,
+                    'Content-Type': 'application/json',
+                    'Notion-Version': '2022-06-28'
+                  },
+                  body: JSON.stringify({
+                    properties: {
+                      'Personal Tag': {
+                        relation: updatedTags
+                      }
+                    }
+                  })
+                });
+
+                console.log(`✅ Tagged ${designee.contact.name} with ${tagName}`);
+              } else {
+                console.log(`ℹ️ ${designee.contact.name} already has ${tagName} tag`);
+              }
+            }
+          }
+        } catch (error) {
+          console.error(`💥 Error tagging ${designee.contact.name}:`, error);
+          // Don't fail registration if tagging fails
         }
-      } catch (emailError) {
-        console.error('💥 Error sending designee email:', emailError);
-        // Don't fail the whole registration if email fails
+      }
+    }
+
+    // Step 8: Send designee invitation emails
+    if (hasDesignee && processedDesignees.length > 0) {
+      console.log(`📧 Sending invitation emails to ${processedDesignees.length} designee(s)...`);
+
+      const { sendEmail } = await import('./lib/resend-mailer.js');
+      const baseUrl = process.env.PRODUCTION_URL || 'https://summit26.campusstores.ca';
+
+      for (let i = 0; i < processedDesignees.length; i++) {
+        const designee = processedDesignees[i];
+        const designeeRegId = designeeRegistrationIds[i];
+
+        try {
+          const designeeUrl = `${baseUrl}/?token=${designee.token}`;
+          const designeeEmail = designee.contact.email || designee.contact.workEmail;
+
+          console.log(`📧 Sending to ${designee.contact.name} (${designeeEmail})`);
+
+          // Build email body
+          const emailBody = `
+            <h2>You've Been Designated to Attend the Managers & Directors Summit</h2>
+
+            <p>Hello ${designee.contact.name},</p>
+
+            <p>${organizationName} has designated you to attend the CSC Managers & Directors Summit.</p>
+
+            <h3>Your Attendance Format:</h3>
+            <p><strong>${designee.format === 'in-person' ? 'In-Person' : 'Virtual (Online)'}</strong></p>
+
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1em; margin: 1.5em 0;">
+              <p><strong>Important: This meeting requires strict confidentiality</strong></p>
+              <p>Before you can attend, you must review and sign a confidentiality agreement. This is not optional.</p>
+            </div>
+
+            <h3>Next Steps:</h3>
+            <ol>
+              <li>Click the link below to access your personalized registration form</li>
+              <li>Review the confidentiality agreement carefully</li>
+              <li>Sign the agreement and upload the signed PDF or image</li>
+              <li>Complete all required acknowledgments</li>
+            </ol>
+
+            <div style="text-align: center; margin: 2em 0;">
+              <a href="${designeeUrl}" style="background: #0071bc; color: white; padding: 1em 2em; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600;">
+                Complete Your Registration
+              </a>
+            </div>
+
+            <p><strong>This link will expire in 14 days.</strong> If you need a new link, please contact your primary member or <a href="mailto:info@campusstores.ca">info@campusstores.ca</a></p>
+
+            <h3>What is the Managers & Directors Summit?</h3>
+            <p>This is a highly confidential meeting where campus store managers and directors discuss:</p>
+            <ul>
+              <li>Real financial situations</li>
+              <li>Staffing challenges and expertise needs</li>
+              <li>Operational challenges and solutions</li>
+              <li>Strategic decisions and institutional requirements</li>
+            </ul>
+
+            <p>Everything discussed operates under "Traffic Light Protocol Red" - the highest level of confidentiality.</p>
+
+            <div style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 1em; margin: 1.5em 0;">
+              <p><strong>Breach of Confidentiality = Immediate Membership Termination</strong></p>
+              <p>Even accidental disclosure or sharing rumors will result in immediate termination of your institution's CSC membership with no appeals or refunds.</p>
+            </div>
+
+            <p>If you have any questions about this invitation or the summit, please contact:</p>
+            <p><a href="mailto:info@campusstores.ca">info@campusstores.ca</a></p>
+
+            <p>—<br>Campus Stores Canada</p>
+
+            <hr style="margin: 2em 0; border: none; border-top: 1px solid #dee2e6;">
+
+            <p style="font-size: 0.85em; color: #6c757d;">
+              <strong>Registration Link:</strong><br>
+              ${designeeUrl}
+            </p>
+
+            <p style="font-size: 0.85em; color: #6c757d;">
+              This link is unique to you and should not be shared. If you did not expect this invitation, please contact <a href="mailto:info@campusstores.ca">info@campusstores.ca</a>
+            </p>
+          `;
+
+          // Send email
+          const emailResult = await sendEmail({
+            to: designeeEmail,
+            subject: `You've Been Designated for the CSC Managers & Directors Summit`,
+            body: emailBody,
+            from: process.env.AWS_SES_SENDER_EMAIL || 'noreply@campusstores.ca'
+          });
+
+          if (emailResult.success) {
+            console.log(`✅ Invitation email sent to ${designee.contact.name}`);
+
+            // Update designee registration with invitation sent timestamp
+            await fetch(`https://api.notion.com/v1/pages/${designeeRegId}`, {
+              method: 'PATCH',
+              headers: {
+                'Authorization': `Bearer ${notionToken}`,
+                'Content-Type': 'application/json',
+                'Notion-Version': '2022-06-28'
+              },
+              body: JSON.stringify({
+                properties: {
+                  "Designee Invitation Sent At": {
+                    date: { start: new Date().toISOString() }
+                  },
+                  "Designee Invitation Sent": {
+                    checkbox: true
+                  }
+                }
+              })
+            });
+          } else {
+            console.error(`⚠️ Failed to send email to ${designee.contact.name}:`, emailResult.error);
+          }
+        } catch (emailError) {
+          console.error(`💥 Error sending email to ${designee.contact.name}:`, emailError);
+          // Don't fail the whole registration if email fails
+        }
       }
     }
 
@@ -674,11 +728,20 @@ export default async function handler(req, res) {
             <li><strong>Your Attendance:</strong> ${primaryIsAttending ? (primaryFormat === 'in-person' ? 'In-Person' : 'Virtual') : 'Not Attending'}</li>
         `;
 
-        if (hasDesignee && designeeContact) {
-          emailBody += `
-            <li><strong>Designee:</strong> ${designeeContact.name}</li>
-            <li><strong>Designee Attendance:</strong> ${designeeFormat === 'in-person' ? 'In-Person' : 'Virtual'}</li>
-          `;
+        if (hasDesignee && processedDesignees.length > 0) {
+          if (processedDesignees.length === 1) {
+            emailBody += `
+              <li><strong>Designee:</strong> ${processedDesignees[0].contact.name}</li>
+              <li><strong>Designee Attendance:</strong> ${processedDesignees[0].format === 'in-person' ? 'In-Person' : 'Virtual'}</li>
+            `;
+          } else {
+            emailBody += `<li><strong>Designees:</strong></li>`;
+            emailBody += `<ul>`;
+            processedDesignees.forEach(d => {
+              emailBody += `<li>${d.contact.name} - ${d.format === 'in-person' ? 'In-Person' : 'Virtual'}</li>`;
+            });
+            emailBody += `</ul>`;
+          }
         }
 
         emailBody += `
@@ -686,7 +749,7 @@ export default async function handler(req, res) {
 
           ${hasDesignee ? `
           <h3>Next Steps:</h3>
-          <p>${designeeContact.name} will receive a separate email with a unique link to complete their confidentiality agreement. Their registration will be pending until they complete this step.</p>
+          <p>${processedDesignees.length === 1 ? processedDesignees[0].contact.name + ' will receive a' : 'Each of your designees will receive a'} separate email with a unique link to complete their confidentiality agreement. Their registration will be pending until they complete this step.</p>
           ` : ''}
 
           <p>You will receive additional details about the summit closer to the event date.</p>
@@ -713,7 +776,8 @@ export default async function handler(req, res) {
       success: true,
       registrationId: registrationId,
       registrationTitle: registrationTitle,
-      designeeToken: designeeToken,
+      designeeTokens: processedDesignees.map(d => d.token),
+      designeeCount: processedDesignees.length,
       message: 'Registration submitted successfully'
     });
 

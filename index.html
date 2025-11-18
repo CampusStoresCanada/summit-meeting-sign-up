@@ -1431,31 +1431,31 @@
                 <div class="scroll-to-accept-container" id="certificationScrollContainer">
                     <div class="agreement-content">
                         <div class="summit-warning" style="margin-top: 0;">
-                            <p><strong>By designating <span id="certificationAlternateName"></span>, you certify the following:</strong></p>
+                            <p><strong>By designating <span id="certificationAlternateNames"></span>, you certify the following:</strong></p>
                         </div>
 
-                        <h3>Certification of Alternate Designee</h3>
+                        <h3 id="certificationHeading">Certification of Alternate Designee(s)</h3>
 
                         <p><strong>1. Confidentiality Understanding:</strong></p>
-                        <p>I certify that <span id="certificationAlternateName2"></span> fully understands the Traffic Light Protocol Red confidentiality requirements and will uphold them without exception.</p>
+                        <p id="certificationText1">I certify that my alternate(s) fully understand the Traffic Light Protocol Red confidentiality requirements and will uphold them without exception.</p>
 
                         <p><strong>2. Personal Responsibility:</strong></p>
-                        <p>I understand that I am personally responsible for the conduct of my designee, whether I attend the summit or not. Any breach of confidentiality by my designee will be treated as if I committed the breach myself.</p>
+                        <p id="certificationText2">I understand that I am personally responsible for the conduct of my alternate(s), whether I attend the summit or not. Any breach of confidentiality by my alternate(s) will be treated as if I committed the breach myself.</p>
 
                         <p><strong>3. Appropriate Level:</strong></p>
-                        <p>I certify that my designee is of appropriate management level to meaningfully contribute to strategic discussions about campus store operations, finances, and challenges.</p>
+                        <p id="certificationText3">I certify that my alternate(s) are of appropriate management level to meaningfully contribute to strategic discussions about campus store operations, finances, and challenges.</p>
 
                         <p><strong>4. Independent Participation:</strong></p>
-                        <p>I certify that my designee can share information and participate in discussions independently, without needing to clear things with me or their collective bargaining agreement.</p>
+                        <p id="certificationText4">I certify that my alternate(s) can share information and participate in discussions independently, without needing to clear things with me or their collective bargaining agreement.</p>
 
                         <p><strong>5. Board Discretion:</strong></p>
-                        <p>I understand and accept that the CSC Board reserves the right to exclude my designee if they determine that person cannot meaningfully contribute to the conversation.</p>
+                        <p id="certificationText5">I understand and accept that the CSC Board reserves the right to exclude my alternate(s) if they determine that person cannot meaningfully contribute to the conversation.</p>
 
                         <p><strong>6. No Refunds or Appeals:</strong></p>
-                        <p>I understand that if my designee is excluded for any reason, or if either of us breaches confidentiality, there will be no refunds and no appeals process.</p>
+                        <p id="certificationText6">I understand that if my alternate(s) are excluded for any reason, or if any of us breach confidentiality, there will be no refunds and no appeals process.</p>
 
                         <div class="summit-info" style="margin-top: 2em;">
-                            <p><strong>Next Step:</strong> After you sign this certification, <span id="emailAlternateName"></span> will receive an email with a unique link to complete their own confidentiality agreement.</p>
+                            <p id="certificationNextStep"><strong>Next Step:</strong> After you sign this certification, your alternate(s) will each receive an email with a unique link to complete their own confidentiality agreement.</p>
                         </div>
                     </div>
                     <div class="scroll-indicator" id="certificationScrollIndicator">
@@ -2741,30 +2741,126 @@
 
         // Step 6: Alternate Format
         function initializeStep6() {
-            const name = registrationState.designeeContact.name || 'your alternate';
-            document.getElementById('alternateNameDisplay').textContent = name;
+            const container = document.getElementById('designeeFormatsContainer');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            // Create format selection for each designee
+            registrationState.designeeContacts.forEach((designee, index) => {
+                const formatDiv = document.createElement('div');
+                formatDiv.className = 'designee-format-section';
+                formatDiv.style.marginBottom = '2em';
+                formatDiv.style.padding = '1.5em';
+                formatDiv.style.background = '#f8f9fa';
+                formatDiv.style.borderRadius = '8px';
+
+                formatDiv.innerHTML = `
+                    <h3 style="margin-top: 0;">${designee.name}</h3>
+                    <p style="font-weight: 600; margin-bottom: 1em;">How will they attend?</p>
+
+                    <div class="radio-group">
+                        <div class="radio-item" onclick="selectDesigneeFormat('${designee.id}', 'in-person')">
+                            <input type="radio" name="format_${designee.id}" id="format_${designee.id}_inperson" value="in-person">
+                            <label for="format_${designee.id}_inperson">
+                                In Person
+                                <div class="explanation-text">They will attend the summit in person at the Fallsview Sheraton Hotel, in Niagara Falls, Ontario</div>
+                            </label>
+                        </div>
+
+                        <div class="radio-item" onclick="selectDesigneeFormat('${designee.id}', 'virtual')">
+                            <input type="radio" name="format_${designee.id}" id="format_${designee.id}_virtual" value="virtual">
+                            <label for="format_${designee.id}_virtual">
+                                Virtual (Online)
+                                <div class="explanation-text">They will attend the summit remotely via video conference</div>
+                            </label>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(formatDiv);
+
+                // Pre-select if already chosen
+                if (registrationState.designeeFormats[designee.id]) {
+                    const format = registrationState.designeeFormats[designee.id];
+                    const radio = document.getElementById(`format_${designee.id}_${format === 'in-person' ? 'inperson' : 'virtual'}`);
+                    if (radio) {
+                        radio.checked = true;
+                        radio.parentElement.classList.add('selected');
+                    }
+                }
+            });
+
+            // Check if all formats are selected
+            updateStep6NextButton();
         }
 
-        function selectAlternateFormat(format) {
-            registrationState.designeeFormat = format;
+        function selectDesigneeFormat(designeeId, format) {
+            registrationState.designeeFormats[designeeId] = format;
 
-            document.querySelectorAll('input[name="alternateFormat"]').forEach(input => {
+            // Update UI
+            document.querySelectorAll(`input[name="format_${designeeId}"]`).forEach(input => {
                 input.parentElement.classList.remove('selected');
             });
 
-            const selectedRadio = document.getElementById(`alternateFormat${format === 'in-person' ? 'InPerson' : 'Virtual'}`);
-            selectedRadio.checked = true;
-            selectedRadio.parentElement.classList.add('selected');
+            const selectedRadio = document.getElementById(`format_${designeeId}_${format === 'in-person' ? 'inperson' : 'virtual'}`);
+            if (selectedRadio) {
+                selectedRadio.checked = true;
+                selectedRadio.parentElement.classList.add('selected');
+            }
 
-            document.getElementById('step6NextBtn').disabled = false;
+            updateStep6NextButton();
+        }
+
+        function updateStep6NextButton() {
+            const nextBtn = document.getElementById('step6NextBtn');
+            if (!nextBtn) return;
+
+            // Enable next button only if all designees have formats selected
+            const allSelected = registrationState.designeeContacts.every(d =>
+                registrationState.designeeFormats[d.id]
+            );
+
+            nextBtn.disabled = !allSelected;
         }
 
         // Step 7: Certification
         function initializeStep7() {
-            const name = registrationState.designeeContact.name || 'your alternate';
-            document.getElementById('certificationAlternateName').textContent = name;
-            document.getElementById('certificationAlternateName2').textContent = name;
-            document.getElementById('emailAlternateName').textContent = name;
+            const designees = registrationState.designeeContacts;
+            const isSingular = designees.length === 1;
+
+            // Format names for display
+            let namesList = '';
+            if (designees.length === 1) {
+                namesList = designees[0].name;
+            } else if (designees.length === 2) {
+                namesList = `${designees[0].name} and ${designees[1].name}`;
+            }
+
+            // Update the name display
+            document.getElementById('certificationAlternateNames').textContent = namesList;
+
+            // Update text to use proper singular/plural
+            if (isSingular) {
+                document.getElementById('certificationHeading').textContent = 'Certification of Alternate Designee';
+                document.getElementById('certificationText1').textContent = `I certify that ${designees[0].name} fully understands the Traffic Light Protocol Red confidentiality requirements and will uphold them without exception.`;
+                document.getElementById('certificationText2').textContent = 'I understand that I am personally responsible for the conduct of my designee, whether I attend the summit or not. Any breach of confidentiality by my designee will be treated as if I committed the breach myself.';
+                document.getElementById('certificationText3').textContent = 'I certify that my designee is of appropriate management level to meaningfully contribute to strategic discussions about campus store operations, finances, and challenges.';
+                document.getElementById('certificationText4').textContent = 'I certify that my designee can share information and participate in discussions independently, without needing to clear things with me or their collective bargaining agreement.';
+                document.getElementById('certificationText5').textContent = 'I understand and accept that the CSC Board reserves the right to exclude my designee if they determine that person cannot meaningfully contribute to the conversation.';
+                document.getElementById('certificationText6').textContent = 'I understand that if my designee is excluded for any reason, or if either of us breaches confidentiality, there will be no refunds and no appeals process.';
+                document.getElementById('certificationNextStep').innerHTML = `<strong>Next Step:</strong> After you sign this certification, ${designees[0].name} will receive an email with a unique link to complete their own confidentiality agreement.`;
+            } else {
+                // Plural - keep the generic language
+                document.getElementById('certificationHeading').textContent = 'Certification of Alternate Designees';
+                document.getElementById('certificationText1').textContent = 'I certify that my alternates fully understand the Traffic Light Protocol Red confidentiality requirements and will uphold them without exception.';
+                document.getElementById('certificationText2').textContent = 'I understand that I am personally responsible for the conduct of my alternates, whether I attend the summit or not. Any breach of confidentiality by my alternates will be treated as if I committed the breach myself.';
+                document.getElementById('certificationText3').textContent = 'I certify that my alternates are of appropriate management level to meaningfully contribute to strategic discussions about campus store operations, finances, and challenges.';
+                document.getElementById('certificationText4').textContent = 'I certify that my alternates can share information and participate in discussions independently, without needing to clear things with me or their collective bargaining agreement.';
+                document.getElementById('certificationText5').textContent = 'I understand and accept that the CSC Board reserves the right to exclude my alternates if they determine that person cannot meaningfully contribute to the conversation.';
+                document.getElementById('certificationText6').textContent = 'I understand that if my alternates are excluded for any reason, or if any of us breach confidentiality, there will be no refunds and no appeals process.';
+                document.getElementById('certificationNextStep').innerHTML = '<strong>Next Step:</strong> After you sign this certification, each of your alternates will receive an email with a unique link to complete their own confidentiality agreement.';
+            }
         }
 
         async function handleCertificationUpload(event) {
@@ -2793,25 +2889,36 @@
             let message = '';
             let nextSteps = '';
 
-            if (registrationState.primaryIsAttending && registrationState.hasDesignee) {
+            const designees = registrationState.designeeContacts;
+            const hasDesignees = designees.length > 0;
+
+            if (registrationState.primaryIsAttending && hasDesignees) {
                 // Both attending
+                const designeeNames = designees.length === 1 ? designees[0].name : designees.map(d => d.name).join(' and ');
+                const designeeList = designees.map(d => {
+                    const format = registrationState.designeeFormats[d.id];
+                    return `<li><strong>${d.name}'s attendance:</strong> ${format === 'in-person' ? 'In-Person' : 'Virtual'}</li>`;
+                }).join('');
+
                 message = `
-                    <p><strong>Registration confirmed for both you and ${registrationState.designeeContact.name}.</strong></p>
-                    <p>Both of you will attend the Managers & Directors Summit.</p>
+                    <p><strong>Registration confirmed for you and ${designeeNames}.</strong></p>
+                    <p>All of you will attend the Managers & Directors Summit.</p>
                     <ul>
                         <li><strong>Your attendance:</strong> ${registrationState.primaryFormat === 'in-person' ? 'In-Person' : 'Virtual'}</li>
-                        <li><strong>${registrationState.designeeContact.name}'s attendance:</strong> ${registrationState.designeeFormat === 'in-person' ? 'In-Person' : 'Virtual'}</li>
+                        ${designeeList}
                     </ul>
                 `;
+
+                const designeeText = designees.length === 1 ? designees[0].name + ' will receive an email' : 'Each of your alternates will receive an email';
                 nextSteps = `
                     <p><strong>Next Steps:</strong></p>
                     <ul>
-                        <li>${registrationState.designeeContact.name} will receive an email with a unique link to complete their confidentiality agreement</li>
-                        <li>You will both receive confirmation emails with meeting details</li>
+                        <li>${designeeText} with a unique link to complete their confidentiality agreement</li>
+                        <li>You will all receive confirmation emails with meeting details</li>
                         <li>Calendar invitations will be sent closer to the event date</li>
                     </ul>
                 `;
-            } else if (registrationState.primaryIsAttending && !registrationState.hasDesignee) {
+            } else if (registrationState.primaryIsAttending && !hasDesignees) {
                 // Primary only
                 message = `
                     <p><strong>Registration confirmed!</strong></p>
@@ -2825,18 +2932,31 @@
                         ${registrationState.primaryFormat === 'virtual' ? '<li>Virtual attendance link and technical setup instructions will be provided</li>' : ''}
                     </ul>
                 `;
-            } else if (!registrationState.primaryIsAttending && registrationState.hasDesignee) {
-                // Designee only
+            } else if (!registrationState.primaryIsAttending && hasDesignees) {
+                // Designee(s) only
+                const designeeNames = designees.length === 1 ? designees[0].name : designees.map(d => d.name).join(' and ');
+                const designeeList = designees.map(d => {
+                    const format = registrationState.designeeFormats[d.id];
+                    return `<li><strong>${d.name}:</strong> ${format === 'in-person' ? 'In-Person' : 'Virtual'}</li>`;
+                }).join('');
+
                 message = `
-                    <p><strong>Registration confirmed for ${registrationState.designeeContact.name}.</strong></p>
-                    <p>They will attend the Managers & Directors Summit ${registrationState.designeeFormat === 'in-person' ? 'in person' : 'virtually'} on behalf of your institution.</p>
+                    <p><strong>Registration confirmed for ${designeeNames}.</strong></p>
+                    <p>${designees.length === 1 ? 'They' : 'They'} will attend the Managers & Directors Summit on behalf of your institution.</p>
+                    <ul>
+                        ${designeeList}
+                    </ul>
                 `;
+
+                const designeeText = designees.length === 1 ? designees[0].name + ' will receive an email' : 'Each of your alternates will receive an email';
+                const completionText = designees.length === 1 ? 'Once they complete their agreement, both you and they will receive confirmation' : 'Once they complete their agreements, you and all alternates will receive confirmation';
+
                 nextSteps = `
                     <p><strong>Next Steps:</strong></p>
                     <ul>
-                        <li>${registrationState.designeeContact.name} will receive an email with a unique link to complete their confidentiality agreement</li>
-                        <li>Once they complete their agreement, both you and they will receive confirmation</li>
-                        <li>They will receive all meeting details and calendar invitations</li>
+                        <li>${designeeText} with a unique link to complete their confidentiality agreement</li>
+                        <li>${completionText}</li>
+                        <li>${designees.length === 1 ? 'They' : 'They'} will receive all meeting details and calendar invitations</li>
                     </ul>
                 `;
             } else {
@@ -3058,6 +3178,13 @@
                     });
                 } else {
                     // Submit primary member registration
+                    // Prepare designee data - each designee gets their format from designeeFormats
+                    const designeesData = registrationState.designeeContacts.map(designee => ({
+                        contact: designee,
+                        format: registrationState.designeeFormats[designee.id],
+                        isNew: registrationState.newDesignees.some(nd => nd.id === designee.id)
+                    }));
+
                     response = await fetch('/api/submit-summit-registration', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -3070,10 +3197,8 @@
                             tlpRedSignatureUrl: uploadedFiles.tlpRedAgreement,
                             employmentSignatureUrl: uploadedFiles.employmentAgreement,
                             virtualProtocolSignatureUrl: uploadedFiles.virtualProtocol || null,
-                            hasDesignee: registrationState.hasDesignee,
-                            designeeContact: registrationState.designeeContact,
-                            designeeIsNew: registrationState.designeeIsNew || false,
-                            designeeFormat: registrationState.designeeFormat,
+                            hasDesignee: registrationState.designeeContacts.length > 0,
+                            designees: designeesData,
                             certificationUrl: uploadedFiles.certification
                         })
                     });

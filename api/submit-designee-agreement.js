@@ -77,13 +77,16 @@ export default async function handler(req, res) {
 
     // Step 3: Update registration with designee signatures and acknowledgments
     const updateProperties = {
-      "Designee TLP Red Signature URL": {
+      "Designee Agreement URL": {  // Use existing property instead of TLP Red Signature URL
         url: tlpRedSignatureUrl
       },
       "Designee Employment Signature URL": {
         url: employmentSignatureUrl
       },
       "Designee Breach Acknowledgment": {
+        checkbox: true
+      },
+      "Designee Agreement Signed": {
         checkbox: true
       },
       "Designee Registration Complete": {

@@ -66,6 +66,7 @@ export default async function handler(req, res) {
 
     const registration = regData.results[0];
     console.log('✅ Found registration:', registration.id);
+    console.log('📋 Available properties in registration:', Object.keys(registration.properties).sort());
 
     // Step 2: Check if token is expired
     const expiresDate = registration.properties["Designee Token Expires"]?.date?.start;
@@ -124,7 +125,9 @@ export default async function handler(req, res) {
       const errorData = await updateResponse.json();
       console.error('❌ Failed to update registration:', errorData);
       console.error('❌ Notion error details:', JSON.stringify(errorData, null, 2));
-      throw new Error(`Failed to update registration: ${errorData.message || JSON.stringify(errorData)}`);
+      const availableProps = Object.keys(registration.properties).sort();
+      console.error('❌ Available properties:', availableProps);
+      throw new Error(`Failed to update registration: ${errorData.message || JSON.stringify(errorData)}. Available properties: ${availableProps.join(', ')}`);
     }
 
     console.log('✅ Updated registration with designee agreement');

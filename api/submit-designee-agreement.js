@@ -123,7 +123,8 @@ export default async function handler(req, res) {
     if (!updateResponse.ok) {
       const errorData = await updateResponse.json();
       console.error('❌ Failed to update registration:', errorData);
-      throw new Error('Failed to update registration');
+      console.error('❌ Notion error details:', JSON.stringify(errorData, null, 2));
+      throw new Error(`Failed to update registration: ${errorData.message || JSON.stringify(errorData)}`);
     }
 
     console.log('✅ Updated registration with designee agreement');

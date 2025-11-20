@@ -232,9 +232,14 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('💥 Error submitting designee agreement:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       error: 'Failed to submit agreement',
-      details: error.message
+      details: error.message,
+      errorName: error.name,
+      errorStack: error.stack
     });
   }
 }

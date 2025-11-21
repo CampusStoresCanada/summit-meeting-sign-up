@@ -1610,6 +1610,12 @@
                     registrationState.primaryIsAttending = true;
 
                     console.log('✅ Loaded designee data:', primaryMemberContact?.name);
+
+                    // Mark step 3 as skipped for designees (they don't designate alternates)
+                    const step3Indicator = document.querySelector('.step-indicator[data-step="3"]');
+                    if (step3Indicator) {
+                        step3Indicator.classList.add('skipped');
+                    }
                 } else {
                     // Load organization data (primary member flow)
                     const response = await fetch(`/api/get-organization?token=${token}`);
@@ -3212,6 +3218,14 @@
                         section.classList.remove('active');
                     });
                     document.getElementById('step8Section').classList.add('active');
+
+                    // Mark step 4 as completed on confirmation
+                    const step4Indicator = document.querySelector('.step-indicator[data-step="4"]');
+                    if (step4Indicator) {
+                        step4Indicator.classList.remove('active');
+                        step4Indicator.classList.add('completed');
+                    }
+
                     hideLoading();
                 } else {
                     throw new Error(result.error || 'Submission failed');

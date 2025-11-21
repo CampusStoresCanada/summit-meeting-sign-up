@@ -264,6 +264,16 @@ body::before {
     font-size: 1.1em;
 }
 
+.step-indicator.skipped {
+    opacity: 0.4;
+    text-decoration: line-through;
+}
+
+.step-indicator.skipped .step-number {
+    background: #999;
+    color: white;
+}
+
 .step-number {
     width: 32px;
     height: 32px;

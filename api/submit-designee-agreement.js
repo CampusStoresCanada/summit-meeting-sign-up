@@ -86,6 +86,9 @@ export default async function handler(req, res) {
       "Designee Breach Acknowledgment": {
         checkbox: true
       },
+      "Designee Agreement Signed": {
+        checkbox: true
+      },
       "Designee Registration Complete": {
         checkbox: true
       },
